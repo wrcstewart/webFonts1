@@ -73,6 +73,7 @@ let dummy =1;
       if (scaleNote >= 0) return (midiBaseNote + RelativeMidiNumOfHMScalePositive[scaleNote]);
       if (scaleNote < 0) return (midiBaseNote + RelativeMidiNumOfHMScaleNegative[-scaleNote]);
     }
+    //comment
 
     function getMidiNoteFromName(noteName) {
       return (notes.indexOf(noteName) + 21)

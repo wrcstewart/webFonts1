@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+
+
+<head>
+  <meta charset="UTF-8">
+  <script src='https://surikov.github.io/webaudiofont/npm/dist/WebAudioFontPlayer.js'></script>
+  <script src='https://surikov.github.io/webaudiofontdata/sound/0000_JCLive_sf2_file.js'></script>
+  <script src='https://surikov.github.io/webaudiofontdata/sound/0730_Aspirin_sf2_file.js'></script>
+  <script src='https://surikov.github.io/webaudiofontdata/sound/12847_0_Chaos_sf2_file.js'></script>
+
+  <script>
+    window.playState = false;
+
+    var noteNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];//used to construct notes[] below
+    var notes = []; // this allows easy look up of note name to midi number - but based with A0 = 0
+    // a function will add 21 to give the correct official midi number of the notes.
+    // the true note names are only used once per generative run - to allow user to enter start note.
+    var notesIx = 3;//index 3 will correspond to the first C
+
+    for (let octave = 1; octave <= 7; octave++) {
+      for (let noteNamesIx = 0; noteNamesIx <= 11; noteNamesIx++) {
+        notes[notesIx] = noteNames[noteNamesIx] + octave;
+        notesIx++;
+      }
+    }
+    //now fill in those notes not covered.
+    notes[0] = "A0";
+    notes[1] = "A#0";
+    notes[2] = "B0";
+    notes[87] = "C8";
+
+    var probs = [0.2, 0.3, 0.2, 0.1, 0.05, .05, 0.05, 0.05];
+    //prob of jumping up or down by the index 0 to 7 corresponding to scale notes;
+    //var cumulativeProbs = [0.0, 0.2, 0.5, 0.7, 0.8, 0.85, 0.9, 0.95, 1.0];
+
+    function generateCumulativeArray(arr){
+      let cumArr = [];
+      let sum =0;
+      for(let i=0;i <arr.length; i++){
+        cumArr[i] = sum;
+        sum = sum + arr[i]
+      }
+cumArr[arr.length] = sum;
+      return(cumArr)
+    }
+
+    var cumulativeProbs = generateCumulativeArray(probs);
+
+let dummy =1;
+
+    function stepScale8() { //compute a random step size in a scale of 8 notes
+      let i;
+      let cumP = Math.random();
+      for (i = 0; i <= 7; i++) if (cumulativeProbs[i + 1] >= cumP) break;
+      return (i);
+    }
+
+    function newNoteScale8(oldNoteScale8) {
+      let step = stepScale8();
+      // the next function determines whether the step should be positive, negative or 0
+      let limit = 8; //max scale notes excursion
+      if ((oldNoteScale8 + step) > limit) return (oldNoteScale8 - step);
+      if ((oldNoteScale8 - step) < -limit) return (oldNoteScale8 + step);
+      if (Math.random() < 0.5) return (oldNoteScale8 - step);
+      return (oldNoteScale8 + step)
+    }
+
+    RelativeMidiNumOfHMScalePositive = [0, 2, 3, 5, 7, 8, 11, 12,14,15,17];
+    RelativeMidiNumOfHMScaleNegative = [0, -1, -4, -5, -7, -9, -10, -12,-13,-16,-17];
+
+    function getMidiNote(scaleNote, midiBaseNote) {
+      if (scaleNote >= 0) return (midiBaseNote + RelativeMidiNumOfHMScalePositive[scaleNote]);
+      if (scaleNote < 0) return (midiBaseNote + RelativeMidiNumOfHMScaleNegative[-scaleNote]);
+    }
+
+    function getMidiNoteFromName(noteName) {
+      return (notes.indexOf(noteName) + 21)
+    }
+
+    var audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    var player = new WebAudioFontPlayer();
+    //player.loader.decodeAfterLoading(audioContext,'_tone_0000_JCLive_sf2_file' );
+    player.loader.decodeAfterLoading(audioContext, '_tone_0730_Aspirin_sf2_file');
+    player.loader.decodeAfterLoading(audioContext, '_drum_47_0_Chaos_sf2_file')
+
+    let origin;
+    let tonicNoteString;
+    let midiBaseNote;
+    let midiNote;
+    let oldNoteScale;
+    let newNoteScale;
+    let count;
+    let len;
+    let midiNoteArray =[];
+
+
+    function playOuter() {
+
+      if (window.playState) {
+        player.cancelQueue(audioContext);
+        alert("queue cancelled");
+        window.playState = false;
+        return;
+      }
+      window.playState = true;
+
+      origin = audioContext.currentTime;
+      tonicNoteString = "C4";
+      midiBaseNote = getMidiNoteFromName(tonicNoteString);
+      midiNote = midiBaseNote; //this will be played and updated in loop
+      oldNoteScale = 0;
+      newNoteScale = 0;
+      count = 1;
+      len = 10;
+      player.cancelQueue(audioContext);
+      let out="";
+      while (count <= len) {
+
+            midiNoteArray[count] = midiNote;
+
+        player.queueWaveTable(
+          audioContext, audioContext.destination, _tone_0730_Aspirin_sf2_file, origin + 1.5 * count, midiNote, 1.0);
+
+        newNoteScale = newNoteScale8(oldNoteScale);
+        out = out + "     " + newNoteScale +" ";
+         document.getElementById("ta1").innerText = out;
+//alert(""+ newNoteScale);
+        midiNote = getMidiNote(newNoteScale, midiBaseNote);
+        out = out +midiNote;
+        //       alert("" + midiNote);
+
+
+        oldNoteScale = newNoteScale;
+
+
+        count++;
+      }
+      count =1;
+      while (count <= len) {
+        player.queueWaveTable(
+          audioContext, audioContext.destination,
+          _tone_0730_Aspirin_sf2_file, origin + 1.5 * (len+count), midiNoteArray[1+len-count], 1.0);
+
+
+count++
+      }
+
+
+    }
+
+  </script>
+</head>
+
+<body>
+<p><a href='javascript:playOuter();'>Hello, world!</a></p>
+<textarea id="ta1"> test text</textarea>
+</body>

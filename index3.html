@@ -34,20 +34,20 @@
     //prob of jumping up or down by the index 0 to 7 corresponding to scale notes;
     //var cumulativeProbs = [0.0, 0.2, 0.5, 0.7, 0.8, 0.85, 0.9, 0.95, 1.0];
 
-    function generateCumulativeArray(arr){
+    function generateCumulativeArray(arr) {
       let cumArr = [];
-      let sum =0;
-      for(let i=0;i <arr.length; i++){
+      let sum = 0;
+      for (let i = 0; i < arr.length; i++) {
         cumArr[i] = sum;
         sum = sum + arr[i]
       }
-cumArr[arr.length] = sum;
-      return(cumArr)
+      cumArr[arr.length] = sum;
+      return (cumArr)
     }
 
     var cumulativeProbs = generateCumulativeArray(probs);
 
-let dummy =1;
+    //let dummy =1;
 
     function stepScale8() { //compute a random step size in a scale of 8 notes
       let i;
@@ -66,13 +66,14 @@ let dummy =1;
       return (oldNoteScale8 + step)
     }
 
-    RelativeMidiNumOfHMScalePositive = [0, 2, 3, 5, 7, 8, 11, 12,14,15,17];
-    RelativeMidiNumOfHMScaleNegative = [0, -1, -4, -5, -7, -9, -10, -12,-13,-16,-17];
+    RelativeMidiNumOfHMScalePositive = [0, 2, 3, 5, 7, 8, 11, 12, 14, 15, 17];
+    RelativeMidiNumOfHMScaleNegative = [0, -1, -4, -5, -7, -9, -10, -12, -13, -16, -17];
 
     function getMidiNote(scaleNote, midiBaseNote) {
       if (scaleNote >= 0) return (midiBaseNote + RelativeMidiNumOfHMScalePositive[scaleNote]);
       if (scaleNote < 0) return (midiBaseNote + RelativeMidiNumOfHMScaleNegative[-scaleNote]);
     }
+
     //comment
 
     function getMidiNoteFromName(noteName) {
@@ -85,15 +86,28 @@ let dummy =1;
     player.loader.decodeAfterLoading(audioContext, '_tone_0730_Aspirin_sf2_file');
     player.loader.decodeAfterLoading(audioContext, '_drum_47_0_Chaos_sf2_file')
 
-    let origin;
+    var origin;
     let tonicNoteString;
     let midiBaseNote;
     let midiNote;
     let oldNoteScale;
     let newNoteScale;
-    let count;
-    let len;
-    let midiNoteArray =[];
+    var count;
+    var len;
+    var midiNoteArray = [];
+    var oldNoteScaleArray = [];
+    var midiPitchArr = [];
+
+    function createMidiPitchArr(midiNoteArr, oldNoteScaleArr) {
+      let midiPitchArr = [];
+      let len = midiNoteArr.length;
+
+      for (let i = 0; i <= len; i++) {
+        midiPitchArr[i] = midiNoteArr[i];
+      }
+
+      return (midiPitchArr);
+    }// try this first for player
 
 
     function playOuter() {
@@ -113,22 +127,25 @@ let dummy =1;
       oldNoteScale = 0;
       newNoteScale = 0;
       count = 1;
-      len = 10;
+      let nGen = 10;//num generated notes
       player.cancelQueue(audioContext);
-      let out="";
-      while (count <= len) {
+      let out = "";
+      midiNoteArray[0] = midiBaseNote;
+      oldNoteScaleArray[0] = 0;
+      while (count <= nGen) {
 
-            midiNoteArray[count] = midiNote;
+        midiNoteArray[count] = midiNote;
+        oldNoteScaleArray[count] = oldNoteScale;
 
-        player.queueWaveTable(
-          audioContext, audioContext.destination, _tone_0730_Aspirin_sf2_file, origin + 1.5 * count, midiNote, 1.0);
+        //player.queueWaveTable(
+          //audioContext, audioContext.destination, _tone_0730_Aspirin_sf2_file, origin + 0.75 * count, midiNote, 0.5);
 
         newNoteScale = newNoteScale8(oldNoteScale);
-        out = out + "     " + newNoteScale +" ";
-         document.getElementById("ta1").innerText = out;
+        out = out + "     " + newNoteScale + " ";
+        document.getElementById("ta1").innerText = out;
 //alert(""+ newNoteScale);
         midiNote = getMidiNote(newNoteScale, midiBaseNote);
-        out = out +midiNote;
+        out = out + midiNote;
         //       alert("" + midiNote);
 
 
@@ -137,17 +154,21 @@ let dummy =1;
 
         count++;
       }
-      count =1;
-      while (count <= len) {
+let dummy2 =9;
+
+      var midiPitchArray = createMidiPitchArr(midiNoteArray,oldNoteScaleArray)
+     count = 0;
+
+
+     while (count <= nGen) {
+
         player.queueWaveTable(
-          audioContext, audioContext.destination,
-          _tone_0730_Aspirin_sf2_file, origin + 1.5 * (len+count), midiNoteArray[1+len-count], 1.0);
+          audioContext, audioContext.destination, _tone_0730_Aspirin_sf2_file, origin + 0.75 * count, midiPitchArray[count], 0.5);
 
 
-count++
+        count++;
+
       }
-
-
     }
 
   </script>

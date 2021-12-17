@@ -8,8 +8,17 @@
   <script src='https://surikov.github.io/webaudiofontdata/sound/0000_JCLive_sf2_file.js'></script>
   <script src='https://surikov.github.io/webaudiofontdata/sound/0730_Aspirin_sf2_file.js'></script>
   <script src='https://surikov.github.io/webaudiofontdata/sound/12847_0_Chaos_sf2_file.js'></script>
+  <script src='https://surikov.github.io/webaudiofontdata/sound/0760_Aspirin_sf2_file.js'></script>
+
 
   <script>
+
+    class MonoNotes {
+      constructor(t,p,d){
+        this.t = t;this.p = p;this.d = d;
+      }
+    }
+
     window.playState = false;
 
     var noteNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];//used to construct notes[] below
@@ -62,8 +71,9 @@
       let limit = 8; //max scale notes excursion
       if ((oldNoteScale8 + step) > limit) return (oldNoteScale8 - step);
       if ((oldNoteScale8 - step) < -limit) return (oldNoteScale8 + step);
-      if (Math.random() < 0.5) return (oldNoteScale8 - step);
-      return (oldNoteScale8 + step)
+
+      if (Math.random() <= 0.5) return (oldNoteScale8 - step);
+      return (oldNoteScale8 + step);
     }
 
     RelativeMidiNumOfHMScalePositive = [0, 2, 3, 5, 7, 8, 11, 12, 14, 15, 17];
@@ -85,6 +95,8 @@
     //player.loader.decodeAfterLoading(audioContext,'_tone_0000_JCLive_sf2_file' );
     player.loader.decodeAfterLoading(audioContext, '_tone_0730_Aspirin_sf2_file');
     player.loader.decodeAfterLoading(audioContext, '_drum_47_0_Chaos_sf2_file')
+    player.loader.decodeAfterLoading(audioContext, '_tone_0760_Aspirin_sf2_file')
+
 
     var origin;
     /*let tonicNoteString;
@@ -109,12 +121,12 @@
       return (notePitchArray);
     }// try this first for player*/
 
-    function createNoteStartArray(midiNoteArray, origin, multiplier) {
+    function createNoteStartArray(midiNoteArray,  multiplier) {
 // multiplier is step between notes in seconds
       let noteStartArray = [];
       let len = midiNoteArray.length;
       for (let i = 0; i < len; i++) {
-        noteStartArray[i] = origin + (i * multiplier);
+        noteStartArray[i] =  (i * multiplier);
       }
       return (noteStartArray);
     }
@@ -198,30 +210,43 @@
 
       var notePitchArray1 = createNotePitchArray("C4", 20);
       origin = audioContext.currentTime;
-      var noteStartArray1 = createNoteStartArray(notePitchArray1, origin, 1.5);
+      var noteStartArray1 = createNoteStartArray(notePitchArray1, 1.5);
       var noteDurationArray1 = createNoteDurationArray(notePitchArray1,1.5,0.95);
+      var n1 = MonoNotes(noteStartArray1,notePitchArray1, noteDurationArray1);
 
      dummy2 = 9;
       count = 0;
 
       while (count < notePitchArray1.length) {
         player.queueWaveTable(
-          audioContext, audioContext.destination, _tone_0730_Aspirin_sf2_file, noteStartArray1[count],
-          notePitchArray1[count], noteDurationArray1[count] );
+          audioContext, audioContext.destination, _tone_0730_Aspirin_sf2_file, origin + n1.t[count],
+          n1.p[count], noteDurationArray1[count] );
         count++;
       }
 
-      var notePitchArray2 = createNotePitchArray("G3", 20);
+       function createTransposedPitchArray(notePitchArray,semitoneShift){
+        let len = notePitchArray.length;
+        let result = [];
+        for(let i=0;i<len;i++) result[i] = notePitchArray[i] + semitoneShift;
+        return (result)
+      }
+
+      var notePitchArray2 =  createTransposedPitchArray(notePitchArray1,3)
+
       //origin = audioContext.currentTime;
-      var noteStartArray2 = createNoteStartArray(notePitchArray2, origin, 1.5);
+      var noteStartArray2 = createNoteStartArray(notePitchArray2, 1.5);
       var noteDurationArray2 = createNoteDurationArray(notePitchArray2,1.5,0.95);
 
+
+
+
+
      //dummy2 = 9;
-      count = 0;
+       count = 0;
 
       while (count < notePitchArray2.length) {
         player.queueWaveTable(
-          audioContext, audioContext.destination, _tone_0730_Aspirin_sf2_file, noteStartArray2[count],
+          audioContext, audioContext.destination,_tone_0760_Aspirin_sf2_file, origin +noteStartArray2[count],
           notePitchArray2[count], noteDurationArray2[count] );
         count++;
       }

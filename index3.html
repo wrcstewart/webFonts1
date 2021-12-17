@@ -87,7 +87,7 @@
     player.loader.decodeAfterLoading(audioContext, '_drum_47_0_Chaos_sf2_file')
 
     var origin;
-    let tonicNoteString;
+    /*let tonicNoteString;
     let midiBaseNote;
     let midiNote;
     let oldNoteScale;
@@ -96,18 +96,56 @@
     var len;
     var midiNoteArray = [];
     var oldNoteScaleArray = [];
-    var midiPitchArr = [];
+    var midiPitchArr = [];*/
 
-    function createMidiPitchArr(midiNoteArr, oldNoteScaleArr) {
-      let midiPitchArr = [];
+    /*function createNotePitchArray(midiNoteArr, oldNoteScaleArr) {
+      let notePitchArray = [];
       let len = midiNoteArr.length;
 
-      for (let i = 0; i <= len; i++) {
-        midiPitchArr[i] = midiNoteArr[i];
+      for (let i = 0; i < len; i++) {
+        notePitchArray[i] = midiNoteArr[i];
       }
 
-      return (midiPitchArr);
-    }// try this first for player
+      return (notePitchArray);
+    }// try this first for player*/
+
+    function createNoteStartArray(midiNoteArray, origin, multiplier) {
+// multiplier is step between notes in seconds
+      let noteStartArray = [];
+      let len = midiNoteArray.length;
+      for (let i = 0; i < len; i++) {
+        noteStartArray[i] = origin + (i * multiplier);
+      }
+      return (noteStartArray);
+    }
+
+
+    function createNoteDurationArray(midiNoteArray, multiplier, noteLength) {
+      let duration = multiplier * noteLength;
+      let noteDurationArray = [];
+      let len = midiNoteArray.length;
+      for (let i = 0; i < len; i++) {
+        noteDurationArray[i] = duration;
+      }
+      return (noteDurationArray);
+    }
+
+    function createNotePitchArray(tonicNoteName,len){
+     let midiBaseNote = getMidiNoteFromName(tonicNoteName);
+
+     let midiNoteArray = [];
+     let oldNoteScale = 0;
+     let newNoteScale = 0;
+     midiNoteArray[0] = midiBaseNote;
+     let count = 1
+       while (count < len ) {
+       newNoteScale = newNoteScale8(oldNoteScale);
+       midiNoteArray[count] = getMidiNote(newNoteScale, midiBaseNote);
+       oldNoteScale = newNoteScale;
+       count++;
+       }
+       return( midiNoteArray)
+    }
 
 
     function playOuter() {
@@ -120,16 +158,16 @@
       }
       window.playState = true;
 
-      origin = audioContext.currentTime;
+      /*origin = audioContext.currentTime;
       tonicNoteString = "C4";
       midiBaseNote = getMidiNoteFromName(tonicNoteString);
       midiNote = midiBaseNote; //this will be played and updated in loop
       oldNoteScale = 0;
       newNoteScale = 0;
       count = 1;
-      let nGen = 10;//num generated notes
+      let nGen = 10;//num generated notes*/
       player.cancelQueue(audioContext);
-      let out = "";
+      /*let out = "";
       midiNoteArray[0] = midiBaseNote;
       oldNoteScaleArray[0] = 0;
       while (count <= nGen) {
@@ -138,7 +176,7 @@
         oldNoteScaleArray[count] = oldNoteScale;
 
         //player.queueWaveTable(
-          //audioContext, audioContext.destination, _tone_0730_Aspirin_sf2_file, origin + 0.75 * count, midiNote, 0.5);
+        //audioContext, audioContext.destination, _tone_0730_Aspirin_sf2_file, origin + 0.75 * count, midiNote, 0.5);
 
         newNoteScale = newNoteScale8(oldNoteScale);
         out = out + "     " + newNoteScale + " ";
@@ -153,22 +191,42 @@
 
 
         count++;
-      }
-let dummy2 =9;
-
-      var midiPitchArray = createMidiPitchArr(midiNoteArray,oldNoteScaleArray)
-     count = 0;
+      }*/
+      let dummy2 = 9;
 
 
-     while (count <= nGen) {
 
+      var notePitchArray1 = createNotePitchArray("C4", 20);
+      origin = audioContext.currentTime;
+      var noteStartArray1 = createNoteStartArray(notePitchArray1, origin, 1.5);
+      var noteDurationArray1 = createNoteDurationArray(notePitchArray1,1.5,0.95);
+
+     dummy2 = 9;
+      count = 0;
+
+      while (count < notePitchArray1.length) {
         player.queueWaveTable(
-          audioContext, audioContext.destination, _tone_0730_Aspirin_sf2_file, origin + 0.75 * count, midiPitchArray[count], 0.5);
-
-
+          audioContext, audioContext.destination, _tone_0730_Aspirin_sf2_file, noteStartArray1[count],
+          notePitchArray1[count], noteDurationArray1[count] );
         count++;
-
       }
+
+      var notePitchArray2 = createNotePitchArray("G3", 20);
+      //origin = audioContext.currentTime;
+      var noteStartArray2 = createNoteStartArray(notePitchArray2, origin, 1.5);
+      var noteDurationArray2 = createNoteDurationArray(notePitchArray2,1.5,0.95);
+
+     //dummy2 = 9;
+      count = 0;
+
+      while (count < notePitchArray2.length) {
+        player.queueWaveTable(
+          audioContext, audioContext.destination, _tone_0730_Aspirin_sf2_file, noteStartArray2[count],
+          notePitchArray2[count], noteDurationArray2[count] );
+        count++;
+      }
+
+
     }
 
   </script>

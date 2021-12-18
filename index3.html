@@ -25,6 +25,22 @@
       }
     }
 
+    class MonoNotesStr{
+
+      constructor(mn){
+        this.mn =mn;
+        this.l = mn.l;
+        let len = this.l;
+        this.i = mn.i;
+        let str = "|music|";
+        str += "this.i" + "|";
+        for (let i =0;i<len;i++){
+          str += mn.t[i] + " " + mn.p[i] + " " + mn.d[i] +"|";
+        }
+        this.s = str;
+      }
+    }
+
     function reflectMonoNotes(mn){ // return a new monoNote that appends a reversed version to end to input
 
       let at =[];let ap =[]; let ad = [];
@@ -85,7 +101,7 @@
     notes[2] = "B0";
     notes[87] = "C8";
 
-    var probs = [0.1, 0.3, 0.3, 0.1, 0.05, .05, 0.05, 0.05];
+    var probs = [0.1, 0.4, 0.3, 0.1, 0.025, 0.025, 0.025, 0.025];
     //prob of jumping up or down by the index 0 to 7 corresponding to scale notes;
     //var cumulativeProbs = [0.0, 0.2, 0.5, 0.7, 0.8, 0.85, 0.9, 0.95, 1.0];
 
@@ -256,8 +272,8 @@
 
       var notePitchArray1 = createNotePitchArray("C4", 5);
       origin = audioContext.currentTime;
-      var noteStartArray1 = createNoteStartArray(notePitchArray1, 1.5);
-      var noteDurationArray1 = createNoteDurationArray(notePitchArray1,1.5,0.95);
+      var noteStartArray1 = createNoteStartArray(notePitchArray1, 0.75);
+      var noteDurationArray1 = createNoteDurationArray(notePitchArray1,0.75,0.95);
       var n1 = new MonoNotes('Flute Pipe 1',noteStartArray1,notePitchArray1, noteDurationArray1);
 
      dummy2 = 9;
@@ -282,11 +298,15 @@
       var notePitchArray2 =  createTransposedPitchArray(notePitchArray1,3)
 
       //origin = audioContext.currentTime;
-      var noteStartArray2 = createNoteStartArray(notePitchArray2, 1.5);
-      var noteDurationArray2 = createNoteDurationArray(notePitchArray2,1.5,0.95);
+      var noteStartArray2 = createNoteStartArray(notePitchArray2, 0.75);
+      var noteDurationArray2 = createNoteDurationArray(notePitchArray2,0.75,0.95);
       var n2 = new MonoNotes('Blown bottle Pipe 1',noteStartArray2,notePitchArray2, noteDurationArray2);
       var n3 = reflectMonoNotes(n2);
       var n4 = musifyMonoNotes(n3,2);
+      var n5 = reflectMonoNotes(n3);
+
+      var mnStr2 = new MonoNotesStr(n2);
+       document.getElementById("ta1").innerText = mnStr2.s;
 
 
 
@@ -296,13 +316,13 @@
        count = 0;
 
       //while (count < notePitchArray2.length) {
-       while (count < n3.l) {
+       while (count < n5.l) {
        /* player.queueWaveTable(
           audioContext, audioContext.destination,instrumentsMap.get("Blown bottle Pipe 1"), origin +noteStartArray2[count],
           notePitchArray2[count], noteDurationArray2[count] );*/
          player.queueWaveTable(
-          audioContext, audioContext.destination, n4.i, origin + n4.t[count],
-          n4.p[count], n4.d[count] );
+          audioContext, audioContext.destination, n5.i, origin + n5.t[count],
+          n5.p[count], n5.d[count] );
 
         count++;
       }

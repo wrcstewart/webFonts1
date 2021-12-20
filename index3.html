@@ -13,72 +13,139 @@
 
   <script>
 
+    var delim = '|';
+
     const instrumentsMap = new Map();
-    instrumentsMap.set('Blown bottle Pipe 1',_tone_0760_Aspirin_sf2_file)
-    instrumentsMap.set('Flute Pipe 1',_tone_0730_Aspirin_sf2_file)
+    instrumentsMap.set('Blown bottle Pipe 1', _tone_0760_Aspirin_sf2_file)
+    instrumentsMap.set('Flute Pipe 1', _tone_0730_Aspirin_sf2_file)
 
 
     class MonoNotes {
-      constructor(instrument,t,p,d){
-        this.instrument = instrument;this.t = t;this.p = p;this.d = d; this.l = p.length;
+      constructor(instrument, t, p, d) {
+        this.instrument = instrument;
+        this.t = t;
+        this.p = p;
+        this.d = d;
+        this.l = p.length;
         this.i = instrumentsMap.get(instrument);
       }
     }
 
-    class MonoNotesStr{
+    function Music(instrument, t, p, d) {
 
-      constructor(mn){
-        this.mn =mn;
+      let len = p.length;
+      let line = [];
+      for (let i = 0; i < len; i++) {
+        let temp = [];
+        temp[0]= t[i];temp[1]= p[i];temp[2]= d[i];
+        line[i] = temp;
+      }
+      this.instrument = instrument;
+      this.line = line;
+    }
+
+    function MonoSeq(instrument, t, p, d) {
+      this.instrument = instrument;
+      this.t = t;
+      this.p = p;
+      this.d = d;
+      this.l = p.length;
+      this.i = instrumentsMap.get(instrument);
+    }
+
+    class MonoNotesStr {
+
+
+      constructor(mn) {
+        this.mn = mn;
         this.l = mn.l;
         let len = this.l;
-        this.i = mn.i;
-        let str = "|music|";
-        str += "this.i" + "|";
-        for (let i =0;i<len;i++){
-          str += mn.t[i] + " " + mn.p[i] + " " + mn.d[i] +"|";
+        this.instrument = mn.instrument;
+        let str = delim + "music" + delim;
+        str += this.instrument + delim + "midi" + delim + "start pitch duration" + delim;
+        for (let i = 0; i < len; i++) {
+          str += (mn.t[i]).toFixed(4) + " " + mn.p[i] + " " + (mn.d[i]).toFixed(4) + delim;
         }
         this.s = str;
       }
     }
 
-    function reflectMonoNotes(mn){ // return a new monoNote that appends a reversed version to end to input
+    function MonoSeqStr(mn) {
+      this.mn = mn;
+      this.l = mn.l;
+      let len = this.l;
+      this.instrument = mn.instrument;
+      let str = delim + "music" + delim;
+      str += this.instrument + delim + "midi" + delim + "start pitch duration" + delim;
+      for (let i = 0; i < len; i++) {
+        str += (mn.t[i]).toFixed(4) + " " + mn.p[i] + " " + (mn.d[i]).toFixed(4) + delim;
+      }
+      this.s = str;
+    }
 
-      let at =[];let ap =[]; let ad = [];
+
+    function reflectMonoNotes(mn) { // return a new monoNote that appends a reversed version to end to input
+
+      let at = [];
+      let ap = [];
+      let ad = [];
       let l = mn.l;
-      for (let i =0;i< l;i++){
-        at[i] = mn.t[i];  ap[i] = mn.p[i];  ad[i] = mn.d[i];
-        if(i < l-1) {
-          at[l + i] = mn.t[l - 1] + (mn.t[l-1] - mn.t[ l- (2+i)]);
+      for (let i = 0; i < l; i++) {
+        at[i] = mn.t[i];
+        ap[i] = mn.p[i];
+        ad[i] = mn.d[i];
+        if (i < l - 1) {
+          at[l + i] = mn.t[l - 1] + (mn.t[l - 1] - mn.t[l - (2 + i)]);
           ap[l + i] = mn.p[l - (i + 2)];
           ad[l + i] = mn.d[l - (i + 2)];//correct this
         }
       }
-      let result = new MonoNotes(mn.instrument,at,ap,ad);
+      let result = new MonoNotes(mn.instrument, at, ap, ad);
 
-      return(result)
+      return (result)
     }
 
-    function musifyMonoNotes(mn, tonicMultiplier){
+    function reflectMonoSeq(mn) { // return a new monoNote that appends a reversed version to end to input
 
-      let at =[];let ap =[]; let ad = [];
+      let at = [];
+      let ap = [];
+      let ad = [];
       let l = mn.l;
-      for (let i =0;i< l;i++){
-        at[i] = mn.t[i];  ap[i] = mn.p[i];  ad[i] = mn.d[i];
-        if (i>0) at[i] += ad[0];
+      for (let i = 0; i < l; i++) {
+        at[i] = mn.t[i];
+        ap[i] = mn.p[i];
+        ad[i] = mn.d[i];
+        if (i < l - 1) {
+          at[l + i] = mn.t[l - 1] + (mn.t[l - 1] - mn.t[l - (2 + i)]);
+          ap[l + i] = mn.p[l - (i + 2)];
+          ad[l + i] = mn.d[l - (i + 2)];//correct this
+        }
       }
-      ad[0] = tonicMultiplier* mn.d[0];  ad[l-1] = tonicMultiplier* mn.d[l-1];
-      let result = new MonoNotes(mn.instrument,at,ap,ad);
+      let result = new MonoSeq(mn.instrument, at, ap, ad);
 
-      return(result)
+      return (result)
+    }
 
+    function musifyMonoNotes(mn, tonicMultiplier) {
 
+      let at = [];
+      let ap = [];
+      let ad = [];
+      let l = mn.l;
+      for (let i = 0; i < l; i++) {
+        at[i] = mn.t[i];
+        ap[i] = mn.p[i];
+        ad[i] = mn.d[i];
+        if (i > 0) at[i] += ad[0];
+      }
+      ad[0] = tonicMultiplier * mn.d[0];
+      ad[l - 1] = tonicMultiplier * mn.d[l - 1];
+      let result = new MonoNotes(mn.instrument, at, ap, ad);
 
-
+      return (result)
 
 
     }
-
-
 
 
     window.playState = false;
@@ -183,12 +250,12 @@
       return (notePitchArray);
     }// try this first for player*/
 
-    function createNoteStartArray(midiNoteArray,  multiplier) {
+    function createNoteStartArray(midiNoteArray, multiplier) {
 // multiplier is step between notes in seconds
       let noteStartArray = [];
       let len = midiNoteArray.length;
       for (let i = 0; i < len; i++) {
-        noteStartArray[i] =  (i * multiplier);
+        noteStartArray[i] = (i * multiplier);
       }
       return (noteStartArray);
     }
@@ -204,21 +271,21 @@
       return (noteDurationArray);
     }
 
-    function createNotePitchArray(tonicNoteName,len){
-     let midiBaseNote = getMidiNoteFromName(tonicNoteName);
+    function createNotePitchArray(tonicNoteName, len) {
+      let midiBaseNote = getMidiNoteFromName(tonicNoteName);
 
-     let midiNoteArray = [];
-     let oldNoteScale = 0;
-     let newNoteScale = 0;
-     midiNoteArray[0] = midiBaseNote;
-     let count = 1
-       while (count < len ) {
-       newNoteScale = newNoteScale8(oldNoteScale);
-       midiNoteArray[count] = getMidiNote(newNoteScale, midiBaseNote);
-       oldNoteScale = newNoteScale;
-       count++;
-       }
-       return( midiNoteArray)
+      let midiNoteArray = [];
+      let oldNoteScale = 0;
+      let newNoteScale = 0;
+      midiNoteArray[0] = midiBaseNote;
+      let count = 1
+      while (count < len) {
+        newNoteScale = newNoteScale8(oldNoteScale);
+        midiNoteArray[count] = getMidiNote(newNoteScale, midiBaseNote);
+        oldNoteScale = newNoteScale;
+        count++;
+      }
+      return (midiNoteArray)
     }
 
 
@@ -269,60 +336,65 @@
       let dummy2 = 9;
 
 
-
       var notePitchArray1 = createNotePitchArray("C4", 5);
       origin = audioContext.currentTime;
       var noteStartArray1 = createNoteStartArray(notePitchArray1, 0.75);
-      var noteDurationArray1 = createNoteDurationArray(notePitchArray1,0.75,0.95);
-      var n1 = new MonoNotes('Flute Pipe 1',noteStartArray1,notePitchArray1, noteDurationArray1);
+      var noteDurationArray1 = createNoteDurationArray(notePitchArray1, 0.75, 0.95);
+      var n1 = new MonoNotes('Flute Pipe 1', noteStartArray1, notePitchArray1, noteDurationArray1);
 
-     dummy2 = 9;
+      dummy2 = 9;
       count = 0;
 
       while (count < notePitchArray1.length) {
         //player.queueWaveTable(
-         // audioContext, audioContext.destination, n1.i, origin + n1.t[count],
-         // n1.p[count], n1.d[count] );
+        // audioContext, audioContext.destination, n1.i, origin + n1.t[count],
+        // n1.p[count], n1.d[count] );
         count++;
       }
 
-       function createTransposedPitchArray(notePitchArray,semitoneShift){
+      function createTransposedPitchArray(notePitchArray, semitoneShift) {
         let len = notePitchArray.length;
-         let result = [];
-        for(let i=0;i<len;i++) result[i] = notePitchArray[i] + semitoneShift;
+        let result = [];
+        for (let i = 0; i < len; i++) result[i] = notePitchArray[i] + semitoneShift;
         return (result)
       }
 
 
-
-      var notePitchArray2 =  createTransposedPitchArray(notePitchArray1,3)
+      var notePitchArray2 = createTransposedPitchArray(notePitchArray1, 3)
 
       //origin = audioContext.currentTime;
       var noteStartArray2 = createNoteStartArray(notePitchArray2, 0.75);
-      var noteDurationArray2 = createNoteDurationArray(notePitchArray2,0.75,0.95);
-      var n2 = new MonoNotes('Blown bottle Pipe 1',noteStartArray2,notePitchArray2, noteDurationArray2);
+      var noteDurationArray2 = createNoteDurationArray(notePitchArray2, 0.75, 0.95);
+      var n2 = new MonoNotes('Blown bottle Pipe 1', noteStartArray2, notePitchArray2, noteDurationArray2);
+      var music1 = new Music('Blown bottle Pipe 1', noteStartArray2, notePitchArray2, noteDurationArray2);
+       var music1Str = JSON.stringify(music1);
+
+      var n2a = new MonoSeq('Blown bottle Pipe 1', noteStartArray2, notePitchArray2, noteDurationArray2);
+
       var n3 = reflectMonoNotes(n2);
-      var n4 = musifyMonoNotes(n3,2);
+      var n4 = musifyMonoNotes(n3, 2);
       var n5 = reflectMonoNotes(n3);
 
       var mnStr2 = new MonoNotesStr(n2);
-       document.getElementById("ta1").innerText = mnStr2.s;
+      var mnStr2a = new MonoSeqStr(n2a);
+      //var mnStr5 = new MonoNotesStr(n5);
+      var n5a = reflectMonoSeq(n2a);
 
 
+      document.getElementById("ta1").innerText = music1Str;
 
 
-
-     //dummy2 = 9;
-       count = 0;
+      //dummy2 = 9;
+      count = 0;
 
       //while (count < notePitchArray2.length) {
-       while (count < n5.l) {
-       /* player.queueWaveTable(
-          audioContext, audioContext.destination,instrumentsMap.get("Blown bottle Pipe 1"), origin +noteStartArray2[count],
-          notePitchArray2[count], noteDurationArray2[count] );*/
-         player.queueWaveTable(
-          audioContext, audioContext.destination, n5.i, origin + n5.t[count],
-          n5.p[count], n5.d[count] );
+      while (count < n5a.l) {
+        /* player.queueWaveTable(
+           audioContext, audioContext.destination,instrumentsMap.get("Blown bottle Pipe 1"), origin +noteStartArray2[count],
+           notePitchArray2[count], noteDurationArray2[count] );*/
+        player.queueWaveTable(
+          audioContext, audioContext.destination, n5a.i, origin + n5a.t[count],
+          n5a.p[count], n5a.d[count]);
 
         count++;
       }

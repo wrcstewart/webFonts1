@@ -34,14 +34,16 @@
     function Music(instrument, t, p, d) {
 
       let len = p.length;
-      let line = [];
+      let start_pitch_duration = [];
       for (let i = 0; i < len; i++) {
         let temp = [];
-        temp[0]= t[i];temp[1]= p[i];temp[2]= d[i];
-        line[i] = temp;
+        temp[0] = t[i];
+        temp[1] = p[i];
+        temp[2] = d[i];
+        start_pitch_duration[i] = temp;
       }
       this.instrument = instrument;
-      this.line = line;
+      this.start_pitch_duration = start_pitch_duration;
     }
 
     function MonoSeq(instrument, t, p, d) {
@@ -336,7 +338,7 @@
       let dummy2 = 9;
 
 
-      var notePitchArray1 = createNotePitchArray("C4", 5);
+      var notePitchArray1 = createNotePitchArray("C4", 7);
       origin = audioContext.currentTime;
       var noteStartArray1 = createNoteStartArray(notePitchArray1, 0.75);
       var noteDurationArray1 = createNoteDurationArray(notePitchArray1, 0.75, 0.95);
@@ -363,11 +365,12 @@
       var notePitchArray2 = createTransposedPitchArray(notePitchArray1, 3)
 
       //origin = audioContext.currentTime;
-      var noteStartArray2 = createNoteStartArray(notePitchArray2, 0.75);
-      var noteDurationArray2 = createNoteDurationArray(notePitchArray2, 0.75, 0.95);
+      var noteStartArray2 = createNoteStartArray(notePitchArray2, 1);
+      var noteDurationArray2 = createNoteDurationArray(notePitchArray2, 1, 0.9);
       var n2 = new MonoNotes('Blown bottle Pipe 1', noteStartArray2, notePitchArray2, noteDurationArray2);
       var music1 = new Music('Blown bottle Pipe 1', noteStartArray2, notePitchArray2, noteDurationArray2);
-       var music1Str = JSON.stringify(music1);
+      var music1Str = JSON.stringify(music1);
+      var music2 = JSON.parse(music1Str);
 
       var n2a = new MonoSeq('Blown bottle Pipe 1', noteStartArray2, notePitchArray2, noteDurationArray2);
 
@@ -388,13 +391,20 @@
       count = 0;
 
       //while (count < notePitchArray2.length) {
-      while (count < n5a.l) {
+      while (count < music2.start_pitch_duration.length) {
         /* player.queueWaveTable(
            audioContext, audioContext.destination,instrumentsMap.get("Blown bottle Pipe 1"), origin +noteStartArray2[count],
            notePitchArray2[count], noteDurationArray2[count] );*/
+        /* player.queueWaveTable(
+           audioContext, audioContext.destination, n5a.i, origin + n5a.t[count],
+           n5a.p[count], n5a.d[count]);*/
+
         player.queueWaveTable(
-          audioContext, audioContext.destination, n5a.i, origin + n5a.t[count],
-          n5a.p[count], n5a.d[count]);
+          audioContext, audioContext.destination,
+          instrumentsMap.get(music2.instrument),
+          origin + music2.start_pitch_duration[count][0],
+          music2.start_pitch_duration[count][1],
+           music2.start_pitch_duration[count][2]);
 
         count++;
       }
@@ -402,10 +412,37 @@
 
     }
 
+    function loadJSON(){
+      let loadedMusic = JSON.parse(document.getElementById("ta1").innerText);
+
+      count = 0;
+
+      //while (count < notePitchArray2.length) {
+      while (count < loadedMusic.start_pitch_duration.length) {
+        /* player.queueWaveTable(
+           audioContext, audioContext.destination,instrumentsMap.get("Blown bottle Pipe 1"), origin +noteStartArray2[count],
+           notePitchArray2[count], noteDurationArray2[count] );*/
+        /* player.queueWaveTable(
+           audioContext, audioContext.destination, n5a.i, origin + n5a.t[count],
+           n5a.p[count], n5a.d[count]);*/
+        origin = audioContext.getCurrentTime();
+        player.queueWaveTable(
+          audioContext, audioContext.destination,
+          instrumentsMap.get(loadedMusic.instrument),
+          origin + loadedMusic.start_pitch_duration[count][0],
+          loadedMusic.start_pitch_duration[count][1],
+           loadedMusic.start_pitch_duration[count][2]);
+
+        count++;
+      }
+      return(loadedMusic)
+    }
+
   </script>
 </head>
 
 <body>
 <p><a href='javascript:playOuter();'>Hello, world!</a></p>
-<textarea id="ta1"> test text</textarea>
+<textarea id="ta1" style="width:300px;height:200px"> test text</textarea>
+<button id="loadMusic" onclick="loadJSON()">Play</button>
 </body>

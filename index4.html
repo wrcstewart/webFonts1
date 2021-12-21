@@ -34,17 +34,17 @@
     function Music(instrument, t, p, d,v) {
 
       let len = p.length;
-      let start_pitch_duration = [];
+      let start_pitch_duration_velocity = [];
       for (let i = 0; i < len; i++) {
         let temp = [];
         temp[0] = t[i];
         temp[1] = p[i];
         temp[2] = d[i];
         temp[3] = v[i];
-        start_pitch_duration[i] = temp;
+        start_pitch_duration_velocity[i] = temp;
       }
       this.instrument = instrument;
-      this.start_pitch_duration = start_pitch_duration;
+      this.start_pitch_duration_velocity = start_pitch_duration_velocity;
     }
 
     function MonoSeq(instrument, t, p, d) {
@@ -314,7 +314,7 @@
   var instrumentVar = instrumentsMap.get(instrumentString);
 
       //while (count < notePitchArray2.length) {
-      while (count < loadedMusic.start_pitch_duration.length) {
+      while (count < loadedMusic.start_pitch_duration_velocity.length) {
         /* player.queueWaveTable(
            audioContext, audioContext.destination,instrumentsMap.get("Blown bottle Pipe 1"), origin +noteStartArray2[count],
            notePitchArray2[count], noteDurationArray2[count] );*/
@@ -325,10 +325,10 @@
         player.queueWaveTable(
           audioContext, audioContext.destination,
          instrumentVar,
-          origin + loadedMusic.start_pitch_duration[count][0],
-          loadedMusic.start_pitch_duration[count][1],
-           loadedMusic.start_pitch_duration[count][2],
-        loadedMusic.start_pitch_duration[count][3]
+          origin + loadedMusic.start_pitch_duration_velocity[count][0],
+          loadedMusic.start_pitch_duration_velocity[count][1],
+           loadedMusic.start_pitch_duration_velocity[count][2],
+        loadedMusic.start_pitch_duration_velocity[count][3]
         )    ;
 
         count++;
@@ -384,7 +384,7 @@
       let dummy2 = 9;
 
 
-      var notePitchArray1 = createNotePitchArray("C4", 18);
+      var notePitchArray1 = createNotePitchArray("C4", 19);
       origin = audioContext.currentTime;
       var noteStartArray1 = createNoteStartArray(notePitchArray1, 0.75);
       var noteDurationArray1 = createNoteDurationArray(notePitchArray1, 0.75, 0.95);
@@ -443,7 +443,7 @@
       count = 0;
 
       //while (count < notePitchArray2.length) {
-      while (count < music2.start_pitch_duration.length) {
+      while (count < music2.start_pitch_duration_velocity.length) {
         /* player.queueWaveTable(
            audioContext, audioContext.destination,instrumentsMap.get("Blown bottle Pipe 1"), origin +noteStartArray2[count],
            notePitchArray2[count], noteDurationArray2[count] );*/
@@ -454,10 +454,10 @@
         player.queueWaveTable(
           audioContext, audioContext.destination,
           instrumentsMap.get(music2.instrument),
-          origin + music2.start_pitch_duration[count][0],
-          music2.start_pitch_duration[count][1],
-           music2.start_pitch_duration[count][2],
-        music2.start_pitch_duration[count][3]
+          origin + music2.start_pitch_duration_velocity[count][0],
+          music2.start_pitch_duration_velocity[count][1],
+           music2.start_pitch_duration_velocity[count][2],
+        music2.start_pitch_duration_velocity[count][3]
         );
 
         count++;

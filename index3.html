@@ -16,8 +16,8 @@
     var delim = '|';
 
     const instrumentsMap = new Map();
-    instrumentsMap.set('Blown bottle Pipe 1', _tone_0760_Aspirin_sf2_file)
-    instrumentsMap.set('Flute Pipe 1', _tone_0730_Aspirin_sf2_file)
+    instrumentsMap.set("Blown bottle Pipe 1", _tone_0760_Aspirin_sf2_file)
+    instrumentsMap.set("Flute Pipe 1", _tone_0730_Aspirin_sf2_file)
 
 
     class MonoNotes {
@@ -290,6 +290,37 @@
       return (midiNoteArray)
     }
 
+     function loadJSON(){
+      var inString = document.getElementById("ta1").value;
+
+      var loadedMusic = JSON.parse(inString);
+
+      count = 0;
+       origin = audioContext.currentTime;
+  var instrumentString = loadedMusic.instrument;
+  var instrumentVar = instrumentsMap.get(instrumentString);
+
+      //while (count < notePitchArray2.length) {
+      while (count < loadedMusic.start_pitch_duration.length) {
+        /* player.queueWaveTable(
+           audioContext, audioContext.destination,instrumentsMap.get("Blown bottle Pipe 1"), origin +noteStartArray2[count],
+           notePitchArray2[count], noteDurationArray2[count] );*/
+        /* player.queueWaveTable(
+           audioContext, audioContext.destination, n5a.i, origin + n5a.t[count],
+           n5a.p[count], n5a.d[count]);*/
+
+        player.queueWaveTable(
+          audioContext, audioContext.destination,
+         instrumentVar,
+          origin + loadedMusic.start_pitch_duration[count][0],
+          loadedMusic.start_pitch_duration[count][1],
+           loadedMusic.start_pitch_duration[count][2])    ;
+
+        count++;
+      }
+      return(loadedMusic)
+    }
+
 
     function playOuter() {
 
@@ -362,6 +393,8 @@
       }
 
 
+
+
       var notePitchArray2 = createTransposedPitchArray(notePitchArray1, 3)
 
       //origin = audioContext.currentTime;
@@ -385,9 +418,12 @@
 
 
       document.getElementById("ta1").innerText = music1Str;
+      var test1 = document.getElementById("ta1").value;
 
 
-      //dummy2 = 9;
+
+
+      dummy2 = 9;
       count = 0;
 
       //while (count < notePitchArray2.length) {
@@ -412,31 +448,7 @@
 
     }
 
-    function loadJSON(){
-      let loadedMusic = JSON.parse(document.getElementById("ta1").innerText);
 
-      count = 0;
-
-      //while (count < notePitchArray2.length) {
-      while (count < loadedMusic.start_pitch_duration.length) {
-        /* player.queueWaveTable(
-           audioContext, audioContext.destination,instrumentsMap.get("Blown bottle Pipe 1"), origin +noteStartArray2[count],
-           notePitchArray2[count], noteDurationArray2[count] );*/
-        /* player.queueWaveTable(
-           audioContext, audioContext.destination, n5a.i, origin + n5a.t[count],
-           n5a.p[count], n5a.d[count]);*/
-        origin = audioContext.getCurrentTime();
-        player.queueWaveTable(
-          audioContext, audioContext.destination,
-          instrumentsMap.get(loadedMusic.instrument),
-          origin + loadedMusic.start_pitch_duration[count][0],
-          loadedMusic.start_pitch_duration[count][1],
-           loadedMusic.start_pitch_duration[count][2]);
-
-        count++;
-      }
-      return(loadedMusic)
-    }
 
   </script>
 </head>

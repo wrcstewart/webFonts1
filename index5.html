@@ -1,0 +1,478 @@
+<!doctype html>
+<html lang="en">
+
+
+<head>
+  <meta charset="UTF-8">
+  <script src='https://surikov.github.io/webaudiofont/npm/dist/WebAudioFontPlayer.js'></script>
+  <script src='https://surikov.github.io/webaudiofontdata/sound/0000_JCLive_sf2_file.js'></script>
+  <script src='https://surikov.github.io/webaudiofontdata/sound/0730_Aspirin_sf2_file.js'></script>
+  <script src='https://surikov.github.io/webaudiofontdata/sound/12847_0_Chaos_sf2_file.js'></script>
+  <script src='https://surikov.github.io/webaudiofontdata/sound/0760_Aspirin_sf2_file.js'></script>
+
+
+  <script>
+
+    var delim = '|';
+
+    const instrumentsMap = new Map();
+    instrumentsMap.set("Blown bottle Pipe 1", _tone_0760_Aspirin_sf2_file)
+    instrumentsMap.set("Flute Pipe 1", _tone_0730_Aspirin_sf2_file)
+
+
+    class MonoNotes {
+      constructor(instrument, t, p, d) {
+        this.instrument = instrument;
+        this.t = t;
+        this.p = p;
+        this.d = d;
+        this.l = p.length;
+        this.i = instrumentsMap.get(instrument);
+      }
+    }
+
+    function MusicLine(instrument, t, p, d,v) {
+
+      let len = p.length;
+      let start_pitch_duration_velocity = [];
+      for (let i = 0; i < len; i++) {
+        let temp = [];
+        temp[0] = t[i];
+        temp[1] = p[i];
+        temp[2] = d[i];
+        temp[3] = v[i];
+        start_pitch_duration_velocity[i] = temp;
+      }
+      this.instrument = instrument;
+      this.start_pitch_duration_velocity = start_pitch_duration_velocity;
+    }
+
+    function MonoSeq(instrument, t, p, d) {
+      this.instrument = instrument;
+      this.t = t;
+      this.p = p;
+      this.d = d;
+      this.l = p.length;
+      this.i = instrumentsMap.get(instrument);
+    }
+
+    class MonoNotesStr {
+
+
+      constructor(mn) {
+        this.mn = mn;
+        this.l = mn.l;
+        let len = this.l;
+        this.instrument = mn.instrument;
+        let str = delim + "music" + delim;
+        str += this.instrument + delim + "midi" + delim + "start pitch duration" + delim;
+        for (let i = 0; i < len; i++) {
+          str += (mn.t[i]).toFixed(4) + " " + mn.p[i] + " " + (mn.d[i]).toFixed(4) + delim;
+        }
+        this.s = str;
+      }
+    }
+
+    function MonoSeqStr(mn) {
+      this.mn = mn;
+      this.l = mn.l;
+      let len = this.l;
+      this.instrument = mn.instrument;
+      let str = delim + "music" + delim;
+      str += this.instrument + delim + "midi" + delim + "start pitch duration" + delim;
+      for (let i = 0; i < len; i++) {
+        str += (mn.t[i]).toFixed(4) + " " + mn.p[i] + " " + (mn.d[i]).toFixed(4) + delim;
+      }
+      this.s = str;
+    }
+
+
+    function reflectMonoNotes(mn) { // return a new monoNote that appends a reversed version to end to input
+
+      let at = [];
+      let ap = [];
+      let ad = [];
+      let l = mn.l;
+      for (let i = 0; i < l; i++) {
+        at[i] = mn.t[i];
+        ap[i] = mn.p[i];
+        ad[i] = mn.d[i];
+        if (i < l - 1) {
+          at[l + i] = mn.t[l - 1] + (mn.t[l - 1] - mn.t[l - (2 + i)]);
+          ap[l + i] = mn.p[l - (i + 2)];
+          ad[l + i] = mn.d[l - (i + 2)];//correct this
+        }
+      }
+      let result = new MonoNotes(mn.instrument, at, ap, ad);
+
+      return (result)
+    }
+
+    function reflectMonoSeq(mn) { // return a new monoNote that appends a reversed version to end to input
+
+      let at = [];
+      let ap = [];
+      let ad = [];
+      let l = mn.l;
+      for (let i = 0; i < l; i++) {
+        at[i] = mn.t[i];
+        ap[i] = mn.p[i];
+        ad[i] = mn.d[i];
+        if (i < l - 1) {
+          at[l + i] = mn.t[l - 1] + (mn.t[l - 1] - mn.t[l - (2 + i)]);
+          ap[l + i] = mn.p[l - (i + 2)];
+          ad[l + i] = mn.d[l - (i + 2)];//correct this
+        }
+      }
+      let result = new MonoSeq(mn.instrument, at, ap, ad);
+
+      return (result)
+    }
+
+    function musifyMonoNotes(mn, tonicMultiplier) {
+
+      let at = [];
+      let ap = [];
+      let ad = [];
+      let l = mn.l;
+      for (let i = 0; i < l; i++) {
+        at[i] = mn.t[i];
+        ap[i] = mn.p[i];
+        ad[i] = mn.d[i];
+        if (i > 0) at[i] += ad[0];
+      }
+      ad[0] = tonicMultiplier * mn.d[0];
+      ad[l - 1] = tonicMultiplier * mn.d[l - 1];
+      let result = new MonoNotes(mn.instrument, at, ap, ad);
+
+      return (result)
+
+
+    }
+
+
+    window.playState = false;
+
+    var noteNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];//used to construct notes[] below
+    var notes = []; // this allows easy look up of note name to midi number - but based with A0 = 0
+    // a function will add 21 to give the correct official midi number of the notes.
+    // the true note names are only used once per generative run - to allow user to enter start note.
+    var notesIx = 3;//index 3 will correspond to the first C
+
+    for (let octave = 1; octave <= 7; octave++) {
+      for (let noteNamesIx = 0; noteNamesIx <= 11; noteNamesIx++) {
+        notes[notesIx] = noteNames[noteNamesIx] + octave;
+        notesIx++;
+      }
+    }
+    //now fill in those notes not covered.
+    notes[0] = "A0";
+    notes[1] = "A#0";
+    notes[2] = "B0";
+    notes[87] = "C8";
+
+    var probs = [0.1, 0.4, 0.3, 0.1, 0.025, 0.025, 0.025, 0.025];
+    //prob of jumping up or down by the index 0 to 7 corresponding to scale notes;
+    //var cumulativeProbs = [0.0, 0.2, 0.5, 0.7, 0.8, 0.85, 0.9, 0.95, 1.0];
+
+    function generateCumulativeArray(arr) {
+      let cumArr = [];
+      let sum = 0;
+      for (let i = 0; i < arr.length; i++) {
+        cumArr[i] = sum;
+        sum = sum + arr[i]
+      }
+      cumArr[arr.length] = sum;
+      return (cumArr)
+    }
+
+    var cumulativeProbs = generateCumulativeArray(probs);
+
+    //let dummy =1;
+
+    function stepScale8() { //compute a random step size in a scale of 8 notes
+      let i;
+      let cumP = Math.random();
+      for (i = 0; i <= 7; i++) if (cumulativeProbs[i + 1] >= cumP) break;
+      return (i);
+    }
+
+    function newNoteScale8(oldNoteScale8) {
+      let step = stepScale8();
+      // the next function determines whether the step should be positive, negative or 0
+      let limit = 8; //max scale notes excursion
+      if ((oldNoteScale8 + step) > limit) return (oldNoteScale8 - step);
+      if ((oldNoteScale8 - step) < -limit) return (oldNoteScale8 + step);
+
+      if (Math.random() <= 0.5) return (oldNoteScale8 - step);
+      return (oldNoteScale8 + step);
+    }
+
+    RelativeMidiNumOfHMScalePositive = [0, 2, 3, 5, 7, 8, 11, 12, 14, 15, 17];
+    RelativeMidiNumOfHMScaleNegative = [0, -1, -4, -5, -7, -9, -10, -12, -13, -16, -17];
+
+    function getMidiNote(scaleNote, midiBaseNote) {
+      if (scaleNote >= 0) return (midiBaseNote + RelativeMidiNumOfHMScalePositive[scaleNote]);
+      if (scaleNote < 0) return (midiBaseNote + RelativeMidiNumOfHMScaleNegative[-scaleNote]);
+    }
+
+    //comment
+
+    function getMidiNoteFromName(noteName) {
+      return (notes.indexOf(noteName) + 21)
+    }
+
+    var audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    var player = new WebAudioFontPlayer();
+    //player.loader.decodeAfterLoading(audioContext,'_tone_0000_JCLive_sf2_file' );
+    player.loader.decodeAfterLoading(audioContext, '_tone_0730_Aspirin_sf2_file');
+    player.loader.decodeAfterLoading(audioContext, '_drum_47_0_Chaos_sf2_file')
+    player.loader.decodeAfterLoading(audioContext, '_tone_0760_Aspirin_sf2_file')
+
+
+    var origin;
+    /*let tonicNoteString;
+    let midiBaseNote;
+    let midiNote;
+    let oldNoteScale;
+    let newNoteScale;
+    var count;
+    var len;
+    var midiNoteArray = [];
+    var oldNoteScaleArray = [];
+    var midiPitchArr = [];*/
+
+    /*function createNotePitchArray(midiNoteArr, oldNoteScaleArr) {
+      let notePitchArray = [];
+      let len = midiNoteArr.length;
+
+      for (let i = 0; i < len; i++) {
+        notePitchArray[i] = midiNoteArr[i];
+      }
+
+      return (notePitchArray);
+    }// try this first for player*/
+
+    function createNoteStartArray(midiNoteArray, multiplier) {
+// multiplier is step between notes in seconds
+      let noteStartArray = [];
+      let len = midiNoteArray.length;
+      for (let i = 0; i < len; i++) {
+        noteStartArray[i] = (i * multiplier);
+      }
+      return (noteStartArray);
+    }
+
+
+    function createNoteDurationArray(midiNoteArray, multiplier, noteLength) {
+      let duration = multiplier * noteLength;
+      let noteDurationArray = [];
+      let len = midiNoteArray.length;
+      for (let i = 0; i < len; i++) {
+        noteDurationArray[i] = duration;
+      }
+      return (noteDurationArray);
+    }
+
+    function createNoteVelocity(midiNoteArray,defaultVel,pulseVel,pulseRatio){
+
+
+      let noteVelocityArray = [];
+      let len = midiNoteArray.length;
+      for (let i = 0; i < len; i++) noteVelocityArray[i] = defaultVel;
+      for (let i = 0; i < len; i+=pulseRatio) noteVelocityArray[i] = pulseVel;
+      return (noteVelocityArray);
+    }
+
+    function createNotePitchArray(tonicNoteName, len) {
+      let midiBaseNote = getMidiNoteFromName(tonicNoteName);
+
+      let midiNoteArray = [];
+      let oldNoteScale = 0;
+      let newNoteScale = 0;
+      midiNoteArray[0] = midiBaseNote;
+      let count = 1
+      while (count < len) {
+        newNoteScale = newNoteScale8(oldNoteScale);
+        midiNoteArray[count] = getMidiNote(newNoteScale, midiBaseNote);
+        oldNoteScale = newNoteScale;
+        count++;
+      }
+      return (midiNoteArray)
+    }
+
+
+
+     function loadJSON(){
+      var inString = document.getElementById("ta1").value;
+
+      var loadedMusicLine = JSON.parse(inString);
+
+      count = 0;
+       origin = audioContext.currentTime;
+  var instrumentString = loadedMusicLine.instrument;
+  var instrumentVar = instrumentsMap.get(instrumentString);
+
+      //while (count < notePitchArray2.length) {
+      while (count < loadedMusicLine.start_pitch_duration_velocity.length) {
+        /* player.queueWaveTable(
+           audioContext, audioContext.destination,instrumentsMap.get("Blown bottle Pipe 1"), origin +noteStartArray2[count],
+           notePitchArray2[count], noteDurationArray2[count] );*/
+        /* player.queueWaveTable(
+           audioContext, audioContext.destination, n5a.i, origin + n5a.t[count],
+           n5a.p[count], n5a.d[count]);*/
+
+        player.queueWaveTable(
+          audioContext, audioContext.destination,
+         instrumentVar,
+          origin + loadedMusicLine.start_pitch_duration_velocity[count][0],
+          loadedMusicLine.start_pitch_duration_velocity[count][1],
+           loadedMusicLine.start_pitch_duration_velocity[count][2],
+        loadedMusicLine.start_pitch_duration_velocity[count][3]
+        )    ;
+
+        count++;
+      }
+      return(loadedMusicLine)
+    }
+
+
+    function playOuter() {
+
+      if (window.playState) {
+        player.cancelQueue(audioContext);
+        alert("queue cancelled");
+        window.playState = false;
+        return;
+      }
+      window.playState = true;
+
+      /*origin = audioContext.currentTime;
+      tonicNoteString = "C4";
+      midiBaseNote = getMidiNoteFromName(tonicNoteString);
+      midiNote = midiBaseNote; //this will be played and updated in loop
+      oldNoteScale = 0;
+      newNoteScale = 0;
+      count = 1;
+      let nGen = 10;//num generated notes*/
+      player.cancelQueue(audioContext);
+      /*let out = "";
+      midiNoteArray[0] = midiBaseNote;
+      oldNoteScaleArray[0] = 0;
+      while (count <= nGen) {
+
+        midiNoteArray[count] = midiNote;
+        oldNoteScaleArray[count] = oldNoteScale;
+
+        //player.queueWaveTable(
+        //audioContext, audioContext.destination, _tone_0730_Aspirin_sf2_file, origin + 0.75 * count, midiNote, 0.5);
+
+        newNoteScale = newNoteScale8(oldNoteScale);
+        out = out + "     " + newNoteScale + " ";
+        document.getElementById("ta1").innerText = out;
+//alert(""+ newNoteScale);
+        midiNote = getMidiNote(newNoteScale, midiBaseNote);
+        out = out + midiNote;
+        //       alert("" + midiNote);
+
+
+        oldNoteScale = newNoteScale;
+
+
+        count++;
+      }*/
+
+
+
+      var notePitchArray1 = createNotePitchArray("C4", 19);
+      origin = audioContext.currentTime;
+      var noteStartArray1 = createNoteStartArray(notePitchArray1, 0.75);
+      var noteDurationArray1 = createNoteDurationArray(notePitchArray1, 0.75, 0.95);
+      var n1 = new MonoNotes('Flute Pipe 1', noteStartArray1, notePitchArray1, noteDurationArray1);
+
+      dummy2 = 9;
+      count = 0;
+
+      while (count < notePitchArray1.length) {
+        //player.queueWaveTable(
+        // audioContext, audioContext.destination, n1.i, origin + n1.t[count],
+        // n1.p[count], n1.d[count] );
+        count++;
+      }
+
+      function createTransposedPitchArray(notePitchArray, semitoneShift) {
+        let len = notePitchArray.length;
+        let result = [];
+        for (let i = 0; i < len; i++) result[i] = notePitchArray[i] + semitoneShift;
+        return (result)
+      }
+
+
+
+
+      var notePitchArray2 = createTransposedPitchArray(notePitchArray1, 3)
+
+      //origin = audioContext.currentTime;
+      var noteStartArray2 = createNoteStartArray(notePitchArray2, 1);
+      var noteDurationArray2 = createNoteDurationArray(notePitchArray2, 1, 0.9);
+      var noteVelocityArray2 = createNoteVelocity(notePitchArray2,0.5,1.5,4);
+      var n2 = new MonoNotes('Blown bottle Pipe 1', noteStartArray2, notePitchArray2, noteDurationArray2);
+      var music1 = new MusicLine('Blown bottle Pipe 1', noteStartArray2, notePitchArray2, noteDurationArray2,noteVelocityArray2);
+      var music1Str = JSON.stringify(music1);
+      var music2 = JSON.parse(music1Str);
+
+      var n2a = new MonoSeq('Blown bottle Pipe 1', noteStartArray2, notePitchArray2, noteDurationArray2);
+
+      var n3 = reflectMonoNotes(n2);
+      var n4 = musifyMonoNotes(n3, 2);
+      var n5 = reflectMonoNotes(n3);
+
+      var mnStr2 = new MonoNotesStr(n2);
+      var mnStr2a = new MonoSeqStr(n2a);
+      //var mnStr5 = new MonoNotesStr(n5);
+      var n5a = reflectMonoSeq(n2a);
+
+
+      document.getElementById("ta1").innerText = music1Str;
+      var test1 = document.getElementById("ta1").value;
+
+
+
+
+      dummy2 = 9;
+      count = 0;
+
+      //while (count < notePitchArray2.length) {
+      while (count < music2.start_pitch_duration_velocity.length) {
+        /* player.queueWaveTable(
+           audioContext, audioContext.destination,instrumentsMap.get("Blown bottle Pipe 1"), origin +noteStartArray2[count],
+           notePitchArray2[count], noteDurationArray2[count] );*/
+        /* player.queueWaveTable(
+           audioContext, audioContext.destination, n5a.i, origin + n5a.t[count],
+           n5a.p[count], n5a.d[count]);*/
+
+        player.queueWaveTable(
+          audioContext, audioContext.destination,
+          instrumentsMap.get(music2.instrument),
+          origin + music2.start_pitch_duration_velocity[count][0],
+          music2.start_pitch_duration_velocity[count][1],
+           music2.start_pitch_duration_velocity[count][2],
+        music2.start_pitch_duration_velocity[count][3]
+        );
+
+        count++;
+      }
+
+
+    }
+
+
+
+  </script>
+</head>
+
+<body>
+<p><a href='javascript:playOuter();'>Hello, world!</a></p>
+<textarea id="ta1" style="width:300px;height:200px"> test text</textarea>
+<button id="loadMusicLine" onclick="loadJSON()">Play</button>
+</body>

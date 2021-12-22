@@ -9,6 +9,7 @@
   <script src='https://surikov.github.io/webaudiofontdata/sound/0730_Aspirin_sf2_file.js'></script>
   <script src='https://surikov.github.io/webaudiofontdata/sound/12847_0_Chaos_sf2_file.js'></script>
   <script src='https://surikov.github.io/webaudiofontdata/sound/0760_Aspirin_sf2_file.js'></script>
+  <script src='https://surikov.github.io/webaudiofontdata/sound/0000_JCLive_sf2_file.js'></script>
 
 
   <script>
@@ -18,8 +19,11 @@
     const instrumentsMap = new Map();
     instrumentsMap.set("Blown bottle Pipe 1", _tone_0760_Aspirin_sf2_file)
     instrumentsMap.set("Flute Pipe 1", _tone_0730_Aspirin_sf2_file)
+    instrumentsMap.set("Acoustic Grand Piano", _tone_0000_JCLive_sf2_file)
 
 
+
+/*
     class MonoNotes {
       constructor(instrument, t, p, d) {
         this.instrument = instrument;
@@ -30,6 +34,7 @@
         this.i = instrumentsMap.get(instrument);
       }
     }
+*/
 
     function MusicLine(instrument, t, p, d,v) {
 
@@ -56,7 +61,7 @@
       this.i = instrumentsMap.get(instrument);
     }
 
-    class MonoNotesStr {
+    /*class MonoNotesStr {
 
 
       constructor(mn) {
@@ -71,7 +76,7 @@
         }
         this.s = str;
       }
-    }
+    }*/
 
     function MonoSeqStr(mn) {
       this.mn = mn;
@@ -226,8 +231,11 @@
     var player = new WebAudioFontPlayer();
     //player.loader.decodeAfterLoading(audioContext,'_tone_0000_JCLive_sf2_file' );
     player.loader.decodeAfterLoading(audioContext, '_tone_0730_Aspirin_sf2_file');
-    player.loader.decodeAfterLoading(audioContext, '_drum_47_0_Chaos_sf2_file')
-    player.loader.decodeAfterLoading(audioContext, '_tone_0760_Aspirin_sf2_file')
+    player.loader.decodeAfterLoading(audioContext, '_drum_47_0_Chaos_sf2_file');
+    player.loader.decodeAfterLoading(audioContext, '_tone_0760_Aspirin_sf2_file');
+    player.loader.decodeAfterLoading(audioContext, '_tone_0000_JCLive_sf2_file');
+
+
 
 
     var origin;
@@ -384,11 +392,11 @@
 
 
 
-      var notePitchArray1 = createNotePitchArray("C4", 19);
+      var notePitchArray1 = createNotePitchArray("C4", 21);
       origin = audioContext.currentTime;
       var noteStartArray1 = createNoteStartArray(notePitchArray1, 0.75);
       var noteDurationArray1 = createNoteDurationArray(notePitchArray1, 0.75, 0.95);
-      var n1 = new MonoNotes('Flute Pipe 1', noteStartArray1, notePitchArray1, noteDurationArray1);
+      var n1 = new MonoNotes('Acoustic Grand Piano', noteStartArray1, notePitchArray1, noteDurationArray1);
 
       dummy2 = 9;
       count = 0;
@@ -417,7 +425,8 @@
       var noteDurationArray2 = createNoteDurationArray(notePitchArray2, 1, 0.9);
       var noteVelocityArray2 = createNoteVelocity(notePitchArray2,0.5,1.5,4);
       var n2 = new MonoNotes('Blown bottle Pipe 1', noteStartArray2, notePitchArray2, noteDurationArray2);
-      var music1 = new MusicLine('Blown bottle Pipe 1', noteStartArray2, notePitchArray2, noteDurationArray2,noteVelocityArray2);
+      //var music1 = new MusicLine('Blown bottle Pipe 1', noteStartArray2, notePitchArray2, noteDurationArray2,noteVelocityArray2);
+      var music1 = new MusicLine("Acoustic Grand Piano", noteStartArray2, notePitchArray2, noteDurationArray2,noteVelocityArray2);
       var music1Str = JSON.stringify(music1);
       var music2 = JSON.parse(music1Str);
 
@@ -451,14 +460,18 @@
            audioContext, audioContext.destination, n5a.i, origin + n5a.t[count],
            n5a.p[count], n5a.d[count]);*/
 
+         var instrumentString = music2.instrument;
+          var instrumentVar = instrumentsMap.get(instrumentString);
+
         player.queueWaveTable(
-          audioContext, audioContext.destination,
-          instrumentsMap.get(music2.instrument),
+          audioContext, audioContext.destination, instrumentVar,
           origin + music2.start_pitch_duration_velocity[count][0],
           music2.start_pitch_duration_velocity[count][1],
            music2.start_pitch_duration_velocity[count][2],
         music2.start_pitch_duration_velocity[count][3]
         );
+        //document.getElementById("ta1").innerText = music1Str + count;
+
 
         count++;
       }
@@ -472,7 +485,7 @@
 </head>
 
 <body>
-<p><a href='javascript:playOuter();'>Hello, world!</a></p>
+<p><a href='javascript:playOuter();'>Generate Notes</a></p>
 <textarea id="ta1" style="width:300px;height:200px"> test text</textarea>
 <button id="loadMusicLine" onclick="loadJSON()">Play</button>
 </body>

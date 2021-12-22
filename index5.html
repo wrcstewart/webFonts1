@@ -78,7 +78,7 @@
       }
     }*/
 
-    function MonoSeqStr(mn) {
+   /* function MonoSeqStr(mn) {
       this.mn = mn;
       this.l = mn.l;
       let len = this.l;
@@ -89,10 +89,10 @@
         str += (mn.t[i]).toFixed(4) + " " + mn.p[i] + " " + (mn.d[i]).toFixed(4) + delim;
       }
       this.s = str;
-    }
+    }*/
 
 
-    function reflectMonoNotes(mn) { // return a new monoNote that appends a reversed version to end to input
+    /*function reflectMonoNotes(mn) { // return a new monoNote that appends a reversed version to end to input
 
       let at = [];
       let ap = [];
@@ -111,9 +111,9 @@
       let result = new MonoNotes(mn.instrument, at, ap, ad);
 
       return (result)
-    }
+    }*/
 
-    function reflectMonoSeq(mn) { // return a new monoNote that appends a reversed version to end to input
+    /*function reflectMonoSeq(mn) { // return a new monoNote that appends a reversed version to end to input
 
       let at = [];
       let ap = [];
@@ -133,8 +133,8 @@
 
       return (result)
     }
-
-    function musifyMonoNotes(mn, tonicMultiplier) {
+*/
+   /* function musifyMonoNotes(mn, tonicMultiplier) {
 
       let at = [];
       let ap = [];
@@ -153,7 +153,7 @@
       return (result)
 
 
-    }
+    }*/
 
 
     window.playState = false;
@@ -396,17 +396,17 @@
       origin = audioContext.currentTime;
       var noteStartArray1 = createNoteStartArray(notePitchArray1, 0.75);
       var noteDurationArray1 = createNoteDurationArray(notePitchArray1, 0.75, 0.95);
-      var n1 = new MonoNotes('Acoustic Grand Piano', noteStartArray1, notePitchArray1, noteDurationArray1);
+      //var n1 = new MonoNotes('Acoustic Grand Piano', noteStartArray1, notePitchArray1, noteDurationArray1);
 
-      dummy2 = 9;
+     /* dummy2 = 9;*/
       count = 0;
 
-      while (count < notePitchArray1.length) {
+     /* while (count < notePitchArray1.length) {
         //player.queueWaveTable(
         // audioContext, audioContext.destination, n1.i, origin + n1.t[count],
         // n1.p[count], n1.d[count] );
         count++;
-      }
+      }*/
 
       function createTransposedPitchArray(notePitchArray, semitoneShift) {
         let len = notePitchArray.length;
@@ -424,22 +424,22 @@
       var noteStartArray2 = createNoteStartArray(notePitchArray2, 1);
       var noteDurationArray2 = createNoteDurationArray(notePitchArray2, 1, 0.9);
       var noteVelocityArray2 = createNoteVelocity(notePitchArray2,0.5,1.5,4);
-      var n2 = new MonoNotes('Blown bottle Pipe 1', noteStartArray2, notePitchArray2, noteDurationArray2);
+     // var n2 = new MonoNotes('Blown bottle Pipe 1', noteStartArray2, notePitchArray2, noteDurationArray2);
       //var music1 = new MusicLine('Blown bottle Pipe 1', noteStartArray2, notePitchArray2, noteDurationArray2,noteVelocityArray2);
       var music1 = new MusicLine("Acoustic Grand Piano", noteStartArray2, notePitchArray2, noteDurationArray2,noteVelocityArray2);
       var music1Str = JSON.stringify(music1);
       var music2 = JSON.parse(music1Str);
 
-      var n2a = new MonoSeq('Blown bottle Pipe 1', noteStartArray2, notePitchArray2, noteDurationArray2);
+      //var n2a = new MonoSeq('Blown bottle Pipe 1', noteStartArray2, notePitchArray2, noteDurationArray2);
 
-      var n3 = reflectMonoNotes(n2);
-      var n4 = musifyMonoNotes(n3, 2);
-      var n5 = reflectMonoNotes(n3);
+     // var n3 = reflectMonoNotes(n2);
+     // var n4 = musifyMonoNotes(n3, 2);
+      //var n5 = reflectMonoNotes(n3);
 
-      var mnStr2 = new MonoNotesStr(n2);
-      var mnStr2a = new MonoSeqStr(n2a);
+      //var mnStr2 = new MonoNotesStr(n2);
+      //var mnStr2a = new MonoSeqStr(n2a);
       //var mnStr5 = new MonoNotesStr(n5);
-      var n5a = reflectMonoSeq(n2a);
+      //var n5a = reflectMonoSeq(n2a);
 
 
       document.getElementById("ta1").innerText = music1Str;
@@ -448,7 +448,7 @@
 
 
 
-      dummy2 = 9;
+      //dummy2 = 9;
       count = 0;
 
       //while (count < notePitchArray2.length) {

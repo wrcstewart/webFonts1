@@ -25,124 +25,6 @@
 
 
 
-    function MusicLine(instrument, t, p, d,v) {
-
-      let len = p.length;
-      let start_pitch_duration_velocity = [];
-      for (let i = 0; i < len; i++) {
-        let temp = [];
-        temp[0] = t[i];
-        temp[1] = p[i];
-        temp[2] = d[i];
-        temp[3] = v[i];
-        start_pitch_duration_velocity[i] = temp;
-      }
-      this.instrument = instrument;
-      this.start_pitch_duration_velocity = start_pitch_duration_velocity;
-    }
-
-    function MonoSeq(instrument, t, p, d) {
-      this.instrument = instrument;
-      this.t = t;
-      this.p = p;
-      this.d = d;
-      this.l = p.length;
-      this.i = instrumentsMap.get(instrument);
-    }
-
-    /*class MonoNotesStr {
-
-
-      constructor(mn) {
-        this.mn = mn;
-        this.l = mn.l;
-        let len = this.l;
-        this.instrument = mn.instrument;
-        let str = delim + "music" + delim;
-        str += this.instrument + delim + "midi" + delim + "start pitch duration" + delim;
-        for (let i = 0; i < len; i++) {
-          str += (mn.t[i]).toFixed(4) + " " + mn.p[i] + " " + (mn.d[i]).toFixed(4) + delim;
-        }
-        this.s = str;
-      }
-    }*/
-
-   /* function MonoSeqStr(mn) {
-      this.mn = mn;
-      this.l = mn.l;
-      let len = this.l;
-      this.instrument = mn.instrument;
-      let str = delim + "music" + delim;
-      str += this.instrument + delim + "midi" + delim + "start pitch duration" + delim;
-      for (let i = 0; i < len; i++) {
-        str += (mn.t[i]).toFixed(4) + " " + mn.p[i] + " " + (mn.d[i]).toFixed(4) + delim;
-      }
-      this.s = str;
-    }*/
-
-
-    /*function reflectMonoNotes(mn) { // return a new monoNote that appends a reversed version to end to input
-
-      let at = [];
-      let ap = [];
-      let ad = [];
-      let l = mn.l;
-      for (let i = 0; i < l; i++) {
-        at[i] = mn.t[i];
-        ap[i] = mn.p[i];
-        ad[i] = mn.d[i];
-        if (i < l - 1) {
-          at[l + i] = mn.t[l - 1] + (mn.t[l - 1] - mn.t[l - (2 + i)]);
-          ap[l + i] = mn.p[l - (i + 2)];
-          ad[l + i] = mn.d[l - (i + 2)];//correct this
-        }
-      }
-      let result = new MonoNotes(mn.instrument, at, ap, ad);
-
-      return (result)
-    }*/
-
-    /*function reflectMonoSeq(mn) { // return a new monoNote that appends a reversed version to end to input
-
-      let at = [];
-      let ap = [];
-      let ad = [];
-      let l = mn.l;
-      for (let i = 0; i < l; i++) {
-        at[i] = mn.t[i];
-        ap[i] = mn.p[i];
-        ad[i] = mn.d[i];
-        if (i < l - 1) {
-          at[l + i] = mn.t[l - 1] + (mn.t[l - 1] - mn.t[l - (2 + i)]);
-          ap[l + i] = mn.p[l - (i + 2)];
-          ad[l + i] = mn.d[l - (i + 2)];//correct this
-        }
-      }
-      let result = new MonoSeq(mn.instrument, at, ap, ad);
-
-      return (result)
-    }
-*/
-   /* function musifyMonoNotes(mn, tonicMultiplier) {
-
-      let at = [];
-      let ap = [];
-      let ad = [];
-      let l = mn.l;
-      for (let i = 0; i < l; i++) {
-        at[i] = mn.t[i];
-        ap[i] = mn.p[i];
-        ad[i] = mn.d[i];
-        if (i > 0) at[i] += ad[0];
-      }
-      ad[0] = tonicMultiplier * mn.d[0];
-      ad[l - 1] = tonicMultiplier * mn.d[l - 1];
-      let result = new MonoNotes(mn.instrument, at, ap, ad);
-
-      return (result)
-
-
-    }*/
 
 
     window.playState = false;
@@ -216,6 +98,22 @@
       return (notes.indexOf(noteName) + 21)
     }
 
+    function MusicLine(instrument, t, p, d,v) {
+
+      let len = p.length;
+      let start_pitch_duration_velocity = [];
+      for (let i = 0; i < len; i++) {
+        let temp = [];
+        temp[0] = t[i];
+        temp[1] = p[i];
+        temp[2] = d[i];
+        temp[3] = v[i];
+        start_pitch_duration_velocity[i] = temp;
+      }
+      this.instrument = instrument;
+      this.start_pitch_duration_velocity = start_pitch_duration_velocity;
+    }
+
     var audioContext = new (window.AudioContext || window.webkitAudioContext)();
     var player = new WebAudioFontPlayer();
     //player.loader.decodeAfterLoading(audioContext,'_tone_0000_JCLive_sf2_file' );
@@ -228,7 +126,7 @@
 
 
     var origin;
-    /*let tonicNoteString;
+
     let midiBaseNote;
     let midiNote;
     let oldNoteScale;
@@ -237,7 +135,7 @@
     var len;
     var midiNoteArray = [];
     var oldNoteScaleArray = [];
-    var midiPitchArr = [];*/
+    var midiPitchArr = [];
 
     /*function createNotePitchArray(midiNoteArr, oldNoteScaleArr) {
       let notePitchArray = [];

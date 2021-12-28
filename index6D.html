@@ -15,7 +15,7 @@
   <script>
 
     var delim = '|';
-     window.playState = false;
+    window.playState = false;
 
     const instrumentsMap = new Map();
     instrumentsMap.set("Blown bottle Pipe 1", _tone_0760_Aspirin_sf2_file)
@@ -54,6 +54,7 @@
       cumArr[arr.length] = sum;
       return (cumArr)
     }
+
     var cumulativeProbs = generateCumulativeArray(probs);
 
     function stepScale8() { //compute a random step size in a scale of 8 notes
@@ -86,7 +87,7 @@
       return (notes.indexOf(noteName) + 21)
     }
 
-    function MusicLine(instrument, t, p, d,v) {
+    function MusicLine(instrument, t, p, d, v) {
 
       let len = p.length;
       let start_pitch_duration_velocity = [];
@@ -100,6 +101,22 @@
       }
       this.instrument = instrument;
       this.start_pitch_duration_velocity = start_pitch_duration_velocity;
+    }
+
+    function CloneMusicLine(newInstrument,ml){
+
+       let len1 = ml.start_pitch_duration_velocity.length;
+      let start_pitch_duration_velocity1 = [];
+      for (let i = 0; i < len1; i++) {
+        let temp = [];
+        temp[0] = ml.start_pitch_duration_velocity[i][0];
+        temp[1] = ml.start_pitch_duration_velocity[i][1]
+        temp[2] = ml.start_pitch_duration_velocity[i][2]
+        temp[3] = ml.start_pitch_duration_velocity[i][3]
+        start_pitch_duration_velocity1[i] = temp;
+      }
+      this.instrument = newInstrument;
+      this.start_pitch_duration_velocity = start_pitch_duration_velocity1;
     }
 
     var audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -142,11 +159,11 @@
       return (noteDurationArray);
     }
 
-    function createNoteVelocity(midiNoteArray,defaultVel,pulseVel,pulseRatio){
+    function createNoteVelocity(midiNoteArray, defaultVel, pulseVel, pulseRatio) {
       let noteVelocityArray = [];
       let len = midiNoteArray.length;
       for (let i = 0; i < len; i++) noteVelocityArray[i] = defaultVel;
-      for (let i = 0; i < len; i+=pulseRatio) noteVelocityArray[i] = pulseVel;
+      for (let i = 0; i < len; i += pulseRatio) noteVelocityArray[i] = pulseVel;
       return (noteVelocityArray);
     }
 
@@ -168,31 +185,50 @@
     }
 
 
-
-     function loadJSON(){
+    function loadJSON() {
       var inString = document.getElementById("ta1").value;
 
       var loadedMusicLine = JSON.parse(inString);
 
       count = 0;
-       origin = audioContext.currentTime;
-  var instrumentString = loadedMusicLine.instrument;
-  var instrumentVar = instrumentsMap.get(instrumentString);
+      origin = audioContext.currentTime;
+      var instrumentString = loadedMusicLine.instrument;
+      var instrumentVar = instrumentsMap.get(instrumentString);
 
       //while (count < notePitchArray2.length) {
       while (count < loadedMusicLine.start_pitch_duration_velocity.length) {
         player.queueWaveTable(
           audioContext, audioContext.destination,
-         instrumentVar,
+          instrumentVar,
           origin + loadedMusicLine.start_pitch_duration_velocity[count][0],
           loadedMusicLine.start_pitch_duration_velocity[count][1],
-           loadedMusicLine.start_pitch_duration_velocity[count][2],
-        loadedMusicLine.start_pitch_duration_velocity[count][3]
-        )    ;
+          loadedMusicLine.start_pitch_duration_velocity[count][2],
+          loadedMusicLine.start_pitch_duration_velocity[count][3]
+        );
         count++;
       }
-      return(loadedMusicLine)
+      return (loadedMusicLine)
     }
+
+    function playMusicLine(ml,origin) {
+
+      let count = 0;
+      let lenML = ml.start_pitch_duration_velocity.length;
+      let instrumentString = ml.instrument;
+      let instrumentVar = instrumentsMap.get(instrumentString);
+
+      while (count < lenML) {
+        player.queueWaveTable(
+          audioContext, audioContext.destination, instrumentVar,
+          origin + ml.start_pitch_duration_velocity[count][0],
+          ml.start_pitch_duration_velocity[count][1],
+          ml.start_pitch_duration_velocity[count][2],
+          ml.start_pitch_duration_velocity[count][3]
+        );
+        count++;
+      }
+    }
+
 
 
     function playOuter() {
@@ -211,6 +247,8 @@
 
       count = 0;
 
+
+
       function createTransposedPitchArray(notePitchArray, semitoneShift) {
         let len = notePitchArray.length;
         let result = [];
@@ -221,15 +259,23 @@
       var notePitchArray2 = createTransposedPitchArray(notePitchArray1, 3)
       var noteStartArray2 = createNoteStartArray(notePitchArray2, 1);
       var noteDurationArray2 = createNoteDurationArray(notePitchArray2, 1, 0.9);
-      var noteVelocityArray2 = createNoteVelocity(notePitchArray2,0.5,1.5,4);
-      var music1 = new MusicLine("Acoustic Grand Piano", noteStartArray2, notePitchArray2, noteDurationArray2,noteVelocityArray2);
+      var noteVelocityArray2 = createNoteVelocity(notePitchArray2, 0.5, 1.5, 4);
+      var music1 = new MusicLine("Acoustic Grand Piano", noteStartArray2, notePitchArray2, noteDurationArray2, noteVelocityArray2);
+      var music3 = new CloneMusicLine("Blown bottle Pipe 1",music1);
+
       var music1Str = JSON.stringify(music1);
       var music2 = JSON.parse(music1Str);
       document.getElementById("ta1").innerText = music1Str;
       var test1 = document.getElementById("ta1").value;
-      count = 0;
+
+      origin = audioContext.currentTime;
+       playMusicLine(music3,origin);
+       playMusicLine(music1,origin);
 
 
+
+
+     /* count = 0;
       while (count < music2.start_pitch_duration_velocity.length) {
         var instrumentString = music2.instrument;
         var instrumentVar = instrumentsMap.get(instrumentString);
@@ -237,11 +283,11 @@
           audioContext, audioContext.destination, instrumentVar,
           origin + music2.start_pitch_duration_velocity[count][0],
           music2.start_pitch_duration_velocity[count][1],
-           music2.start_pitch_duration_velocity[count][2],
-        music2.start_pitch_duration_velocity[count][3]
+          music2.start_pitch_duration_velocity[count][2],
+          music2.start_pitch_duration_velocity[count][3]
         );
         count++;
-      }
+      }*/
 
 
     }

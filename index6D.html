@@ -22,6 +22,13 @@
     instrumentsMap.set("Flute Pipe 1", _tone_0730_Aspirin_sf2_file)
     instrumentsMap.set("Acoustic Grand Piano", _tone_0000_JCLive_sf2_file)
 
+     const beatsMap = new Map();
+    beatsMap.set('C',1.0);
+    beatsMap.set('Q',0.5);
+    //beatsMap.set('C',1.0);
+   // beatsMap.set('C',1.0);
+
+
     var noteNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];//used to construct notes[] below
     var notes = []; // this allows easy look up of note name to midi number - but based with A0 = 0
     // a function will add 21 to give the correct official midi number of the notes.
@@ -102,8 +109,9 @@
       this.instrument = instrument;
       this.bpm = bpm;
       this.start_pitch_duration_velocity = start_pitch_duration_velocity;
-
     }
+
+    var beat1 = ['C','Q','Q','C','C','C','C','C','Q','Q'];
 
     function CloneMusicLine(newInstrument,bpm, semitonesShift, ml) {
 
@@ -124,7 +132,9 @@
     }
 
 
-   /* function CloneMusicLineToRhythm(beatsString,bpm,ml) {
+
+
+   function CloneMusicLineToRhythm(beats,bpm,ml) {
 
       let len1 = ml.start_pitch_duration_velocity.length;
       let start_pitch_duration_velocity1 = [];
@@ -140,7 +150,7 @@
       this.instrument = bpm;
       this.start_pitch_duration_velocity = start_pitch_duration_velocity1;
     this.bmp = bpm;
-    }*/
+    }
 
     var audioContext = new (window.AudioContext || window.webkitAudioContext)();
     var player = new WebAudioFontPlayer();
@@ -240,10 +250,7 @@
       for (let i = 0; i < len; i++) playMusicLine(musicLineArray[i], origin);
     }
 
-    /*function addRhythm(musicLineArray,rhythmArray){
 
-
-    }*/
 
 
     function playOuter() {

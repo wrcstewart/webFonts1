@@ -22,11 +22,11 @@
     instrumentsMap.set("Flute Pipe 1", _tone_0730_Aspirin_sf2_file)
     instrumentsMap.set("Acoustic Grand Piano", _tone_0000_JCLive_sf2_file)
 
-     const beatsMap = new Map();
-    beatsMap.set('C',1.0);
-    beatsMap.set('Q',0.5);
+    const beatsMap = new Map();
+    beatsMap.set('C', 1.0);
+    beatsMap.set('Q', 0.5);
     //beatsMap.set('C',1.0);
-   // beatsMap.set('C',1.0);
+    // beatsMap.set('C',1.0);
 
 
     var noteNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];//used to construct notes[] below
@@ -111,9 +111,9 @@
       this.start_pitch_duration_velocity = start_pitch_duration_velocity;
     }
 
-    var beat1 = ['C','Q','Q'];
+    var beat1 = ['C', 'Q', 'Q'];
 
-    function CloneMusicLine(newInstrument,bpm, semitonesShift, ml) {
+    function CloneMusicLine(newInstrument, bpm, semitonesShift, ml) {
       this.instrument = newInstrument;
       this.bpm = bpm;
       let len1 = ml.start_pitch_duration_velocity.length;
@@ -132,34 +132,23 @@
     }
 
 
-
-
-   function CloneMusicLineToRhythm(beats,bpm,ml) {
+    function CloneMusicLineToRhythm(beats, bpm, ml) {
       // set new start times based on bpm and beats.
-
-
-     this.instrument = ml.instrument;
-         this.bpm = bpm;
-
-     //let tMult = 60/bpm;
-
+      this.instrument = ml.instrument;
+      this.bpm = bpm; let tMult = 1.0;
 
       let len1 = ml.start_pitch_duration_velocity.length;
       let start_pitch_duration_velocity1 = [];
       for (let i = 0; i < len1; i++) {
         let temp = [];
-        temp[0] = ml.start_pitch_duration_velocity[i][0] * tMult  ;
+        temp[0] = ml.start_pitch_duration_velocity[i][0] * tMult;
         temp[1] = ml.start_pitch_duration_velocity[i][1];
         temp[2] = ml.start_pitch_duration_velocity[i][2] * tMult;
         temp[3] = ml.start_pitch_duration_velocity[i][3]
         start_pitch_duration_velocity1[i] = temp;
       }
-    //  this.instrument = ml.instrument;
-
       this.start_pitch_duration_velocity = start_pitch_duration_velocity1;
-   // this.bpm = bpm;
     }
-
 
 
     var audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -232,24 +221,24 @@
       var inString = document.getElementById("ta1").value;
       var loadedMusicScore = JSON.parse(inString);
       origin = audioContext.currentTime;
-      playScore(loadedMusicScore,origin);
+      playScore(loadedMusicScore, origin);
     }
 
     function playMusicLine(ml, origin) {
 
       let count = 0;
       let lenML = ml.start_pitch_duration_velocity.length;
-      let bpm = ml.bmp;//ignore for time being
+      let bpm = ml.bpm;//ignore for time being
       let instrumentString = ml.instrument;
       let instrumentVar = instrumentsMap.get(instrumentString);
-      let timeMult = 60/bpm;
+      let timeMult = 60 / bpm;
 
       while (count < lenML) {
         player.queueWaveTable(
           audioContext, audioContext.destination, instrumentVar,
-          origin + ml.start_pitch_duration_velocity[count][0] *timeMult,
+          origin + ml.start_pitch_duration_velocity[count][0] * timeMult,
           ml.start_pitch_duration_velocity[count][1],
-          ml.start_pitch_duration_velocity[count][2] *timeMult,
+          ml.start_pitch_duration_velocity[count][2] * timeMult,
           ml.start_pitch_duration_velocity[count][3]
         );
         count++;
@@ -260,8 +249,6 @@
       let len = musicLineArray.length;
       for (let i = 0; i < len; i++) playMusicLine(musicLineArray[i], origin);
     }
-
-
 
 
     function playOuter() {
@@ -292,13 +279,15 @@
       var notePitchArray2 = createTransposedPitchArray(notePitchArray1, 3)
       var noteStartArray2 = createNoteStartArray(notePitchArray2, 1);
       var noteDurationArray2 = createNoteDurationArray(notePitchArray2, 1, 0.9);
-      var noteVelocityArray2 = createNoteVelocity(notePitchArray2, 0.5, 1.5, 4);
+      var noteVelocityArray2 = createNoteVelocity(notePitchArray2, 1.0, 1.0, 4);
 
       var testMusicLineArray = [];
-     var music1 = new MusicLine("Acoustic Grand Piano", 60, noteStartArray2, notePitchArray2, noteDurationArray2, noteVelocityArray2);
+      var music1 = new MusicLine("Acoustic Grand Piano", 60, noteStartArray2, notePitchArray2, noteDurationArray2, noteVelocityArray2);
       //testMusicLineArray[0] = music1;
-      testMusicLineArray[0] = new CloneMusicLineToRhythm(beat1,120,music1);
-      //testMusicLineArray[2] = new CloneMusicLine("Flute Pipe 1",60, 8, music1);
+      testMusicLineArray[0] = new CloneMusicLineToRhythm(beat1, 120, music1);
+      testMusicLineArray[1] = new CloneMusicLineToRhythm(beat1, 180, music1);
+      testMusicLineArray[2] = new CloneMusicLineToRhythm(beat1, 240, music1);
+      testMusicLineArray[3] = new CloneMusicLineToRhythm(beat1, 360, music1);
 
 
       var music1Str = JSON.stringify(testMusicLineArray);

@@ -131,22 +131,64 @@
 
     }
 
+    function getTimeIncr(beats, countBeats) {
+
+      return (beatsMap.get(beats[countBeats]))
+    }
+
 
     function CloneMusicLineToRhythm(beats, bpm, ml) {
       // set new start times based on bpm and beats.
       this.instrument = ml.instrument;
-      this.bpm = bpm; let tMult = 1.0;
+      this.bpm = bpm; //reconsider if this needs passing in
+ let start_pitch_duration_velocity1 = [];
 
-      let len1 = ml.start_pitch_duration_velocity.length;
-      let start_pitch_duration_velocity1 = [];
-      for (let i = 0; i < len1; i++) {
+      let countSPDV = 0;
+      let countBeats = 0;
+      let countSPDV1 = 0;
+      let lenSPDV = ml.start_pitch_duration_velocity.length;
+      let lenBeats = beats.length;
+      let time = 0;
+
+      while (countSPDV < lenSPDV) { //overall process to stop when out of pitch values
+
+        while (countBeats < lenBeats) {
+
+          let timeIncr = getTimeIncr(beats, countBeats);
+
+          if (timeIncr > 0) {
+            let temp = [];
+            temp[0] = time;
+            temp[1] = ml.start_pitch_duration_velocity[countSPDV][1];//adjust this counter
+            temp[2] = ml.start_pitch_duration_velocity[countSPDV][2] ;
+            temp[3] = ml.start_pitch_duration_velocity[countSPDV][3];
+            start_pitch_duration_velocity1[countSPDV1] = temp;//must adjust this counter
+            time += timeIncr;
+            countSPDV +=1;
+            countSPDV1 +=1;
+          }
+
+countBeats += 1;
+          if (countBeats == lenBeats) countBeats = 0;// last statement in this while loop
+        }
+
+
+      }
+
+
+
+
+
+     /* for (let i = 0; i < len1; i++) {
         let temp = [];
         temp[0] = ml.start_pitch_duration_velocity[i][0] * tMult;
         temp[1] = ml.start_pitch_duration_velocity[i][1];
         temp[2] = ml.start_pitch_duration_velocity[i][2] * tMult;
         temp[3] = ml.start_pitch_duration_velocity[i][3]
         start_pitch_duration_velocity1[i] = temp;
-      }
+      }*/
+
+
       this.start_pitch_duration_velocity = start_pitch_duration_velocity1;
     }
 

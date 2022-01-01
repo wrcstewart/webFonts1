@@ -10,6 +10,8 @@
   <script src='https://surikov.github.io/webaudiofontdata/sound/12847_0_Chaos_sf2_file.js'></script>
   <script src='https://surikov.github.io/webaudiofontdata/sound/0760_Aspirin_sf2_file.js'></script>
   <script src='https://surikov.github.io/webaudiofontdata/sound/0000_JCLive_sf2_file.js'></script>
+  <script src='https://surikov.github.io/webaudiofontdata/sound/12835_0_Chaos_sf2_file.js'></script>
+
 
 
   <script>
@@ -21,10 +23,15 @@
     instrumentsMap.set("Blown bottle Pipe 1", _tone_0760_Aspirin_sf2_file)
     instrumentsMap.set("Flute Pipe 1", _tone_0730_Aspirin_sf2_file)
     instrumentsMap.set("Acoustic Grand Piano", _tone_0000_JCLive_sf2_file)
+    instrumentsMap.set("Bass Drum 2",_drum_35_0_Chaos_sf2_file );
+
 
     const beatsMap = new Map();
     beatsMap.set('C', 1.0);
     beatsMap.set('Q', 0.5);
+    beatsMap.set('CR',-1.0);
+    beatsMap.set('CQ',-0.5);
+    beatsMap.set('CM',-2.0);
     //beatsMap.set('C',1.0);
     // beatsMap.set('C',1.0);
 
@@ -111,7 +118,8 @@
       this.start_pitch_duration_velocity = start_pitch_duration_velocity;
     }
 
-    var beat1 = ['C', 'Q', 'Q'];
+    var beat1 = ['C', 'Q', 'Q','C','C','C','C','C','Q','Q','CM','C','C'];
+    var beatBassDrum1 = ["C","CR","Q",'Q',"CR"]
 
     function CloneMusicLine(newInstrument, bpm, semitonesShift, ml) {
       this.instrument = newInstrument;
@@ -150,7 +158,7 @@
       let lenBeats = beats.length;
       let time = 0;
 
-      while (countSPDV < lenSPDV) { //overall process to stop when out of pitch values
+      while (countSPDV < (lenSPDV - 0.1) ) { //overall process to stop when out of pitch values
 
         while (countBeats < lenBeats) {
 
@@ -164,8 +172,12 @@
             temp[3] = ml.start_pitch_duration_velocity[countSPDV][3];
             start_pitch_duration_velocity1[countSPDV1] = temp;//must adjust this counter
             time += timeIncr;
-            countSPDV +=1;
+            countSPDV +=1;//need to break round here
+            if (countSPDV == lenSPDV) break;
             countSPDV1 +=1;
+          }
+          if (timeIncr <= 0){
+             time += Math.abs(timeIncr);
           }
 
 countBeats += 1;
@@ -200,6 +212,7 @@ countBeats += 1;
     player.loader.decodeAfterLoading(audioContext, '_drum_47_0_Chaos_sf2_file');
     player.loader.decodeAfterLoading(audioContext, '_tone_0760_Aspirin_sf2_file');
     player.loader.decodeAfterLoading(audioContext, '_tone_0000_JCLive_sf2_file');
+    player.loader.decodeAfterLoading(audioContext, '_drum_35_0_Chaos_sf2_file');
     var origin;
     let midiBaseNote;
     let midiNote;
@@ -302,7 +315,7 @@ countBeats += 1;
       }
       window.playState = true;
       player.cancelQueue(audioContext);
-      var notePitchArray1 = createNotePitchArray("C4", 180);
+      var notePitchArray1 = createNotePitchArray("C4", 72);
       origin = audioContext.currentTime;
       var noteStartArray1 = createNoteStartArray(notePitchArray1, 0.75);
       var noteDurationArray1 = createNoteDurationArray(notePitchArray1, 0.75, 0.95);
@@ -324,12 +337,13 @@ countBeats += 1;
       var noteVelocityArray2 = createNoteVelocity(notePitchArray2, 1.0, 1.0, 4);
 
       var testMusicLineArray = [];
-      var music1 = new MusicLine("Acoustic Grand Piano", 60, noteStartArray2, notePitchArray2, noteDurationArray2, noteVelocityArray2);
+     // var music1 = new MusicLine("Acoustic Grand Piano", 60, noteStartArray2, notePitchArray2, noteDurationArray2, noteVelocityArray2);
+      var music1 = new MusicLine("Bass Drum 2", 60, noteStartArray2, notePitchArray2, noteDurationArray2, noteVelocityArray2);
       //testMusicLineArray[0] = music1;
-      testMusicLineArray[0] = new CloneMusicLineToRhythm(beat1, 120, music1);
-      testMusicLineArray[1] = new CloneMusicLineToRhythm(beat1, 180, music1);
-      testMusicLineArray[2] = new CloneMusicLineToRhythm(beat1, 240, music1);
-      testMusicLineArray[3] = new CloneMusicLineToRhythm(beat1, 360, music1);
+      testMusicLineArray[0] = new CloneMusicLineToRhythm(beatBassDrum1, 60, music1);
+     // testMusicLineArray[1] = new CloneMusicLineToRhythm(beat1, 180, music1);
+     // testMusicLineArray[2] = new CloneMusicLineToRhythm(beat1, 240, music1);
+     // testMusicLineArray[3] = new CloneMusicLineToRhythm(beat1, 360, music1);
 
 
       var music1Str = JSON.stringify(testMusicLineArray);
@@ -340,7 +354,7 @@ countBeats += 1;
 
       origin = audioContext.currentTime;
 
-      playScore(readArray, origin);
+      playScore(testMusicLineArray, origin);
 
       /* playMusicLine(music3,origin);
        playMusicLine(music1,origin);

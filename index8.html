@@ -30,6 +30,7 @@
     const beatsMap = new Map();
     beatsMap.set('C', 1.0);
     beatsMap.set('Q', 0.5);
+    beatsMap.set('M', 2.0);
     beatsMap.set('CR', -1.0);
     beatsMap.set('CQ', -0.5);
     beatsMap.set('CM', -2.0);
@@ -124,7 +125,7 @@
     var beat1 = ['C', 'Q', 'Q', 'C', 'C', 'C', 'C', 'C', 'Q', 'Q', 'CM', 'C', 'C'];
     var beatBassDrum1 = ["C", "CR", "Q", 'Q', "CR", "Q", "Q", "CR", "Q", 'Q', "CR"]
     var beatSnareDrum1 = ["CR", "S", "SR", "SR", "S", "CR", "C"]
-    var beatFlute = ["C", "C", "C", "Q", "Q"]
+    var beatFlute1 = ["C", "C", "C", "Q", "Q","C","C","Q","Q","Q","Q"]
 
     function CloneMusicLine(newInstrument, bpm, semitonesShift, ml) {
       this.instrument = newInstrument;
@@ -147,7 +148,9 @@
     }
 
     function getPitchIndexFromTime(t, lenPitchArray) {
-      return ((Math.round(t)) % lenPitchArray);
+      let epsilon = (Math.random() - 0.5)* 0.0000000001;
+      // for Q choose either current or next, randomly
+      return ((Math.round(t+epsilon)) % lenPitchArray);
     }
 
     function CloneMusicLineToRhythm(beats, bpm, ml, endTime) {
@@ -328,10 +331,11 @@
       // var music1 = new MusicLine("Acoustic Grand Piano", 60, noteStartArray2, notePitchArray2, noteDurationArray2, noteVelocityArray2);
       var music1 = new MusicLine("Bass Drum 2", 60, noteStartArray2, notePitchArray2, noteDurationArray2, noteVelocityArray2);
       var music2 = new MusicLine("Snare Drum 1", 60, noteStartArray2, notePitchArray2, noteDurationArray2, noteVelocityArray2);
-      var music3 = new MusicLine("Flute Pipe 1", 60, noteStartArray2, notePitchArray2, noteDurationArray2, noteVelocityArray2);
+      var music3 = new MusicLine("Acoustic Grand Piano", 60, noteStartArray2, notePitchArray2, noteDurationArray2, noteVelocityArray2);
       //testMusicLineArray[0] = music1;
-      testMusicLineArray[0] = new CloneMusicLineToRhythm(beatBassDrum1, 120, music1, 60);
-      testMusicLineArray[1] = new CloneMusicLineToRhythm(beatSnareDrum1, 120, music2, 60);
+      testMusicLineArray[0] = new CloneMusicLineToRhythm(beatBassDrum1, 150, music1, 120);
+      testMusicLineArray[1] = new CloneMusicLineToRhythm(beatSnareDrum1, 150, music2, 120);
+      testMusicLineArray[2] = new CloneMusicLineToRhythm(beatFlute1, 150, music3, 120);
      // testMusicLineArray[2] = new CloneMusicLineToRhythm(beatFlute, 120, music3, 60);
       // testMusicLineArray[1] = new CloneMusicLineToRhythm(beat1, 180, music1);
       // testMusicLineArray[2] = new CloneMusicLineToRhythm(beat1, 240, music1);

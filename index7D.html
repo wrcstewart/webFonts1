@@ -156,7 +156,6 @@
       this.bpm = bpm; //reconsider if this needs passing in
       this.endTime = endTime;
       let start_pitch_duration_velocity1 = [];
-
       let countSPDV = 0;
       let countBeats = 0;
       let countSPDV1 = 0;
@@ -179,34 +178,16 @@
             temp[3] = ml.start_pitch_duration_velocity[ixx][3];
             start_pitch_duration_velocity1[countSPDV1] = temp;
             time += timeIncr;
-            //countSPDV +=1;//need to break round here
-            //if (countSPDV == lenSPDV) break;
-            //put new break!!!!
             if (time > endTime) break;
             countSPDV1 += 1;
           }
           if (timeIncr <= 0) {
             time += Math.abs(timeIncr);
           }
-
           countBeats += 1;
           if (countBeats == lenBeats) countBeats = 0;// last statement in this while loop
         }
-
-
       }
-
-
-      /* for (let i = 0; i < len1; i++) {
-         let temp = [];
-         temp[0] = ml.start_pitch_duration_velocity[i][0] * tMult;
-         temp[1] = ml.start_pitch_duration_velocity[i][1];
-         temp[2] = ml.start_pitch_duration_velocity[i][2] * tMult;
-         temp[3] = ml.start_pitch_duration_velocity[i][3]
-         start_pitch_duration_velocity1[i] = temp;
-       }*/
-
-
       this.start_pitch_duration_velocity = start_pitch_duration_velocity1;
     }
 
@@ -324,7 +305,7 @@
       player.cancelQueue(audioContext);
       var notePitchArray1 = createNotePitchArray("C4", 12);
       origin = audioContext.currentTime;
-      var noteStartArray1 = createNoteStartArray(notePitchArray1, 0.75);
+      var noteStartArray1 = createNoteStartArray(notePitchArray1, 1.0);
       var noteDurationArray1 = createNoteDurationArray(notePitchArray1, 0.75, 0.95);
 
       count = 0;
@@ -338,7 +319,7 @@
       }
 
 
-      var notePitchArray2 = createTransposedPitchArray(notePitchArray1, -12)
+      var notePitchArray2 = createTransposedPitchArray(notePitchArray1, -24)
       var noteStartArray2 = createNoteStartArray(notePitchArray2, 1);
       var noteDurationArray2 = createNoteDurationArray(notePitchArray2, 1, 0.9);
       var noteVelocityArray2 = createNoteVelocity(notePitchArray2, 1.0, 1.0, 4);
@@ -351,7 +332,7 @@
       //testMusicLineArray[0] = music1;
       testMusicLineArray[0] = new CloneMusicLineToRhythm(beatBassDrum1, 120, music1, 60);
       testMusicLineArray[1] = new CloneMusicLineToRhythm(beatSnareDrum1, 120, music2, 60);
-      testMusicLineArray[2] = new CloneMusicLineToRhythm(beatFlute, 120, music3, 60);
+     // testMusicLineArray[2] = new CloneMusicLineToRhythm(beatFlute, 120, music3, 60);
       // testMusicLineArray[1] = new CloneMusicLineToRhythm(beat1, 180, music1);
       // testMusicLineArray[2] = new CloneMusicLineToRhythm(beat1, 240, music1);
       // testMusicLineArray[3] = new CloneMusicLineToRhythm(beat1, 360, music1);

@@ -12,6 +12,7 @@
   <script src='https://surikov.github.io/webaudiofontdata/sound/0000_JCLive_sf2_file.js'></script>
   <script src='https://surikov.github.io/webaudiofontdata/sound/12835_0_Chaos_sf2_file.js'></script>
   <script src='https://surikov.github.io/webaudiofontdata/sound/12838_0_Chaos_sf2_file.js'></script>
+  <script src='https://surikov.github.io/webaudiofontdata/sound/12842_0_Chaos_sf2_file.js'></script>
 
 
   <script>
@@ -25,6 +26,8 @@
     instrumentsMap.set("Acoustic Grand Piano", _tone_0000_JCLive_sf2_file)
     instrumentsMap.set("Bass Drum 2", _drum_35_0_Chaos_sf2_file);
     instrumentsMap.set("Snare Drum 1", _drum_38_0_Chaos_sf2_file);
+    instrumentsMap.set("Hi-hat 1", _drum_42_0_Chaos_sf2_file);
+
 
 
     const beatsMap = new Map();
@@ -105,22 +108,6 @@
       return (notes.indexOf(noteName) + 21)
     }
 
-    function MusicLine(instrument, bpm, t, p, d, v) {
-
-      let len = p.length;
-      let start_pitch_duration_velocity = [];
-      for (let i = 0; i < len; i++) {
-        let temp = [];
-        temp[0] = t[i];
-        temp[1] = p[i];
-        temp[2] = d[i];
-        temp[3] = v[i];
-        start_pitch_duration_velocity[i] = temp;
-      }
-      this.instrument = instrument;
-      this.bpm = bpm;
-      this.start_pitch_duration_velocity = start_pitch_duration_velocity;
-    }
 
     function MLine(duration, instrument, bpm, beats, pitches, noteDuration) {
       this.duration = duration;
@@ -134,28 +121,14 @@
 
     }
 
-    var beat1 = ['C', 'Q', 'Q', 'C', 'C', 'C', 'C', 'C', 'Q', 'Q', 'CM', 'C', 'C'];
-    var beatBassDrum1 = ["C", "CR", "Q", 'Q', "CR", "Q", "Q", "CR", "Q", 'Q', "CR"]
+    var beat1 = ['C', 'Q', 'Q', 'C', 'C', 'C', 'C', 'C', 'Q', 'Q', 'CR', 'C', 'C'];
+    var beatBassDrum1 = ["CF", "CR", "Q", 'Q', "CR", "QF", "Q", "CR", "Q", 'Q', "CR"]
     var beatSnareDrum1 = ["CR", "S", "SR", "SR", "S", "CR", "C"]
-    var beatFlute1 = ["CF", "C", "C", "Q", "Q"];
+    var beatFlute1 = ["M","MR"];
+    var beatHighHat1 = ["SF","S","S","S"];
 
-    var pulse1_4 = [2, 1, 1, 1];//relative velocites
 
-    function CloneMusicLine(newInstrument, bpm, semitonesShift, ml) {
-      this.instrument = newInstrument;
-      this.bpm = bpm;
-      let len1 = ml.start_pitch_duration_velocity.length;
-      let start_pitch_duration_velocity1 = [];
-      for (let i = 0; i < len1; i++) {
-        let temp = [];
-        temp[0] = ml.start_pitch_duration_velocity[i][0];
-        temp[1] = ml.start_pitch_duration_velocity[i][1] + semitonesShift;
-        temp[2] = ml.start_pitch_duration_velocity[i][2]
-        temp[3] = ml.start_pitch_duration_velocity[i][3]
-        start_pitch_duration_velocity1[i] = temp;
-      }
-      this.start_pitch_duration_velocity = start_pitch_duration_velocity1;
-    }
+
 
     function getTimeIncr(beats, countBeats) {
       let beatsString = (beats[countBeats]);
@@ -182,53 +155,6 @@
       return ((Math.round(t + epsilon)) % lenPitchArray);
     }
 
-    function CloneMusicLineToRhythm(beats, bpm, ml, endTime) {
-      // set new start times based on bpm and beats.
-      this.instrument = ml.instrument;
-      this.bpm = bpm; //reconsider if this needs passing in
-      this.endTime = endTime;
-      let start_pitch_duration_velocity1 = [];
-      let countSPDV = 0;
-      let countBeats = 0;
-      let countSPDV1 = 0;
-      let lenSPDV = ml.start_pitch_duration_velocity.length;
-      let lenBeats = beats.length;
-      let time = 0;
-
-      while (time < endTime) { //overall process to stop when past duration
-
-        while (countBeats < lenBeats) {
-
-          let timeIncr = getTimeIncr(beats, countBeats);
-
-          if (timeIncr > 0) {
-            let temp = [];
-            let ixx = getPitchIndexFromTime(time, lenSPDV);
-            temp[0] = time;
-            temp[1] = ml.start_pitch_duration_velocity[ixx][1];
-            temp[2] = ml.start_pitch_duration_velocity[ixx][2] * timeIncr;
-            temp[3] = ml.start_pitch_duration_velocity[ixx][3];
-            start_pitch_duration_velocity1[countSPDV1] = temp;
-            time += timeIncr;
-            if (time > endTime) break;
-            countSPDV1 += 1;
-          }
-          if (timeIncr <= 0) {
-            time += Math.abs(timeIncr);
-          }
-          countBeats += 1;
-          if (countBeats == lenBeats) countBeats = 0;// last statement in this while loop
-        }
-      }
-      this.start_pitch_duration_velocity = start_pitch_duration_velocity1;
-    }
-
-    /* function getVelocity(pulse,time){
-      let lenPulse = pulse.length;
-       for (let i=0;i<lenPulse;i++){
-       if (   (time % lenPulse) == i ) return (pulse[i])
-      }
-     }*/
 
     function playMLine(mL, origin) {
 
@@ -291,6 +217,8 @@
     player.loader.decodeAfterLoading(audioContext, '_tone_0000_JCLive_sf2_file');
     player.loader.decodeAfterLoading(audioContext, '_drum_35_0_Chaos_sf2_file');
     player.loader.decodeAfterLoading(audioContext, '_drum_38_0_Chaos_sf2_file');
+    player.loader.decodeAfterLoading(audioContext, '_drum_42_0_Chaos_sf2_file');
+
     var origin;
     let midiBaseNote;
     let midiNote;
@@ -302,35 +230,6 @@
     var oldNoteScaleArray = [];
     var midiPitchArr = [];
 
-
-    function createNoteStartArray(midiNoteArray, multiplier) {
-// multiplier is step between notes in seconds
-      let noteStartArray = [];
-      let len = midiNoteArray.length;
-      for (let i = 0; i < len; i++) {
-        noteStartArray[i] = (i * multiplier);
-      }
-      return (noteStartArray);
-    }
-
-
-    function createNoteDurationArray(midiNoteArray, multiplier, noteLength) {
-      let duration = multiplier * noteLength;
-      let noteDurationArray = [];
-      let len = midiNoteArray.length;
-      for (let i = 0; i < len; i++) {
-        noteDurationArray[i] = duration;
-      }
-      return (noteDurationArray);
-    }
-
-    function createNoteVelocity(midiNoteArray, defaultVel, pulseVel, pulseRatio) {
-      let noteVelocityArray = [];
-      let len = midiNoteArray.length;
-      for (let i = 0; i < len; i++) noteVelocityArray[i] = defaultVel;
-      for (let i = 0; i < len; i += pulseRatio) noteVelocityArray[i] = pulseVel;
-      return (noteVelocityArray);
-    }
 
     function createNotePitchArray(tonicNoteName, len) {
       let midiBaseNote = getMidiNoteFromName(tonicNoteName);
@@ -349,42 +248,31 @@
       return (midiNoteArray)
     }
 
+    function createTransposedPitchArray(notePitchArray, semitoneShift) {
+      let len = notePitchArray.length;
+      let result = [];
+      for (let i = 0; i < len; i++) result[i] = notePitchArray[i] + semitoneShift;
+      return (result)
+    }
+
 
     function loadJSON() {
       var inString = document.getElementById("ta1").value;
-      var loadedML = JSON.parse(inString);
+      var mLineArray = JSON.parse(inString);
       origin = audioContext.currentTime;
-      playMLine(loadedML,origin);
-    }
-
-    function playMusicLine(ml, origin) {
-
-      let count = 0;
-      let lenML = ml.start_pitch_duration_velocity.length;
-      let bpm = ml.bpm;//ignore for time being
-      let instrumentString = ml.instrument;
-      let instrumentVar = instrumentsMap.get(instrumentString);
-      let timeMult = 60 / bpm;
-
-      while (count < lenML) {
-        player.queueWaveTable(
-          audioContext, audioContext.destination, instrumentVar,
-          origin + ml.start_pitch_duration_velocity[count][0] * timeMult,
-          ml.start_pitch_duration_velocity[count][1],
-          ml.start_pitch_duration_velocity[count][2] * timeMult,
-          ml.start_pitch_duration_velocity[count][3]
-        );
-        count++;
-      }
-    }
-
-    function playScore(musicLineArray, origin) {
-      let len = musicLineArray.length;
-      for (let i = 0; i < len; i++) playMusicLine(musicLineArray[i], origin);
+      origin += 1;
+      //playMLine(loadedML,origin);
+      playSection(mLineArray, origin);
     }
 
 
-    function playOuter() {
+    function playSection(mLineArray, origin) {
+      let len = mLineArray.length;
+      for (let i = 0; i < len; i++) playMLine(mLineArray[i], origin);
+    }
+
+
+    function genMusic() {
       if (window.playState) {
         player.cancelQueue(audioContext);
         alert("queue cancelled");
@@ -394,76 +282,21 @@
       window.playState = true;
       player.cancelQueue(audioContext);
       var notePitchArray1 = createNotePitchArray("C4", 8);
-      origin = audioContext.currentTime;
-      var noteStartArray1 = createNoteStartArray(notePitchArray1, 1.0);
-      var noteDurationArray1 = createNoteDurationArray(notePitchArray1, 0.75, 0.95);
-
-      count = 0;
-
-
-      function createTransposedPitchArray(notePitchArray, semitoneShift) {
-        let len = notePitchArray.length;
-        let result = [];
-        for (let i = 0; i < len; i++) result[i] = notePitchArray[i] + semitoneShift;
-        return (result)
-      }
 
 
       var notePitchArray2 = createTransposedPitchArray(notePitchArray1, 0)
-      var noteStartArray2 = createNoteStartArray(notePitchArray2, 1);
-      var noteDurationArray2 = createNoteDurationArray(notePitchArray2, 1, 0.9);
-      var noteVelocityArray2 = createNoteVelocity(notePitchArray2, 1.0, 1.0, 4);
 
-      var testMusicLineArray = [];
-      // var music1 = new MusicLine("Acoustic Grand Piano", 60, noteStartArray2, notePitchArray2, noteDurationArray2, noteVelocityArray2);
-      var music1 = new MusicLine("Bass Drum 2", 60, noteStartArray2, notePitchArray2, noteDurationArray2, noteVelocityArray2);
-      var music2 = new MusicLine("Snare Drum 1", 60, noteStartArray2, notePitchArray2, noteDurationArray2, noteVelocityArray2);
-      var music3 = new MusicLine("Acoustic Grand Piano", 60, noteStartArray2, notePitchArray2, noteDurationArray2, noteVelocityArray2);
-
-      var music4 = new MLine(40, "Acoustic Grand Piano", 120, beatFlute1, notePitchArray2, 0.9);
+      // var music4 = new MLine(10, "Acoustic Grand Piano", 120, beatFlute1, notePitchArray2, 0.9);
+      var music4 = new MLine(30, "Acoustic Grand Piano", 120, beatFlute1, [51, 53, 54, 58, 54, 53, 49, 51,53], 0.9);
+      var music5 = new MLine(30, "Bass Drum 2", 120, beatBassDrum1, [32], 0.9);
+      var music6 = new MLine(30, "Snare Drum 1", 120, beatSnareDrum1, [39], 0.9);
+      var music7 = new MLine(30, "Hi-hat 1", 120, beatHighHat1, [58], 0.9);
+      var mLineArray = [music4,music5,music6,music7];
 
 
-      //testMusicLineArray[0] = music1;
-      testMusicLineArray[0] = new CloneMusicLineToRhythm(beatBassDrum1, 150, music1, 120);
-      testMusicLineArray[1] = new CloneMusicLineToRhythm(beatSnareDrum1, 150, music2, 120);
-      testMusicLineArray[2] = new CloneMusicLineToRhythm(beatFlute1, 150, music3, 120);
-      // testMusicLineArray[2] = new CloneMusicLineToRhythm(beatFlute, 120, music3, 60);
-      // testMusicLineArray[1] = new CloneMusicLineToRhythm(beat1, 180, music1);
-      // testMusicLineArray[2] = new CloneMusicLineToRhythm(beat1, 240, music1);
-      // testMusicLineArray[3] = new CloneMusicLineToRhythm(beat1, 360, music1);
-
-      playMLine(music4, origin);
-
-
-      var music1Str = JSON.stringify(music4);
-      var readArray = JSON.parse(music1Str);
+      var music1Str = JSON.stringify(mLineArray);
+      //var readArray = JSON.parse(music1Str);
       document.getElementById("ta1").innerText = music1Str;
-      var test1 = document.getElementById("ta1").value;
-
-
-      origin = audioContext.currentTime;
-
-      //playScore(testMusicLineArray, origin);
-
-      /* playMusicLine(music3,origin);
-       playMusicLine(music1,origin);
-       playMusicLine(music4,origin);*/
-
-
-      /* count = 0;
-       while (count < music2.start_pitch_duration_velocity.length) {
-         var instrumentString = music2.instrument;
-         var instrumentVar = instrumentsMap.get(instrumentString);
-         player.queueWaveTable(
-           audioContext, audioContext.destination, instrumentVar,
-           origin + music2.start_pitch_duration_velocity[count][0],
-           music2.start_pitch_duration_velocity[count][1],
-           music2.start_pitch_duration_velocity[count][2],
-           music2.start_pitch_duration_velocity[count][3]
-         );
-         count++;
-       }*/
-
 
     }
 
@@ -471,7 +304,7 @@
 </head>
 
 <body>
-<p><a href='javascript:playOuter();'>Generate Notes</a></p>
+<p><a href='javascript:genMusic();'>Generate Music</a></p>
 <textarea id="ta1" style="width:300px;height:200px"> test text</textarea>
 <button id="loadMusicLine" onclick="loadJSON()">Play</button>
 </body>

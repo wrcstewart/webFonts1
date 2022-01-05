@@ -31,11 +31,11 @@
     beatsMap.set('C', 1.0);
     beatsMap.set('Q', 0.5);
     beatsMap.set('M', 2.0);
-    beatsMap.set('CR', -1.0);
-    beatsMap.set('CQ', -0.5);
-    beatsMap.set('CM', -2.0);
+    beatsMap.set('CR', 1.0);
+    beatsMap.set('QR', 0.5);
+    beatsMap.set('MR', 2.0);
     beatsMap.set('S', 0.25);
-    beatsMap.set('SR', -0.25);
+    beatsMap.set('SR', 0.25);
     //beatsMap.set('C',1.0);
     // beatsMap.set('C',1.0);
 
@@ -122,10 +122,24 @@
       this.start_pitch_duration_velocity = start_pitch_duration_velocity;
     }
 
+    function MLine(duration, instrument, bpm, beats, pitches, noteDuration) {
+      this.duration = duration;
+      this.bpm = bpm;
+      this.noteDuration = noteDuration;
+
+      this.instrument = instrument;
+      this.beats = beats;
+      this.pitches = pitches;
+
+
+    }
+
     var beat1 = ['C', 'Q', 'Q', 'C', 'C', 'C', 'C', 'C', 'Q', 'Q', 'CM', 'C', 'C'];
     var beatBassDrum1 = ["C", "CR", "Q", 'Q', "CR", "Q", "Q", "CR", "Q", 'Q', "CR"]
     var beatSnareDrum1 = ["CR", "S", "SR", "SR", "S", "CR", "C"]
-    var beatFlute1 = ["C", "C", "C", "Q", "Q","C","C","Q","Q","Q","Q"]
+    var beatFlute1 = ["CF", "C", "C", "Q", "Q"];
+
+    var pulse1_4 = [2, 1, 1, 1];//relative velocites
 
     function CloneMusicLine(newInstrument, bpm, semitonesShift, ml) {
       this.instrument = newInstrument;
@@ -144,13 +158,28 @@
     }
 
     function getTimeIncr(beats, countBeats) {
-      return (beatsMap.get(beats[countBeats]))
+      let beatsString = (beats[countBeats]);
+      if (beatsString.length == 1) return (beatsMap.get(beatsString))
+      if (beatsString.charAt(1) == 'R') return (-beatsMap.get(beatsString.substr(0, 1)))
+      if (beatsString.charAt(1) == 'F') return (beatsMap.get(beatsString.substr(0, 1)))
+      if (beatsString.charAt(1) == 'P') return (beatsMap.get(beatsString.substr(0, 1)))
+    }
+
+    function getVelocity(beats, countBeats) {
+      let velocityNormal = 0.6;
+      let velocityF = 1.0;
+      let velocityP = 0.3;
+      let beatsString = (beats[countBeats]);
+      if (beatsString.length == 1) return (velocityNormal);
+      if (beatsString.charAt(1) == 'F') return (velocityF);
+      if (beatsString.charAt(1) == 'P') return (velocityP);
+      return (velocityNormal);
     }
 
     function getPitchIndexFromTime(t, lenPitchArray) {
-      let epsilon = (Math.random() - 0.5)* 0.0000000001;
+      let epsilon = -0.0000001; //(Math.random() - 0.5) * 0.0000000001;
       // for Q choose either current or next, randomly
-      return ((Math.round(t+epsilon)) % lenPitchArray);
+      return ((Math.round(t + epsilon)) % lenPitchArray);
     }
 
     function CloneMusicLineToRhythm(beats, bpm, ml, endTime) {
@@ -166,7 +195,7 @@
       let lenBeats = beats.length;
       let time = 0;
 
-      while (time < endTime) { //overall process to stop when out of pitch values
+      while (time < endTime) { //overall process to stop when past duration
 
         while (countBeats < lenBeats) {
 
@@ -192,6 +221,64 @@
         }
       }
       this.start_pitch_duration_velocity = start_pitch_duration_velocity1;
+    }
+
+    /* function getVelocity(pulse,time){
+      let lenPulse = pulse.length;
+       for (let i=0;i<lenPulse;i++){
+       if (   (time % lenPulse) == i ) return (pulse[i])
+      }
+     }*/
+
+    function playMLine(mL, origin) {
+
+      let bpm = mL.bpm;
+      let instrumentVar = instrumentsMap.get(mL.instrument);
+
+      let beats = mL.beats;
+      let pitches = mL.pitches;
+      let pulse = mL.pulse;
+      let noteDuration = mL.noteDuration;
+      let lenBeats = beats.length;
+      let lenPitches = pitches.length;
+      let countBeats = 0;
+      // let countPulse =0;
+      // let lenPulse = pulse.length;
+      let time = 0;
+      let tMult = 60 / bpm;
+      let endTime = (mL.duration) / tMult;
+
+      let s, p, d, v; //actual values for playSound
+
+      while (time < endTime) { //overall process to stop when past duration
+
+        while (countBeats < lenBeats) {
+
+          let timeIncr = getTimeIncr(beats, countBeats);
+          v = getVelocity(beats, countBeats);
+
+          if (timeIncr > 0) {
+
+            let ixx = getPitchIndexFromTime(time, lenPitches);
+            s = time;
+            p = pitches[ixx];
+            d = noteDuration * timeIncr;
+
+            // if (time % 4  == 0 ) {v =1}  else {v=0.2}
+
+            time += timeIncr;
+            if (time > endTime) break;
+            player.queueWaveTable(
+              audioContext, audioContext.destination, instrumentVar, origin + (s * tMult), p, d * tMult, v);
+          }
+
+          if (timeIncr <= 0) {
+            time += Math.abs(timeIncr);
+          }
+          countBeats += 1;
+          if (countBeats == lenBeats) countBeats = 0;
+        }
+      }
     }
 
 
@@ -265,9 +352,9 @@
 
     function loadJSON() {
       var inString = document.getElementById("ta1").value;
-      var loadedMusicScore = JSON.parse(inString);
+      var loadedML = JSON.parse(inString);
       origin = audioContext.currentTime;
-      playScore(loadedMusicScore, origin);
+      playMLine(loadedML,origin);
     }
 
     function playMusicLine(ml, origin) {
@@ -306,7 +393,7 @@
       }
       window.playState = true;
       player.cancelQueue(audioContext);
-      var notePitchArray1 = createNotePitchArray("C4", 12);
+      var notePitchArray1 = createNotePitchArray("C4", 8);
       origin = audioContext.currentTime;
       var noteStartArray1 = createNoteStartArray(notePitchArray1, 1.0);
       var noteDurationArray1 = createNoteDurationArray(notePitchArray1, 0.75, 0.95);
@@ -322,7 +409,7 @@
       }
 
 
-      var notePitchArray2 = createTransposedPitchArray(notePitchArray1, -24)
+      var notePitchArray2 = createTransposedPitchArray(notePitchArray1, 0)
       var noteStartArray2 = createNoteStartArray(notePitchArray2, 1);
       var noteDurationArray2 = createNoteDurationArray(notePitchArray2, 1, 0.9);
       var noteVelocityArray2 = createNoteVelocity(notePitchArray2, 1.0, 1.0, 4);
@@ -332,17 +419,23 @@
       var music1 = new MusicLine("Bass Drum 2", 60, noteStartArray2, notePitchArray2, noteDurationArray2, noteVelocityArray2);
       var music2 = new MusicLine("Snare Drum 1", 60, noteStartArray2, notePitchArray2, noteDurationArray2, noteVelocityArray2);
       var music3 = new MusicLine("Acoustic Grand Piano", 60, noteStartArray2, notePitchArray2, noteDurationArray2, noteVelocityArray2);
+
+      var music4 = new MLine(40, "Acoustic Grand Piano", 120, beatFlute1, notePitchArray2, 0.9);
+
+
       //testMusicLineArray[0] = music1;
       testMusicLineArray[0] = new CloneMusicLineToRhythm(beatBassDrum1, 150, music1, 120);
       testMusicLineArray[1] = new CloneMusicLineToRhythm(beatSnareDrum1, 150, music2, 120);
       testMusicLineArray[2] = new CloneMusicLineToRhythm(beatFlute1, 150, music3, 120);
-     // testMusicLineArray[2] = new CloneMusicLineToRhythm(beatFlute, 120, music3, 60);
+      // testMusicLineArray[2] = new CloneMusicLineToRhythm(beatFlute, 120, music3, 60);
       // testMusicLineArray[1] = new CloneMusicLineToRhythm(beat1, 180, music1);
       // testMusicLineArray[2] = new CloneMusicLineToRhythm(beat1, 240, music1);
       // testMusicLineArray[3] = new CloneMusicLineToRhythm(beat1, 360, music1);
 
+      playMLine(music4, origin);
 
-      var music1Str = JSON.stringify(testMusicLineArray);
+
+      var music1Str = JSON.stringify(music4);
       var readArray = JSON.parse(music1Str);
       document.getElementById("ta1").innerText = music1Str;
       var test1 = document.getElementById("ta1").value;
@@ -350,7 +443,7 @@
 
       origin = audioContext.currentTime;
 
-      playScore(testMusicLineArray, origin);
+      //playScore(testMusicLineArray, origin);
 
       /* playMusicLine(music3,origin);
        playMusicLine(music1,origin);

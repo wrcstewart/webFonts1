@@ -29,11 +29,12 @@
     instrumentsMap.set("Hi-hat 1", _drum_42_0_Chaos_sf2_file);
 
 
-
     const beatsMap = new Map();
     beatsMap.set('C', 1.0);
     beatsMap.set('Q', 0.5);
     beatsMap.set('M', 2.0);
+    beatsMap.set('B', 8.0);
+    beatsMap.set('H', 4.0);
     beatsMap.set('CR', 1.0);
     beatsMap.set('QR', 0.5);
     beatsMap.set('MR', 2.0);
@@ -109,30 +110,28 @@
     }
 
 
-    function MLine(start,duration, instrument, bpm, beats, pitches, noteDuration) {
+    function MLine(groupMode, start, duration, instrument, bpm, beats, pitches, noteDuration) {
       this.start = start;
       this.duration = duration;
       this.bpm = bpm;
-      this.noteDuration = noteDuration;
-
       this.instrument = instrument;
+      this.noteDuration = noteDuration;
+      this.groupMode = groupMode;
       this.beats = beats;
       this.pitches = pitches;
-
-
     }
 
     var beat1 = ['C', 'Q', 'Q', 'C', 'C', 'C', 'C', 'C', 'Q', 'Q', 'CR', 'C', 'C'];
     var beatBassDrum1 = ["CF", "CR", "Q", 'Q', "CR", "QF", "Q", "CR", "Q", 'Q', "CR"]
     var beatSnareDrum1 = ["CR", "S", "SR", "SR", "S", "CR", "C"]
-    var beatFlute1 = ["MF","MR","CFD","Q","CFD","Q","MR"];
-    var beatHighHat1 = ["SF","S","S","S"];
+    var beatFlute1 = ["CM","C","C","C"];
+    var beatHighHat1 = ["SF", "S", "S", "S"];
 
 
-function dotMult(beatsString){
-  if (beatsString.includes("D")) return(1.5);
-  return (1)
-}
+    function dotMult(beatsString) {
+      if (beatsString.includes("D")) return (1.5);
+      return (1)
+    }
 
     function getTimeIncr(beats, countBeats) {
       let beatsString = (beats[countBeats]);
@@ -164,7 +163,7 @@ function dotMult(beatsString){
 
       let bpm = mL.bpm;
       let instrumentVar = instrumentsMap.get(mL.instrument);
-
+      let groupMode = mL.groupMode;
       let beats = mL.beats;
       let pitches = mL.pitches;
       let pulse = mL.pulse;
@@ -180,12 +179,45 @@ function dotMult(beatsString){
       let start = mL.start;
 
       let s, p, d, v; //actual values for playSound
+      let timeIncr;
+
+      function playIfArray(pitchesEntry) {
+        let velocityReCompensationMult = 1.0;
+        if (!Array.isArray(pitchesEntry)) return;
+        let lenPitchesEntry = pitchesEntry.length;
+        let vInner = v / lenPitchesEntry;
+        vInner = v * velocityReCompensationMult;
+        //let timeInnerIncr = timeIncr/lenPitchesEntry;
+        //let innerD = d/lenPitchesEntry;
+
+        if (groupMode == "CHORD") {
+          for (let j = 0; j < lenPitchesEntry; j++) {
+            player.queueWaveTable(
+              audioContext, audioContext.destination, instrumentVar, origin + start + (s * tMult), pitchesEntry[j], d * tMult, vInner);
+          }
+        }
+
+        if (groupMode == "ARPEGGIO") {
+          let innerTime = 0;
+          let timeInnerIncr = timeIncr / lenPitchesEntry;
+          let innerD = (d * tMult) / lenPitchesEntry;
+          for (let j = 0; j < lenPitchesEntry; j++) {
+            player.queueWaveTable(
+              audioContext,
+              audioContext.destination, instrumentVar, origin + start + (s + innerTime) * tMult, pitchesEntry[j],
+              innerD, vInner);
+
+            innerTime += timeInnerIncr;
+          }
+        }
+      }
+
 
       while (time < endTime) { //overall process to stop when past duration
 
         while (countBeats < lenBeats) {
 
-          let timeIncr = getTimeIncr(beats, countBeats);
+          timeIncr = getTimeIncr(beats, countBeats);
           v = getVelocity(beats, countBeats);
 
           if (timeIncr > 0) {
@@ -195,15 +227,21 @@ function dotMult(beatsString){
             p = pitches[ixx];
             d = noteDuration * timeIncr;
 
+
             // if (time % 4  == 0 ) {v =1}  else {v=0.2}
 
             time += timeIncr;//after note parameters set ---add a separate play chord routine that adjusts time Incr.
             if (time > endTime) break;
-            player.queueWaveTable(
-              audioContext, audioContext.destination, instrumentVar, origin + start + (s * tMult), p, d * tMult, v);
 
-         // player.queueWaveTable(
-              //audioContext, audioContext.destination, instrumentVar, origin + start + (s * tMult)+0.02, p +3, d * tMult, v);
+
+            playIfArray(p);
+
+            if (!Array.isArray(p)) {
+              player.queueWaveTable(
+                audioContext, audioContext.destination, instrumentVar, origin + start + (s * tMult), p, d * tMult, v);
+            }
+            // player.queueWaveTable(
+            //audioContext, audioContext.destination, instrumentVar, origin + start + (s * tMult)+0.02, p +3, d * tMult, v);
           }
 
           if (timeIncr <= 0) {
@@ -295,12 +333,13 @@ function dotMult(beatsString){
       var notePitchArray2 = createTransposedPitchArray(notePitchArray1, 0)
 
       // var music4 = new MLine(20, "Acoustic Grand Piano", 120, beatFlute1, notePitchArray2, 0.9);
-      var music4 = new MLine(8,24, "Acoustic Grand Piano", 120, beatFlute1, [51, 53, 54, 58, 54, 53, 49, 51,53], 0.9);
-      var music5 = new MLine(4,28, "Bass Drum 2", 120, beatBassDrum1, [32], 0.9);
-      var music6 = new MLine(4,28, "Snare Drum 1", 120, beatSnareDrum1, [39], 0.9);
-      var music7 = new MLine(0,32, "Hi-hat 1", 120, beatHighHat1, [58], 0.9);
-     var mLineArray = [music4,music5,music6,music7];
-      //var mLineArray = [music4];
+      var music4 = new MLine("ARPEGGIO", 1, 50, "Acoustic Grand Piano", 60, beatFlute1, [[57, 60, 64, 69], 53, 68, 55, [69, 64, 60, 57], 55, 54, 53], 0.9);
+       var music5 = new MLine("CHORD", 1, 50, "Acoustic Grand Piano", 60, beatFlute1, [[57, 60, 64, 69], 53, 68, 55, [69, 64, 60, 57], 55, 54, 53], 0.9);
+      // var music5 = new MLine("CHORD", 4, 28, "Bass Drum 2", 120, beatBassDrum1, [32], 0.9);
+      //  var music6 = new MLine("CHORD", 4, 28, "Snare Drum 1", 120, beatSnareDrum1, [39], 0.9);
+      //  var music7 = new MLine("CHORD", 0, 32, "Hi-hat 1", 120, beatHighHat1, [58], 0.9);
+      // var mLineArray = [music4, music5, music6, music7];
+      var mLineArray = [music4,music5];
 
 
       var music1Str = JSON.stringify(mLineArray);

@@ -124,7 +124,7 @@
     var beat1 = ['C', 'Q', 'Q', 'C', 'C', 'C', 'C', 'C', 'Q', 'Q', 'CR', 'C', 'C'];
     var beatBassDrum1 = ["CF", "CR", "Q", 'Q', "CR", "QF", "Q", "CR", "Q", 'Q', "CR"]
     var beatSnareDrum1 = ["CR", "S", "SR", "SR", "S", "CR", "C"]
-    var beatFlute1 = ["CF", "CP", "CP", "CP"];
+    var beatFlute1 = ["CF", "CP", "Q", "Q","CP"];
     var beatHighHat1 = ["SF", "S", "S", "S"];
 
 
@@ -353,15 +353,16 @@
       var G = [55, 59, 62];
       // var music4 = new MLine(20, "Acoustic Grand Piano", 120, beatFlute1, notePitchArray2, 0.9);
 
-      music10 = new MLine("CHORD", 1, 20, "Acoustic Grand Piano", 60, beatFlute1, ["C4",["G3",0,4,7], 0, 1,2 ,3], 0.9);
+      music10 = new MLine("ARPEGGIO", 5, 50, "Acoustic Grand Piano", 60, beatFlute1, ["C4",["A3",0,3,7,0],["A3",0,3,7,0],
+       ["G2",0,7],["G5",7,0],["F3",0,4,7,0],["F3",0,4,7,0],["E4",7,0],["E3",0,0]], 0.9);
 
-      var music5 = new MLine("CHORD", 5, 50, "Acoustic Grand Piano", 60, beatFlute1, [Am, Am, G, G], 0.9);
-      var music7 = new MLine("CHORD", 5, 50, "Bass Drum 2", 60, beatBassDrum1, [33], 0.9);
-      var music8 = new MLine("CHORD", 5, 50, "Snare Drum 1", 60, beatSnareDrum1, [40], 0.9);
+      //var music5 = new MLine("CHORD", 5, 50, "Acoustic Grand Piano", 60, beatFlute1, [Am, Am, G, G], 0.9);
+      var music7 = new MLine("CHORD", 2, 50, "Bass Drum 2", 60, beatBassDrum1, [33], 0.9);
+      var music8 = new MLine("CHORD", 2, 50, "Snare Drum 1", 60, beatSnareDrum1, [40], 0.9);
       var music9 = new MLine("CHORD", 1, 50, "Hi-hat 1", 60, beatHighHat1, [57], 0.9);
       // var mLineArray = [music4, music5, music7, music8,music9];
      // var mLineArray = [music4, music5];
-      var  mLineArray = [music10];
+      var  mLineArray = [music10,music7,music8,music9];
 
 
       var music1Str = JSON.stringify(mLineArray);

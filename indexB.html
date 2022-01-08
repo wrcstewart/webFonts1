@@ -110,13 +110,13 @@
     }
 
 
-    function MLine(groupMode, start, duration, instrument, bpm, beats, pitches, noteDuration) {
+    function MLine(innerArrays, start, duration, instrument, bpm, beats, pitches, noteDuration) {
       this.start = start;
       this.duration = duration;
       this.bpm = bpm;
       this.instrument = instrument;
       this.noteDuration = noteDuration;
-      this.groupMode = groupMode;
+      this.innerArrays = innerArrays;
       this.beats = beats;
       this.pitches = pitches;
     }
@@ -124,7 +124,7 @@
     var beat1 = ['C', 'Q', 'Q', 'C', 'C', 'C', 'C', 'C', 'Q', 'Q', 'CR', 'C', 'C'];
     var beatBassDrum1 = ["CF", "CR", "Q", 'Q', "CR", "QF", "Q", "CR", "Q", 'Q', "CR"]
     var beatSnareDrum1 = ["CR", "S", "SR", "SR", "S", "CR", "C"]
-    var beatFlute1 = ["CM","C","C","C"];
+    var beatFlute1 = ["CF", "CP", "CP", "CP"];
     var beatHighHat1 = ["SF", "S", "S", "S"];
 
 
@@ -158,14 +158,31 @@
       return ((Math.round(t + epsilon)) % lenPitchArray);
     }
 
+    function reBaseArray(inArray){
+
+      if (typeof inArray[0] !== 'string') return (inArray);
+
+      let baseMidiNote = getMidiNoteFromName(inArray[0]);
+
+      for(let i=1;i<inArray.length;i++) {
+
+        inArray[i - 1] = inArray[i];
+        if (!Array.isArray(inArray[i - 1])) (inArray[i - 1]) += baseMidiNote;
+      }
+        inArray.pop();
+
+      return(inArray)
+    }
+
 
     function playMLine(mL, origin) {
 
       let bpm = mL.bpm;
       let instrumentVar = instrumentsMap.get(mL.instrument);
-      let groupMode = mL.groupMode;
+      let innerArrays = mL.innerArrays;
       let beats = mL.beats;
       let pitches = mL.pitches;
+      pitches = reBaseArray(pitches);
       let pulse = mL.pulse;
       let noteDuration = mL.noteDuration;
       let lenBeats = beats.length;
@@ -182,7 +199,8 @@
       let timeIncr;
 
       function playIfArray(pitchesEntry) {
-        let velocityReCompensationMult = 1.0;
+        pitchesEntry = reBaseArray(pitchesEntry)
+        let velocityReCompensationMult = 0.5;
         if (!Array.isArray(pitchesEntry)) return;
         let lenPitchesEntry = pitchesEntry.length;
         let vInner = v / lenPitchesEntry;
@@ -190,14 +208,14 @@
         //let timeInnerIncr = timeIncr/lenPitchesEntry;
         //let innerD = d/lenPitchesEntry;
 
-        if (groupMode == "CHORD") {
+        if (innerArrays == "CHORD") {
           for (let j = 0; j < lenPitchesEntry; j++) {
             player.queueWaveTable(
               audioContext, audioContext.destination, instrumentVar, origin + start + (s * tMult), pitchesEntry[j], d * tMult, vInner);
           }
         }
 
-        if (groupMode == "ARPEGGIO") {
+        if (innerArrays == "ARPEGGIO") {
           let innerTime = 0;
           let timeInnerIncr = timeIncr / lenPitchesEntry;
           let innerD = (d * tMult) / lenPitchesEntry;
@@ -331,15 +349,19 @@
 
 
       var notePitchArray2 = createTransposedPitchArray(notePitchArray1, 0)
-
+      var Am = [57, 60, 64, 69];
+      var G = [55, 59, 62];
       // var music4 = new MLine(20, "Acoustic Grand Piano", 120, beatFlute1, notePitchArray2, 0.9);
-      var music4 = new MLine("ARPEGGIO", 1, 50, "Acoustic Grand Piano", 60, beatFlute1, [[57, 60, 64, 69], 53, 68, 55, [69, 64, 60, 57], 55, 54, 53], 0.9);
-       var music5 = new MLine("CHORD", 1, 50, "Acoustic Grand Piano", 60, beatFlute1, [[57, 60, 64, 69], 53, 68, 55, [69, 64, 60, 57], 55, 54, 53], 0.9);
-      // var music5 = new MLine("CHORD", 4, 28, "Bass Drum 2", 120, beatBassDrum1, [32], 0.9);
-      //  var music6 = new MLine("CHORD", 4, 28, "Snare Drum 1", 120, beatSnareDrum1, [39], 0.9);
-      //  var music7 = new MLine("CHORD", 0, 32, "Hi-hat 1", 120, beatHighHat1, [58], 0.9);
-      // var mLineArray = [music4, music5, music6, music7];
-      var mLineArray = [music4,music5];
+
+      music10 = new MLine("CHORD", 1, 20, "Acoustic Grand Piano", 60, beatFlute1, ["C4",["G3",0,4,7], 0, 1,2 ,3], 0.9);
+
+      var music5 = new MLine("CHORD", 5, 50, "Acoustic Grand Piano", 60, beatFlute1, [Am, Am, G, G], 0.9);
+      var music7 = new MLine("CHORD", 5, 50, "Bass Drum 2", 60, beatBassDrum1, [33], 0.9);
+      var music8 = new MLine("CHORD", 5, 50, "Snare Drum 1", 60, beatSnareDrum1, [40], 0.9);
+      var music9 = new MLine("CHORD", 1, 50, "Hi-hat 1", 60, beatHighHat1, [57], 0.9);
+      // var mLineArray = [music4, music5, music7, music8,music9];
+     // var mLineArray = [music4, music5];
+      var  mLineArray = [music10];
 
 
       var music1Str = JSON.stringify(mLineArray);

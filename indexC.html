@@ -1,0 +1,417 @@
+<!doctype html>
+<html lang="en">
+
+
+<head>
+  <meta charset="UTF-8">
+  <script src='https://surikov.github.io/webaudiofont/npm/dist/WebAudioFontPlayer.js'></script>
+  <script src='https://surikov.github.io/webaudiofontdata/sound/0000_JCLive_sf2_file.js'></script>
+  <script src='https://surikov.github.io/webaudiofontdata/sound/0730_Aspirin_sf2_file.js'></script>
+  <script src='https://surikov.github.io/webaudiofontdata/sound/12847_0_Chaos_sf2_file.js'></script>
+  <script src='https://surikov.github.io/webaudiofontdata/sound/0760_Aspirin_sf2_file.js'></script>
+  <script src='https://surikov.github.io/webaudiofontdata/sound/0000_JCLive_sf2_file.js'></script>
+  <script src='https://surikov.github.io/webaudiofontdata/sound/12835_0_Chaos_sf2_file.js'></script>
+  <script src='https://surikov.github.io/webaudiofontdata/sound/12838_0_Chaos_sf2_file.js'></script>
+  <script src='https://surikov.github.io/webaudiofontdata/sound/12842_0_Chaos_sf2_file.js'></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jsoneditor/9.5.11/jsoneditor.min.js"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/jsoneditor/9.5.11/jsoneditor.css" rel="stylesheet" type="text/css">
+
+
+  <script>
+
+    var delim = '|';
+    window.playState = false;
+
+    const instrumentsMap = new Map();
+    instrumentsMap.set("Blown bottle Pipe 1", _tone_0760_Aspirin_sf2_file)
+    instrumentsMap.set("Flute Pipe 1", _tone_0730_Aspirin_sf2_file)
+    instrumentsMap.set("Acoustic Grand Piano", _tone_0000_JCLive_sf2_file)
+    instrumentsMap.set("Bass Drum 2", _drum_35_0_Chaos_sf2_file);
+    instrumentsMap.set("Snare Drum 1", _drum_38_0_Chaos_sf2_file);
+    instrumentsMap.set("Hi-hat 1", _drum_42_0_Chaos_sf2_file);
+
+
+    const beatsMap = new Map();
+    beatsMap.set('C', 1.0);
+    beatsMap.set('Q', 0.5);
+    beatsMap.set('M', 2.0);
+    beatsMap.set('B', 8.0);
+    beatsMap.set('H', 4.0);
+    beatsMap.set('CR', 1.0);
+    beatsMap.set('QR', 0.5);
+    beatsMap.set('MR', 2.0);
+    beatsMap.set('S', 0.25);
+    beatsMap.set('SR', 0.25);
+    //beatsMap.set('C',1.0);
+    // beatsMap.set('C',1.0);
+
+
+    var noteNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];//used to construct notes[] below
+    var notes = []; // this allows easy look up of note name to midi number - but based with A0 = 0
+    // a function will add 21 to give the correct official midi number of the notes.
+    // the true note names are only used once per generative run - to allow user to enter start note.
+    var notesIx = 3;//index 3 will correspond to the first C
+
+    for (let octave = 1; octave <= 7; octave++) {
+      for (let noteNamesIx = 0; noteNamesIx <= 11; noteNamesIx++) {
+        notes[notesIx] = noteNames[noteNamesIx] + octave;
+        notesIx++;
+      }
+    }
+    //now fill in those notes not covered.
+    notes[0] = "A0";
+    notes[1] = "A#0";
+    notes[2] = "B0";
+    notes[87] = "C8";
+
+    var probs = [0.2, 0.4, 0.15, 0.15, 0.025, 0.025, 0.025, 0.025];
+    //prob of jumping up or down by the index 0 to 7 corresponding to scale notes;
+    //var cumulativeProbs = [0.0, 0.2, 0.5, 0.7, 0.8, 0.85, 0.9, 0.95, 1.0];
+
+    function generateCumulativeArray(arr) {
+      let cumArr = [];
+      let sum = 0;
+      for (let i = 0; i < arr.length; i++) {
+        cumArr[i] = sum;
+        sum = sum + arr[i]
+      }
+      cumArr[arr.length] = sum;
+      return (cumArr)
+    }
+
+    var cumulativeProbs = generateCumulativeArray(probs);
+
+    function stepScale8() { //compute a random step size in a scale of 8 notes
+      let i;
+      let cumP = Math.random();
+      for (i = 0; i <= 7; i++) if (cumulativeProbs[i + 1] >= cumP) break;
+      return (i);
+    }
+
+    function newNoteScale8(oldNoteScale8) {
+      let step = stepScale8();
+      // the next function determines whether the step should be positive, negative or 0
+      let limit = 8; //max scale notes excursion
+      if ((oldNoteScale8 + step) > limit) return (oldNoteScale8 - step);
+      if ((oldNoteScale8 - step) < -limit) return (oldNoteScale8 + step);
+
+      if (Math.random() <= 0.5) return (oldNoteScale8 - step);
+      return (oldNoteScale8 + step);
+    }
+
+    RelativeMidiNumOfHMScalePositive = [0, 2, 3, 5, 7, 8, 11, 12, 14, 15, 17];
+    RelativeMidiNumOfHMScaleNegative = [0, -1, -4, -5, -7, -9, -10, -12, -13, -16, -17];
+
+    function getMidiNote(scaleNote, midiBaseNote) {
+      if (scaleNote >= 0) return (midiBaseNote + RelativeMidiNumOfHMScalePositive[scaleNote]);
+      if (scaleNote < 0) return (midiBaseNote + RelativeMidiNumOfHMScaleNegative[-scaleNote]);
+    }
+
+    function getMidiNoteFromName(noteName) {
+      return (notes.indexOf(noteName) + 21)
+    }
+
+
+    function MLine(innerArrays, start, duration, instrument, bpm, beats, pitches, noteDuration) {
+      this.start = start;
+      this.duration = duration;
+      this.bpm = bpm;
+      this.instrument = instrument;
+      this.noteDuration = noteDuration;
+      this.innerArrays = innerArrays;
+      this.beats = beats;
+      this.pitches = pitches;
+    }
+
+    var beat1 = ['C', 'Q', 'Q', 'C', 'C', 'C', 'C', 'C', 'Q', 'Q', 'CR', 'C', 'C'];
+    var beatBassDrum1 = ["CF", "CR", "Q", 'Q', "CR", "QF", "Q", "CR", "Q", 'Q', "CR"]
+    var beatSnareDrum1 = ["CR", "S", "SR", "SR", "S", "CR", "C"]
+    var beatFlute1 = ["CF", "CP", "Q", "Q", "CP"];
+    var beatHighHat1 = ["SF", "S", "S", "S"];
+
+
+    function dotMult(beatsString) {
+      if (beatsString.includes("D")) return (1.5);
+      return (1)
+    }
+
+    function getTimeIncr(beats, countBeats) {
+      let beatsString = (beats[countBeats]);
+      if (beatsString.length == 1) return (beatsMap.get(beatsString))
+      if (beatsString.charAt(1) == 'R') return (-beatsMap.get(beatsString.substr(0, 1)) * dotMult(beatsString))
+      if (beatsString.charAt(1) == 'F') return (beatsMap.get(beatsString.substr(0, 1)) * dotMult(beatsString))
+      if (beatsString.charAt(1) == 'P') return (beatsMap.get(beatsString.substr(0, 1)) * dotMult(beatsString))
+    }
+
+    function getVelocity(beats, countBeats) {
+      let velocityNormal = 0.6;
+      let velocityF = 1.0;
+      let velocityP = 0.3;
+      let beatsString = (beats[countBeats]);
+      if (beatsString.length == 1) return (velocityNormal);
+      if (beatsString.charAt(1) == 'F') return (velocityF);
+      if (beatsString.charAt(1) == 'P') return (velocityP);
+      return (velocityNormal);
+    }
+
+    function getPitchIndexFromTime(t, lenPitchArray) {
+      let epsilon = -0.0000001; //(Math.random() - 0.5) * 0.0000000001;
+      // for Q choose either current or next, randomly
+      return ((Math.round(t + epsilon)) % lenPitchArray);
+    }
+
+    function reBaseArray(inArray) {
+
+      if (typeof inArray[0] !== 'string') return (inArray);
+
+      let baseMidiNote = getMidiNoteFromName(inArray[0]);
+
+      for (let i = 1; i < inArray.length; i++) {
+
+        inArray[i - 1] = inArray[i];
+        if (!Array.isArray(inArray[i - 1])) (inArray[i - 1]) += baseMidiNote;
+      }
+      inArray.pop();
+
+      return (inArray)
+    }
+
+
+    function playMLine(mL, origin) {
+
+      let bpm = mL.bpm;
+      let instrumentVar = instrumentsMap.get(mL.instrument);
+      let innerArrays = mL.innerArrays;
+      let beats = mL.beats;
+      let pitches = mL.pitches;
+      pitches = reBaseArray(pitches);
+      let pulse = mL.pulse;
+      let noteDuration = mL.noteDuration;
+      let lenBeats = beats.length;
+      let lenPitches = pitches.length;
+      let countBeats = 0;
+      // let countPulse =0;
+      // let lenPulse = pulse.length;
+      let time = 0;
+      let tMult = 60 / bpm;
+      let endTime = (mL.duration) / tMult;
+      let start = mL.start;
+
+      let s, p, d, v; //actual values for playSound
+      let timeIncr;
+
+      function playIfArray(pitchesEntry) {
+        pitchesEntry = reBaseArray(pitchesEntry)
+        let velocityReCompensationMult = 0.5;
+        if (!Array.isArray(pitchesEntry)) return;
+        let lenPitchesEntry = pitchesEntry.length;
+        let vInner = v / lenPitchesEntry;
+        vInner = v * velocityReCompensationMult;
+        //let timeInnerIncr = timeIncr/lenPitchesEntry;
+        //let innerD = d/lenPitchesEntry;
+        let windowStart =0;
+
+        if (innerArrays == "CHORD") {
+          for (let j = 0; j < lenPitchesEntry; j++) {
+            player.queueWaveTable(
+              audioContext, audioContext.destination, instrumentVar, origin + start + (s * tMult), pitchesEntry[j], d * tMult, vInner);
+          }
+        }
+
+        if (innerArrays == "ARPEGGIO") {
+          let innerTime = 0;
+          let timeInnerIncr = timeIncr / lenPitchesEntry;
+          let innerD = (d * tMult) / lenPitchesEntry;
+          for (let j = 0; j < lenPitchesEntry; j++) {
+            player.queueWaveTable(
+              audioContext,
+              audioContext.destination, instrumentVar, origin + start + (s + innerTime) * tMult, pitchesEntry[j],
+              innerD, vInner);
+
+            innerTime += timeInnerIncr;
+          }
+        }
+      }
+
+
+      while (time < endTime) { //overall process to stop when past duration
+
+        while (countBeats < lenBeats) {
+
+          timeIncr = getTimeIncr(beats, countBeats);
+          v = getVelocity(beats, countBeats);
+
+          if (timeIncr > 0) {
+
+            let ixx = getPitchIndexFromTime(time, lenPitches);
+            s = time;
+            p = pitches[ixx];
+            d = noteDuration * timeIncr;
+
+
+            // if (time % 4  == 0 ) {v =1}  else {v=0.2}
+
+            time += timeIncr;//after note parameters set ---add a separate play chord routine that adjusts time Incr.
+            if (time > endTime) break;
+
+
+            playIfArray(p);
+
+            if (!Array.isArray(p)) {
+              player.queueWaveTable(
+                audioContext, audioContext.destination, instrumentVar, origin + start + (s * tMult), p, d * tMult, v);
+            }
+            // player.queueWaveTable(
+            //audioContext, audioContext.destination, instrumentVar, origin + start + (s * tMult)+0.02, p +3, d * tMult, v);
+          }
+
+          if (timeIncr <= 0) {
+            time += Math.abs(timeIncr);
+          }
+          countBeats += 1;
+          if (countBeats == lenBeats) countBeats = 0;
+        }
+      }
+    }
+
+
+    var audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    var player = new WebAudioFontPlayer();
+    //player.loader.decodeAfterLoading(audioContext,'_tone_0000_JCLive_sf2_file' );
+    player.loader.decodeAfterLoading(audioContext, '_tone_0730_Aspirin_sf2_file');
+    player.loader.decodeAfterLoading(audioContext, '_drum_47_0_Chaos_sf2_file');
+    player.loader.decodeAfterLoading(audioContext, '_tone_0760_Aspirin_sf2_file');
+    player.loader.decodeAfterLoading(audioContext, '_tone_0000_JCLive_sf2_file');
+    player.loader.decodeAfterLoading(audioContext, '_drum_35_0_Chaos_sf2_file');
+    player.loader.decodeAfterLoading(audioContext, '_drum_38_0_Chaos_sf2_file');
+    player.loader.decodeAfterLoading(audioContext, '_drum_42_0_Chaos_sf2_file');
+
+    var origin;
+    let midiBaseNote;
+    let midiNote;
+    let oldNoteScale;
+    let newNoteScale;
+    var count;
+    var len;
+    var midiNoteArray = [];
+    var oldNoteScaleArray = [];
+    var midiPitchArr = [];
+
+
+    function createNotePitchArray(tonicNoteName, len) {
+      let midiBaseNote = getMidiNoteFromName(tonicNoteName);
+
+      let midiNoteArray = [];
+      let oldNoteScale = 0;
+      let newNoteScale = 0;
+      midiNoteArray[0] = midiBaseNote;
+      let count = 1
+      while (count < len) {
+        newNoteScale = newNoteScale8(oldNoteScale);
+        midiNoteArray[count] = getMidiNote(newNoteScale, midiBaseNote);
+        oldNoteScale = newNoteScale;
+        count++;
+      }
+      return (midiNoteArray)
+    }
+
+    function createTransposedPitchArray(notePitchArray, semitoneShift) {
+      let len = notePitchArray.length;
+      let result = [];
+      for (let i = 0; i < len; i++) result[i] = notePitchArray[i] + semitoneShift;
+      return (result)
+    }
+
+
+    function loadJSON() {
+       player.cancelQueue(audioContext);
+      var inString = document.getElementById("ta1").value;
+     // var inStringExtras = document.getElementById("ta2").value;
+      var mLineArray = JSON.parse(inString);
+     // var extras = JSON.parse(inStringExtras);
+      // mLineArray[0] = {...mLineArray[0], ...extras};
+
+      origin = audioContext.currentTime;
+      origin += 1;
+      //playMLine(loadedML,origin);
+      playSection(mLineArray, origin );
+    }
+
+
+    function playSection(mLineArray, origin) {
+      let len = mLineArray.length;
+      for (let i = 0; i < len; i++) playMLine(mLineArray[i], origin);
+    }
+
+
+    function genMusic() {
+      if (window.playState) {
+        player.cancelQueue(audioContext);
+        alert("queue cancelled");
+        window.playState = false;
+        return;
+      }
+      window.playState = true;
+      player.cancelQueue(audioContext);
+      var notePitchArray1 = createNotePitchArray("C4", 8);
+
+
+      var notePitchArray2 = createTransposedPitchArray(notePitchArray1, 0)
+      var Am = [57, 60, 64, 69];
+      var G = [55, 59, 62];
+      // var music4 = new MLine(20, "Acoustic Grand Piano", 120, beatFlute1, notePitchArray2, 0.9);
+
+
+
+      music10 = new MLine("ARPEGGIO", 5, 17, "Acoustic Grand Piano", 60, beatFlute1, ["C4", ["A3", 0, 3, 7, 0], ["A3", 0, 3, 7, 0],
+        ["G2", 0, 7], ["G5", 7, 0], ["F3", 0, 4, 7, 0], ["F3", 0, 4, 7, 0], ["E4", 7, 0], ["E3", 0, 0]], 0.9);
+
+      //var music5 = new MLine("CHORD", 5, 10, "Acoustic Grand Piano", 60, beatFlute1, [Am, Am, G, G], 0.9);
+      var music7 = new MLine("CHORD", 2, 20, "Bass Drum 2", 60, beatBassDrum1, [33], 0.9);
+      var music8 = new MLine("CHORD", 2, 20, "Snare Drum 1", 60, beatSnareDrum1, [40], 0.9);
+      var music9 = new MLine("CHORD", 1, 21, "Hi-hat 1", 60, beatHighHat1, [57], 0.9);
+      var music11 = new MLine("CHORD", 22, 5, "Hi-hat 1", 60, beatHighHat1, [57], 0.9);
+
+      // var mLineArray = [music4, music5, music7, music8,music9];
+      // var mLineArray = [music4, music5];
+      var mLineArray = [music10, music7, music8, music9, music11];
+
+
+      //const container = document.getElementById("jsoneditor");
+      //const options = {};
+      //const editor = new JSONEditor(container, options);
+
+
+
+     var music1Str = JSON.stringify(mLineArray,null,"");
+     //var music2Str =JSON.stringify(mLineArray);
+
+      var pitchesStr1 = JSON.stringify(mLineArray[0],['bpm','instrument']);
+
+    // editor.set({mLineArray});
+
+
+      var readArray = JSON.parse(music1Str);
+
+     //document.getElementById("pre1").innerText = music1Str;
+      document.getElementById("ta1").innerText = music1Str;
+      document.getElementById("ta2").innerText = pitchesStr1;
+
+
+    }
+
+
+  </script>
+</head>
+
+<body>
+<p><a href='javascript:genMusic();'>Generate Music</a></p>
+
+<textarea id="ta1" wrap="soft" style="width:300px;height:200px;"
+> test text</textarea>
+
+
+<button id="loadMusicLine" onclick="loadJSON()">Play</button>
+<textarea id="ta2" style="width: 400px; height: 400px;"></textarea>
+
+</body>

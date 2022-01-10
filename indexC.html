@@ -114,7 +114,7 @@
 
     function MLine(innerArrays, start, duration, instrument, bpm, beats, pitches, noteDuration) {
       this.start = start;
-      this.duration = duration;
+      this.duration = duration - start;
       this.bpm = bpm;
       this.instrument = instrument;
       this.noteDuration = noteDuration;
@@ -370,18 +370,18 @@
       // var music4 = new MLine(20, "Acoustic Grand Piano", 180, beatFlute1, notePitchArray2, 0.9);
 
 
-      //music10 = new MLine("ARPEGGIO", 0, 10, "Acoustic Grand Piano", 60, beatFlute1, ["C4", ["A3", 0, 3, 7, 0], ["A3", 0, 3, 7, 0],
-        //["G2", 0, 7], ["G5", 7, 0], ["F3", 0, 4, 7, 0], ["F3", 0, 4, 7, 0], ["E4", 7, 0], ["E3", 0, 0]], 0.9);
+      var music10 = new MLine("ARPEGGIO", 5, 15, "Acoustic Grand Piano",120 , beatFlute1, ["C4", ["A3", 0, 3, 7, 0], ["A3", 0, 3, 7, 0],
+        ["G2", 0, 7], ["G5", 7, 0], ["F3", 0, 4, 7, 0], ["F3", 0, 4, 7, 0], ["E4", 7, 0], ["E3", 0, 0]], 0.9);
 
       //var music5 = new MLine("CHORD", 0, 30, "Acoustic Grand Piano", 60, beatFlute1, [Am, Am, G, G], 0.9);
       //var music7 = new MLine("CHORD", 0, 10, "Bass Drum 2", 60, beatBassDrum1, [33], 0.9);
      // var music8 = new MLine("CHORD", 2, 10, "Snare Drum 1", 60, beatSnareDrum1, [40], 0.9);
      // var music9 = new MLine("CHORD", 0, 10, "Hi-hat 1", 60, beatHighHat1, [57], 0.9);
-      var music11 = new MLine("CHORD", 5, 10, "Hi-hat 1", 60, beatHighHat1, [57], 0.9);
+      var music11 = new MLine("CHORD", 5, 15, "Hi-hat 1", 120, beatHighHat1, [57], 0.9);
 
       // var mLineArray = [music4, music5, music7, music8,music9];
       // var mLineArray = [music4, music5];
-      var mLineArray = [ music11];
+      var mLineArray = [ music11,music10];
 
 
       //const container = document.getElementById("jsoneditor");

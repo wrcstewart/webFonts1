@@ -112,9 +112,10 @@
     }
 
 
-    function MLine(innerArrays, start, duration, instrument, bpm, beats, pitches, noteDuration) {
+    function MLine(innerArrays, start, finish, instrument, bpm, beats, pitches, noteDuration) {
       this.start = start;
-      this.duration = duration - start;
+      this.finish = finish;
+     // this.duration = finish - start;
       this.bpm = bpm;
       this.instrument = instrument;
       this.noteDuration = noteDuration;
@@ -175,7 +176,10 @@
 
       return (inArray)
     }
-
+function showIt(s){
+     document.getElementById("ta3").innerText = JSON.stringify(s);
+    return;
+}
 
     function playMLine(mL, origin) {
 
@@ -194,13 +198,14 @@
       // let lenPulse = pulse.length;
       let time = 0;
       let tMult = 60 / bpm;
-      let endTime = mL.start + (mL.duration) / tMult;
+      let endTime = mL.start + ((mL.finish-mL.start) / tMult);
       let start = mL.start;
 
       let s, p, d, v; //actual values for playSound
       let timeIncr;
       let ws = start; // ignore for time being
       let we = endTime; //would set endTime to we here
+
 
       function playIfArray(pitchesEntry) {
         pitchesEntry = reBaseArray(pitchesEntry)
@@ -216,8 +221,10 @@
         if (innerArrays == "CHORD") {
           for (let j = 0; j < lenPitchesEntry; j++) {
 
+            let ss = origin + start + ((s -ws) * tMult);
+
             player.queueWaveTable(
-              audioContext, audioContext.destination, instrumentVar, origin + start + ((s -ws) * tMult), pitchesEntry[j], d * tMult, vInner);
+              audioContext, audioContext.destination, instrumentVar, ss , pitchesEntry[j], d * tMult, vInner);
           }
         }
 
@@ -226,9 +233,11 @@
           let timeInnerIncr = timeIncr / lenPitchesEntry;
           let innerD = (d * tMult) / lenPitchesEntry;
           for (let j = 0; j < lenPitchesEntry; j++) {
+            let ss = origin + start   + ((s-ws) + innerTime)  * tMult;
+            setTimeout(showIt,(ss - origin) *1000,pitchesEntry[j]);
             player.queueWaveTable(
               audioContext,
-              audioContext.destination, instrumentVar, origin + start   + ((s-ws) + innerTime)  * tMult, pitchesEntry[j],
+              audioContext.destination, instrumentVar, ss, pitchesEntry[j],
               innerD, vInner);
 
             innerTime += timeInnerIncr;
@@ -264,8 +273,10 @@
 
             if (!Array.isArray(p)) {
 
+              let ss = origin + start + ((s -ws) * tMult);
+
               player.queueWaveTable(
-                audioContext, audioContext.destination, instrumentVar, origin + start + ((s -ws) * tMult)  , p, d * tMult, v);
+                audioContext, audioContext.destination, instrumentVar, ss  , p, d * tMult, v);
 
             }
             // player.queueWaveTable(
@@ -370,14 +381,14 @@
       // var music4 = new MLine(20, "Acoustic Grand Piano", 180, beatFlute1, notePitchArray2, 0.9);
 
 
-      var music10 = new MLine("ARPEGGIO", 5, 15, "Acoustic Grand Piano",120 , beatFlute1, ["C4", ["A3", 0, 3, 7, 0], ["A3", 0, 3, 7, 0],
+      var music10 = new MLine("ARPEGGIO", 2, 60, "Acoustic Grand Piano",120 , beatFlute1, ["C4", ["A3", 0, 3, 7, 0], ["A3", 0, 3, 7, 0],
         ["G2", 0, 7], ["G5", 7, 0], ["F3", 0, 4, 7, 0], ["F3", 0, 4, 7, 0], ["E4", 7, 0], ["E3", 0, 0]], 0.9);
 
       //var music5 = new MLine("CHORD", 0, 30, "Acoustic Grand Piano", 60, beatFlute1, [Am, Am, G, G], 0.9);
       //var music7 = new MLine("CHORD", 0, 10, "Bass Drum 2", 60, beatBassDrum1, [33], 0.9);
      // var music8 = new MLine("CHORD", 2, 10, "Snare Drum 1", 60, beatSnareDrum1, [40], 0.9);
      // var music9 = new MLine("CHORD", 0, 10, "Hi-hat 1", 60, beatHighHat1, [57], 0.9);
-      var music11 = new MLine("CHORD", 5, 15, "Hi-hat 1", 120, beatHighHat1, [57], 0.9);
+      var music11 = new MLine("CHORD", 2, 60, "Hi-hat 1", 120, beatHighHat1, [57], 0.9);
 
       // var mLineArray = [music4, music5, music7, music8,music9];
       // var mLineArray = [music4, music5];
@@ -419,5 +430,6 @@
 
 <button id="loadMusicLine" onclick="loadJSON()">Play</button>
 <textarea id="ta2" style="width: 400px; height: 400px;"></textarea>
+<textarea id="ta3" style="width: 400px; height: 400px;"></textarea>
 
 </body>

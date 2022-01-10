@@ -194,11 +194,13 @@
       // let lenPulse = pulse.length;
       let time = 0;
       let tMult = 60 / bpm;
-      let endTime = (mL.duration) / tMult;
+      let endTime = mL.start + (mL.duration) / tMult;
       let start = mL.start;
 
       let s, p, d, v; //actual values for playSound
       let timeIncr;
+      let ws = start; // ignore for time being
+      let we = endTime; //would set endTime to we here
 
       function playIfArray(pitchesEntry) {
         pitchesEntry = reBaseArray(pitchesEntry)
@@ -209,12 +211,13 @@
         vInner = v * velocityReCompensationMult;
         //let timeInnerIncr = timeIncr/lenPitchesEntry;
         //let innerD = d/lenPitchesEntry;
-        let windowStart =0;
+
 
         if (innerArrays == "CHORD") {
           for (let j = 0; j < lenPitchesEntry; j++) {
+
             player.queueWaveTable(
-              audioContext, audioContext.destination, instrumentVar, origin + start + (s * tMult), pitchesEntry[j], d * tMult, vInner);
+              audioContext, audioContext.destination, instrumentVar, origin + start + ((s -ws) * tMult), pitchesEntry[j], d * tMult, vInner);
           }
         }
 
@@ -225,7 +228,7 @@
           for (let j = 0; j < lenPitchesEntry; j++) {
             player.queueWaveTable(
               audioContext,
-              audioContext.destination, instrumentVar, origin + start + (s + innerTime) * tMult, pitchesEntry[j],
+              audioContext.destination, instrumentVar, origin + start   + ((s-ws) + innerTime)  * tMult, pitchesEntry[j],
               innerD, vInner);
 
             innerTime += timeInnerIncr;
@@ -233,8 +236,11 @@
         }
       }
 
+      time += ws;
+      //endTime = we;
 
       while (time < endTime) { //overall process to stop when past duration
+
 
         while (countBeats < lenBeats) {
 
@@ -254,12 +260,13 @@
             time += timeIncr;//after note parameters set ---add a separate play chord routine that adjusts time Incr.
             if (time > endTime) break;
 
-
             playIfArray(p);
 
             if (!Array.isArray(p)) {
+
               player.queueWaveTable(
-                audioContext, audioContext.destination, instrumentVar, origin + start + (s * tMult), p, d * tMult, v);
+                audioContext, audioContext.destination, instrumentVar, origin + start + ((s -ws) * tMult)  , p, d * tMult, v);
+
             }
             // player.queueWaveTable(
             //audioContext, audioContext.destination, instrumentVar, origin + start + (s * tMult)+0.02, p +3, d * tMult, v);
@@ -324,17 +331,18 @@
 
 
     function loadJSON() {
-       player.cancelQueue(audioContext);
+
+      player.cancelQueue(audioContext);
       var inString = document.getElementById("ta1").value;
-     // var inStringExtras = document.getElementById("ta2").value;
+      // var inStringExtras = document.getElementById("ta2").value;
       var mLineArray = JSON.parse(inString);
-     // var extras = JSON.parse(inStringExtras);
+      // var extras = JSON.parse(inStringExtras);
       // mLineArray[0] = {...mLineArray[0], ...extras};
 
       origin = audioContext.currentTime;
-      origin += 1;
+
       //playMLine(loadedML,origin);
-      playSection(mLineArray, origin );
+      playSection(mLineArray, origin);
     }
 
 
@@ -359,22 +367,21 @@
       var notePitchArray2 = createTransposedPitchArray(notePitchArray1, 0)
       var Am = [57, 60, 64, 69];
       var G = [55, 59, 62];
-      // var music4 = new MLine(20, "Acoustic Grand Piano", 120, beatFlute1, notePitchArray2, 0.9);
+      // var music4 = new MLine(20, "Acoustic Grand Piano", 180, beatFlute1, notePitchArray2, 0.9);
 
 
+      //music10 = new MLine("ARPEGGIO", 0, 10, "Acoustic Grand Piano", 60, beatFlute1, ["C4", ["A3", 0, 3, 7, 0], ["A3", 0, 3, 7, 0],
+        //["G2", 0, 7], ["G5", 7, 0], ["F3", 0, 4, 7, 0], ["F3", 0, 4, 7, 0], ["E4", 7, 0], ["E3", 0, 0]], 0.9);
 
-      music10 = new MLine("ARPEGGIO", 5, 17, "Acoustic Grand Piano", 60, beatFlute1, ["C4", ["A3", 0, 3, 7, 0], ["A3", 0, 3, 7, 0],
-        ["G2", 0, 7], ["G5", 7, 0], ["F3", 0, 4, 7, 0], ["F3", 0, 4, 7, 0], ["E4", 7, 0], ["E3", 0, 0]], 0.9);
-
-      //var music5 = new MLine("CHORD", 5, 10, "Acoustic Grand Piano", 60, beatFlute1, [Am, Am, G, G], 0.9);
-      var music7 = new MLine("CHORD", 2, 20, "Bass Drum 2", 60, beatBassDrum1, [33], 0.9);
-      var music8 = new MLine("CHORD", 2, 20, "Snare Drum 1", 60, beatSnareDrum1, [40], 0.9);
-      var music9 = new MLine("CHORD", 1, 21, "Hi-hat 1", 60, beatHighHat1, [57], 0.9);
-      var music11 = new MLine("CHORD", 22, 5, "Hi-hat 1", 60, beatHighHat1, [57], 0.9);
+      //var music5 = new MLine("CHORD", 0, 30, "Acoustic Grand Piano", 60, beatFlute1, [Am, Am, G, G], 0.9);
+      //var music7 = new MLine("CHORD", 0, 10, "Bass Drum 2", 60, beatBassDrum1, [33], 0.9);
+     // var music8 = new MLine("CHORD", 2, 10, "Snare Drum 1", 60, beatSnareDrum1, [40], 0.9);
+     // var music9 = new MLine("CHORD", 0, 10, "Hi-hat 1", 60, beatHighHat1, [57], 0.9);
+      var music11 = new MLine("CHORD", 5, 10, "Hi-hat 1", 60, beatHighHat1, [57], 0.9);
 
       // var mLineArray = [music4, music5, music7, music8,music9];
       // var mLineArray = [music4, music5];
-      var mLineArray = [music10, music7, music8, music9, music11];
+      var mLineArray = [ music11];
 
 
       //const container = document.getElementById("jsoneditor");
@@ -382,18 +389,17 @@
       //const editor = new JSONEditor(container, options);
 
 
+      var music1Str = JSON.stringify(mLineArray, null, "");
+      //var music2Str =JSON.stringify(mLineArray);
 
-     var music1Str = JSON.stringify(mLineArray,null,"");
-     //var music2Str =JSON.stringify(mLineArray);
+      var pitchesStr1 = JSON.stringify(mLineArray[0], ['bpm', 'instrument']);
 
-      var pitchesStr1 = JSON.stringify(mLineArray[0],['bpm','instrument']);
-
-    // editor.set({mLineArray});
+      // editor.set({mLineArray});
 
 
       var readArray = JSON.parse(music1Str);
 
-     //document.getElementById("pre1").innerText = music1Str;
+      //document.getElementById("pre1").innerText = music1Str;
       document.getElementById("ta1").innerText = music1Str;
       document.getElementById("ta2").innerText = pitchesStr1;
 

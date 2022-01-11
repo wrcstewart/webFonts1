@@ -22,6 +22,7 @@
     var delim = '|';
     window.playState = false;
 
+
     const instrumentsMap = new Map();
     instrumentsMap.set("Blown bottle Pipe 1", _tone_0760_Aspirin_sf2_file)
     instrumentsMap.set("Flute Pipe 1", _tone_0730_Aspirin_sf2_file)
@@ -112,10 +113,11 @@
     }
 
 
-    function MLine(innerArrays, start, finish, instrument, bpm, beats, pitches, noteDuration) {
+    function MLine(id, innerArrays, start, finish, instrument, bpm, beats, pitches, noteDuration) {
+      this.id = id;
       this.start = start;
       this.finish = finish;
-     // this.duration = finish - start;
+      // this.duration = finish - start;
       this.bpm = bpm;
       this.instrument = instrument;
       this.noteDuration = noteDuration;
@@ -176,10 +178,34 @@
 
       return (inArray)
     }
-function showIt(s){
-     document.getElementById("ta3").innerText = JSON.stringify(s);
-    return;
-}
+
+    var monitor = [];
+
+    function refreshMonitor(monitor) {
+      let ta = document.getElementById("ta4");
+      let report = "";
+      for (let i = 0; i < monitor.length; i++) report += monitor[i] + "\n";
+      ta.innerHTML = report;
+    }
+
+    function showIt(s, instrument, id) {
+      if (typeof (s) === 'number') {
+        monitor[id] = instrument + ": " + '"'+ notes[s - 21] +'"';
+      } else {
+
+        monitor[id] = instrument + ": " + s;
+      }
+
+
+      refreshMonitor(monitor);
+      return;
+    }
+
+    function extractNotesFromArrayOfMidiNumbers(pitchesEntry){
+      let result =[];
+      for (let j=0;j<pitchesEntry.length;j++){ result[j] = notes[pitchesEntry[j]-21]}
+        return(result);
+    }
 
     function playMLine(mL, origin) {
 
@@ -198,7 +224,7 @@ function showIt(s){
       // let lenPulse = pulse.length;
       let time = 0;
       let tMult = 60 / bpm;
-      let endTime = mL.start + ((mL.finish-mL.start) / tMult);
+      let endTime = mL.start + ((mL.finish - mL.start) / tMult);
       let start = mL.start;
 
       let s, p, d, v; //actual values for playSound
@@ -221,10 +247,14 @@ function showIt(s){
         if (innerArrays == "CHORD") {
           for (let j = 0; j < lenPitchesEntry; j++) {
 
-            let ss = origin + start + ((s -ws) * tMult);
+            let ss = origin + start + ((s - ws) * tMult);
+
+            let chordNotes = extractNotesFromArrayOfMidiNumbers(pitchesEntry);
+
+            setTimeout(showIt, (ss - origin) * 1000, JSON.stringify(chordNotes), mL.instrument, mL.id);
 
             player.queueWaveTable(
-              audioContext, audioContext.destination, instrumentVar, ss , pitchesEntry[j], d * tMult, vInner);
+              audioContext, audioContext.destination, instrumentVar, ss, pitchesEntry[j], d * tMult, vInner);
           }
         }
 
@@ -233,8 +263,9 @@ function showIt(s){
           let timeInnerIncr = timeIncr / lenPitchesEntry;
           let innerD = (d * tMult) / lenPitchesEntry;
           for (let j = 0; j < lenPitchesEntry; j++) {
-            let ss = origin + start   + ((s-ws) + innerTime)  * tMult;
-            setTimeout(showIt,(ss - origin) *1000,pitchesEntry[j]);
+            let ss = origin + start + ((s - ws) + innerTime) * tMult;
+
+            setTimeout(showIt, (ss - origin) * 1000, pitchesEntry[j], mL.instrument, mL.id);
             player.queueWaveTable(
               audioContext,
               audioContext.destination, instrumentVar, ss, pitchesEntry[j],
@@ -273,10 +304,10 @@ function showIt(s){
 
             if (!Array.isArray(p)) {
 
-              let ss = origin + start + ((s -ws) * tMult);
-
+              let ss = origin + start + ((s - ws) * tMult);
+              setTimeout(showIt, (ss - origin) * 1000, p, mL.instrument, mL.id);
               player.queueWaveTable(
-                audioContext, audioContext.destination, instrumentVar, ss  , p, d * tMult, v);
+                audioContext, audioContext.destination, instrumentVar, ss, p, d * tMult, v);
 
             }
             // player.queueWaveTable(
@@ -381,18 +412,19 @@ function showIt(s){
       // var music4 = new MLine(20, "Acoustic Grand Piano", 180, beatFlute1, notePitchArray2, 0.9);
 
 
-      var music10 = new MLine("ARPEGGIO", 2, 60, "Acoustic Grand Piano",120 , beatFlute1, ["C4", ["A3", 0, 3, 7, 0], ["A3", 0, 3, 7, 0],
-        ["G2", 0, 7], ["G5", 7, 0], ["F3", 0, 4, 7, 0], ["F3", 0, 4, 7, 0], ["E4", 7, 0], ["E3", 0, 0]], 0.9);
-
+      var music10 = new MLine(1, "CHORD", 2, 120, "Acoustic Grand Piano", 60, beatFlute1, ["C4", ["A3", 0, 3, 7, 0], ["A3", 0, 3, 7, 10],
+        ["G2", 0, 7], ["G5", 7, 0], ["F3", 0, 4, 7, 0], ["F3", 0, 4, 7, 9], ["E4", 7, 0], ["E3", 0, 0]], 0.9);
+var music12 = new MLine(0, "ARPEGGIO", 2, 120, "Acoustic Grand Piano", 60, beatFlute1, ["C4", ["A4", 0, 3, 7, 0], ["A4", 0, 3, 7, 0],
+        ["G4", 0, 7], ["G5", 7, 0], ["F4", 0, 4, 7, 0], ["F4", 0, 4, 7, 0], ["E5", 7, 0], ["E4", 0, 0]], 0.9);
       //var music5 = new MLine("CHORD", 0, 30, "Acoustic Grand Piano", 60, beatFlute1, [Am, Am, G, G], 0.9);
       //var music7 = new MLine("CHORD", 0, 10, "Bass Drum 2", 60, beatBassDrum1, [33], 0.9);
-     // var music8 = new MLine("CHORD", 2, 10, "Snare Drum 1", 60, beatSnareDrum1, [40], 0.9);
-     // var music9 = new MLine("CHORD", 0, 10, "Hi-hat 1", 60, beatHighHat1, [57], 0.9);
-      var music11 = new MLine("CHORD", 2, 60, "Hi-hat 1", 120, beatHighHat1, [57], 0.9);
+      // var music8 = new MLine("CHORD", 2, 10, "Snare Drum 1", 60, beatSnareDrum1, [40], 0.9);
+      // var music9 = new MLine("CHORD", 0, 10, "Hi-hat 1", 60, beatHighHat1, [57,59], 0.9);
+      var music11 = new MLine(2, "CHORD", 2, 120, "Hi-hat 1", 120, beatHighHat1, [57,59], 0.9);
 
       // var mLineArray = [music4, music5, music7, music8,music9];
       // var mLineArray = [music4, music5];
-      var mLineArray = [ music11,music10];
+      var mLineArray = [music10, music11,music12];
 
 
       //const container = document.getElementById("jsoneditor");
@@ -424,12 +456,14 @@ function showIt(s){
 <body>
 <p><a href='javascript:genMusic();'>Generate Music</a></p>
 
-<textarea id="ta1" wrap="soft" style="width:300px;height:200px;"
-> test text</textarea>
+<textarea id="ta1" wrap="soft" style="width:300px;height:200px;"> test text</textarea>
 
 
 <button id="loadMusicLine" onclick="loadJSON()">Play</button>
+
 <textarea id="ta2" style="width: 400px; height: 400px;"></textarea>
 <textarea id="ta3" style="width: 400px; height: 400px;"></textarea>
+<textarea id="ta4" style="width: 400px; height: 400px;">ta4</textarea>
+
 
 </body>

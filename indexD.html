@@ -129,7 +129,7 @@
     var beat1 = ['C', 'Q', 'Q', 'C', 'C', 'C', 'C', 'C', 'Q', 'Q', 'CR', 'C', 'C'];
     var beatBassDrum1 = ["CF", "CR", "Q", 'Q', "CR", "QF", "Q", "CR", "Q", 'Q', "CR"]
     var beatSnareDrum1 = ["CR", "S", "SR", "SR", "S", "CR", "C"]
-    var beatFlute1 = ["C", "CP", "Q", "QP", "QP","QP"];
+    var beatFlute1 = ["C", "CP", "Q", "QP", "QP", "QP"];
     var beatFlute2 = ["C", "CP", "CP", "CP"];
     var beatHighHat1 = ["SF", "S", "S", "S"];
 
@@ -191,7 +191,7 @@
 
     function showIt(s, instrument, id) {
       if (typeof (s) === 'number') {
-        monitor[id] = instrument + ": " + '"'+ notes[s - 21] +'"';
+        monitor[id] = instrument + ": " + '"' + notes[s - 21] + '"';
       } else {
 
         monitor[id] = instrument + ": " + s;
@@ -202,13 +202,18 @@
       return;
     }
 
-    function extractNotesFromArrayOfMidiNumbers(pitchesEntry){
-      let result =[];
-      for (let j=0;j<pitchesEntry.length;j++){ result[j] = notes[pitchesEntry[j]-21]}
-        return(result);
+    function extractNotesFromArrayOfMidiNumbers(pitchesEntry) {
+      let result = [];
+      for (let j = 0; j < pitchesEntry.length; j++) {
+        result[j] = notes[pitchesEntry[j] - 21]
+      }
+      return (result);
     }
 
     function playMLine(mL, origin) {
+
+
+
 
       let bpm = mL.bpm;
       let instrumentVar = instrumentsMap.get(mL.instrument);
@@ -252,6 +257,8 @@
 
             let chordNotes = extractNotesFromArrayOfMidiNumbers(pitchesEntry);
 
+           // if (but.getAttribute("data-playing") == "off"){but.setAttribute("data-playing","on");return;};
+
             setTimeout(showIt, (ss - origin) * 1000, JSON.stringify(chordNotes), mL.instrument, mL.id);
 
             player.queueWaveTable(
@@ -260,6 +267,7 @@
         }
 
         if (innerArrays == "ARPEGGIO") {
+         // if (playState == "off") return;
           let innerTime = 0;
           let timeInnerIncr = timeIncr / lenPitchesEntry;
           let innerD = (d * tMult) / lenPitchesEntry;
@@ -281,7 +289,7 @@
       //endTime = we;
 
       while (time < endTime) { //overall process to stop when past duration
-
+       // if (playState == "off") return;
 
         while (countBeats < lenBeats) {
 
@@ -302,8 +310,10 @@
             if (time > endTime) break;
 
             playIfArray(p);
+           // if (playState == "off") return;
 
             if (!Array.isArray(p)) {
+            //  if (playState == "off") return;
 
               let ss = origin + start + ((s - ws) * tMult);
               setTimeout(showIt, (ss - origin) * 1000, p, mL.instrument, mL.id);
@@ -314,7 +324,7 @@
             // player.queueWaveTable(
             //audioContext, audioContext.destination, instrumentVar, origin + start + (s * tMult)+0.02, p +3, d * tMult, v);
           }
-
+         // if (playState == "off") return;
           if (timeIncr <= 0) {
             time += Math.abs(timeIncr);
           }
@@ -374,8 +384,17 @@
 
 
     function loadJSON() {
+      let but = document.getElementById("loadMusicLine");
 
-      player.cancelQueue(audioContext);
+      let playState = but.getAttribute("data-playing");
+
+      if (playState == "off") {
+        but.setAttribute("data-playing","on");but.innerHTML = "Reset";}
+      else {
+         but.setAttribute("data-playing","off");but.innerHTML = "Play"; player.cancelQueue(audioContext);return;
+      }
+
+
       var inString = document.getElementById("ta1").value;
       // var inStringExtras = document.getElementById("ta2").value;
       var mLineArray = JSON.parse(inString);
@@ -398,7 +417,7 @@
     function genMusic() {
       if (window.playState) {
         player.cancelQueue(audioContext);
-        alert("queue cancelled");
+        //alert("queue cancelled");
         window.playState = false;
         return;
       }
@@ -413,19 +432,19 @@
       // var music4 = new MLine(20, "Acoustic Grand Piano", 180, beatFlute1, notePitchArray2, 0.9);
 
 
-      var music10 = new MLine(1, "CHORD", 2, 120, "Acoustic Grand Piano", 60, beatFlute2, ["C4", ["A3", 0, 3, 7, 0], ["A3", 0, 3, 7, 10],
+      var music10 = new MLine(1, "CHORD", 2, 120, "Acoustic Grand Piano", 30, beatFlute2, ["C4", ["A3", 0, 3, 7, 0], ["A3", 0, 3, 7, 10],
         ["G2", 0, 7], ["G3", 7, 0], ["F3", 0, 4, 7, 0], ["F3", 0, 4, 7, 9], ["E4", 7, 0], ["E3", 0, 0]], 0.9);
-var music12 = new MLine(0, "ARPEGGIO", 2, 120, "Flute Pipe 1", 60, beatFlute1, ["C4", ["A4", 0, 3, 7, 0], ["A4", 0, 3, 7, 0],
+      var music12 = new MLine(0, "ARPEGGIO", 2, 120, "Flute Pipe 1", 30, beatFlute1, ["C4", ["A6", 0, 3, 7, 0], ["A5", 0, 3, 7, 0],
         ["G4", 0, 7], ["G4", 5, 0], ["F4", 0, 4, 7, 0], ["F4", 0, 4, 7, 0], ["E4", 7, 0], ["E4", 0, 0]], 0.9);
       //var music5 = new MLine("CHORD", 0, 30, "Acoustic Grand Piano", 60, beatFlute1, [Am, Am, G, G], 0.9);
       //var music7 = new MLine("CHORD", 0, 10, "Bass Drum 2", 60, beatBassDrum1, [33], 0.9);
       // var music8 = new MLine("CHORD", 2, 10, "Snare Drum 1", 60, beatSnareDrum1, [40], 0.9);
       // var music9 = new MLine("CHORD", 0, 10, "Hi-hat 1", 60, beatHighHat1, [57,59], 0.9);
-      var music11 = new MLine(2, "CHORD", 2, 120, "Hi-hat 1", 120, beatHighHat1, [57,59], 0.9);
+      var music11 = new MLine(2, "CHORD", 5, 120, "Hi-hat 1", 120, beatHighHat1, [57, 59], 0.9);
 
       // var mLineArray = [music4, music5, music7, music8,music9];
       // var mLineArray = [music4, music5];
-      var mLineArray = [music10,music12]// music11,music12];
+      var mLineArray = [music10, music12]// music11,music12];
 
 
       //const container = document.getElementById("jsoneditor");
@@ -457,10 +476,11 @@ var music12 = new MLine(0, "ARPEGGIO", 2, 120, "Flute Pipe 1", 60, beatFlute1, [
 <body>
 <p><a href='javascript:genMusic();'>Generate Music</a></p>
 
+
 <textarea id="ta1" wrap="soft" style="width:300px;height:200px;"> test text</textarea>
 
 
-<button id="loadMusicLine" onclick="loadJSON()">Play</button>
+<button id="loadMusicLine" data-playing="off" onclick="loadJSON()">Play</button>
 
 <textarea id="ta2" style="width: 400px; height: 400px;"></textarea>
 <textarea id="ta3" style="width: 400px; height: 400px;"></textarea>

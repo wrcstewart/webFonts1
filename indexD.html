@@ -22,6 +22,8 @@
     var delim = '|';
     window.playState = false;
 
+    timeOutsArray =[];
+
 
     const instrumentsMap = new Map();
     instrumentsMap.set("Blown bottle Pipe 1", _tone_0760_Aspirin_sf2_file)
@@ -214,7 +216,7 @@
 
 
 
-
+      let but = document.getElementById("loadMusicLine");
       let bpm = mL.bpm;
       let instrumentVar = instrumentsMap.get(mL.instrument);
       let innerArrays = mL.innerArrays;
@@ -253,13 +255,15 @@
         if (innerArrays == "CHORD") {
           for (let j = 0; j < lenPitchesEntry; j++) {
 
+            if (but.getAttribute("data-playing") == "off") return;
+
             let ss = origin + start + ((s - ws) * tMult);
 
             let chordNotes = extractNotesFromArrayOfMidiNumbers(pitchesEntry);
 
            // if (but.getAttribute("data-playing") == "off"){but.setAttribute("data-playing","on");return;};
 
-            setTimeout(showIt, (ss - origin) * 1000, JSON.stringify(chordNotes), mL.instrument, mL.id);
+            timeOutsArray.push(setTimeout(showIt, (ss - origin) * 1000, JSON.stringify(chordNotes), mL.instrument, mL.id));
 
             player.queueWaveTable(
               audioContext, audioContext.destination, instrumentVar, ss, pitchesEntry[j], d * tMult, vInner);
@@ -272,9 +276,11 @@
           let timeInnerIncr = timeIncr / lenPitchesEntry;
           let innerD = (d * tMult) / lenPitchesEntry;
           for (let j = 0; j < lenPitchesEntry; j++) {
+
+             if (but.getAttribute("data-playing") == "off") return;
             let ss = origin + start + ((s - ws) + innerTime) * tMult;
 
-            setTimeout(showIt, (ss - origin) * 1000, pitchesEntry[j], mL.instrument, mL.id);
+            timeOutsArray.push(setTimeout(showIt, (ss - origin) * 1000, pitchesEntry[j], mL.instrument, mL.id));
             player.queueWaveTable(
               audioContext,
               audioContext.destination, instrumentVar, ss, pitchesEntry[j],
@@ -292,6 +298,8 @@
        // if (playState == "off") return;
 
         while (countBeats < lenBeats) {
+
+           if (but.getAttribute("data-playing") == "off") return;
 
           timeIncr = getTimeIncr(beats, countBeats);
           v = getVelocity(beats, countBeats);
@@ -316,7 +324,7 @@
             //  if (playState == "off") return;
 
               let ss = origin + start + ((s - ws) * tMult);
-              setTimeout(showIt, (ss - origin) * 1000, p, mL.instrument, mL.id);
+              timeOutsArray.push(setTimeout(showIt, (ss - origin) * 1000, p, mL.instrument, mL.id));
               player.queueWaveTable(
                 audioContext, audioContext.destination, instrumentVar, ss, p, d * tMult, v);
 
@@ -325,6 +333,7 @@
             //audioContext, audioContext.destination, instrumentVar, origin + start + (s * tMult)+0.02, p +3, d * tMult, v);
           }
          // if (playState == "off") return;
+           if (but.getAttribute("data-playing") == "off") return;
           if (timeIncr <= 0) {
             time += Math.abs(timeIncr);
           }
@@ -391,7 +400,10 @@
       if (playState == "off") {
         but.setAttribute("data-playing","on");but.innerHTML = "Reset";}
       else {
-         but.setAttribute("data-playing","off");but.innerHTML = "Play"; player.cancelQueue(audioContext);return;
+         but.setAttribute("data-playing","off");but.innerHTML = "Play"; player.cancelQueue(audioContext);
+         timeOutsArray.forEach(  (item)=>{clearTimeout(item)}  );
+         timeOutsArray.length =0;
+         return;
       }
 
 

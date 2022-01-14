@@ -133,6 +133,7 @@
     var beatSnareDrum1 = ["CR", "S", "SR", "SR", "S", "CR", "C"]
     var beatFlute1 = ["C", "CP", "Q", "QP", "QP", "QP"];
     var beatFlute2 = ["C", "CP", "CP", "CP"];
+    var beatFlute3 = ["B","CR"]
     var beatHighHat1 = ["SF", "S", "S", "S"];
 
 
@@ -269,6 +270,8 @@
               audioContext, audioContext.destination, instrumentVar, ss, pitchesEntry[j], d * tMult, vInner);
           }
         }
+
+
 
         if (innerArrays == "ARPEGGIO") {
          // if (playState == "off") return;
@@ -444,9 +447,9 @@
       // var music4 = new MLine(20, "Acoustic Grand Piano", 180, beatFlute1, notePitchArray2, 0.9);
 
 
-      var music10 = new MLine(1, "CHORD", 2, 120, "Acoustic Grand Piano", 30, beatFlute2, ["C4", ["A3", 0, 3, 7, 0], ["A3", 0, 3, 7, 10],
+      var music10 = new MLine(1, "CHORD", 2, 120, "Flute Pipe 1", 60, beatFlute3, ["C4", ["A3", 0, 3, 7, 0], ["A3", 0, 3, 7, 10],
         ["G2", 0, 7], ["G3", 7, 0], ["F3", 0, 4, 7, 0], ["F3", 0, 4, 7, 9], ["E4", 7, 0], ["E3", 0, 0]], 0.9);
-      var music12 = new MLine(0, "ARPEGGIO", 2, 120, "Flute Pipe 1", 30, beatFlute1, ["C4", ["A6", 0, 3, 7, 0], ["A5", 0, 3, 7, 0],
+      var music12 = new MLine(0, "ARPEGGIO", 2, 120, "Flute Pipe 1", 60, beatFlute3, ["C4", ["A6", 0, 3, 7, 0], ["A5", 0, 3, 7, 0],
         ["G4", 0, 7], ["G4", 5, 0], ["F4", 0, 4, 7, 0], ["F4", 0, 4, 7, 0], ["E4", 7, 0], ["E4", 0, 0]], 0.9);
       //var music5 = new MLine("CHORD", 0, 30, "Acoustic Grand Piano", 60, beatFlute1, [Am, Am, G, G], 0.9);
       //var music7 = new MLine("CHORD", 0, 10, "Bass Drum 2", 60, beatBassDrum1, [33], 0.9);

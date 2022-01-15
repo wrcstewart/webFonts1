@@ -428,6 +428,147 @@
       for (let i = 0; i < len; i++) playMLine(mLineArray[i], origin);
     }
 
+    function mixNoteTest(){
+      let selectedPreset = _tone_0730_Aspirin_sf2_file;
+      for (var i = 0; i < selectedPreset.zones.length; i++) {
+					selectedPreset.zones[i].ahdsr = [{
+							duration: 0,
+							volume: 1
+						}, {
+							duration: 0.5,
+							volume: 0.9
+						}, {
+							duration: 0.5,
+							volume: 0.85
+						}, {
+							duration: 0.5,
+							volume: 0.8
+						}, {
+							duration: 0.5,
+							volume: 0.75
+						}, {
+							duration: 0.5,
+							volume: 0.7
+						}, {
+							duration: 0.5,
+							volume: 0.65
+						}, {
+							duration: 0.5,
+							volume: 0.6
+						}, {
+							duration: 0.5,
+							volume: 0.55
+						}, {
+							duration: 0.5,
+							volume: 0.5
+						}, {
+							duration: 0.5,
+							volume: 0.45
+						}, {
+							duration: 0.5,
+							volume: 0.4
+						},{
+							duration: 0.5,
+							volume: 0.35
+						}, {
+							duration: 0.5,
+							volume: 0.3
+						}, {
+            duration: 0.5,
+            volume: 0.25
+          },{
+							duration: 0.5,
+							volume: 0.2
+						}, {
+            duration: 0.5,
+            volume: 0.15
+
+          },{duration: 0.5,
+							volume: 0.1
+						}, {duration: 0.5,
+							volume: 0.05
+						}
+
+
+
+					];
+				}
+
+    origin = audioContext.currentTime;
+      player.queueWaveTable(audioContext, audioContext.destination, selectedPreset, origin+1, 35, 11);
+
+
+      for (var i = 0; i < selectedPreset.zones.length; i++) {
+					selectedPreset.zones[i].ahdsr = [{
+							duration: 0,
+							volume: 0.02
+						}, {
+							duration: 0.5,
+							volume: 0.05
+						}, {
+							duration: 0.5,
+							volume: 0.1
+						}, {
+							duration: 0.5,
+							volume: 0.15
+						}, {
+							duration: 0.5,
+							volume: 0.23
+						}, {
+							duration: 0.5,
+							volume: 0.3
+						}, {
+							duration: 0.5,
+							volume: 0.35
+						}, {
+							duration: 0.5,
+							volume: 0.4
+						}, {
+							duration: 0.5,
+							volume: 0.45
+						}, {
+							duration: 0.5,
+							volume: 0.5
+						}, {
+							duration: 0.5,
+							volume: 0.55
+						}, {
+							duration: 0.5,
+							volume: 0.6
+						},{
+							duration: 0.5,
+							volume: 0.65
+						}, {
+							duration: 0.5,
+							volume: 0.7
+						}, {
+            duration: 0.5,
+            volume: 0.75
+          },{
+							duration: 0.5,
+							volume: 0.8
+						}, {
+            duration: 0.5,
+            volume: 0.85
+
+          },{duration: 0.5,
+							volume: 0.9
+						}, {duration: 0.5,
+							volume: 0.95
+						}
+
+
+
+					];
+				}
+ player.queueWaveTable(audioContext, audioContext.destination, selectedPreset, origin+1, 38, 11);
+
+    }
+
+
+
+
+
 
     function genMusic() {
       if (window.playState) {
@@ -496,6 +637,8 @@
 
 
 <button id="loadMusicLine" data-playing="off" onclick="loadJSON()">Play</button>
+<button id="playMixNote"  onclick="mixNoteTest()">Mix Note Test</button>
+
 
 <textarea id="ta2" style="width: 400px; height: 400px;"></textarea>
 <textarea id="ta3" style="width: 400px; height: 400px;"></textarea>

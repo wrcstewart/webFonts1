@@ -430,7 +430,7 @@
 
     function mixNoteTest(){
       let selectedPreset = _tone_0730_Aspirin_sf2_file;
-      for (var i = 0; i < selectedPreset.zones.length; i++) {
+     /* for (var i = 0; i < selectedPreset.zones.length; i++) {
 					selectedPreset.zones[i].ahdsr = [{
 							duration: 0,
 							volume: 1
@@ -492,13 +492,28 @@
 
 
 					];
-				}
+				}*/
+
+      var testSlides1 = [
+        {pitch:57,when:3},{pitch:55,when:3.3}
+      ];
+      var testSlides2 = [
+        {pitch:60,when:4},{pitch:59,when:4.3}
+      ];
+      var testSlides3 = [
+        {pitch:64,when:5},{pitch:62,when:5.3}
+      ];
+
 
     origin = audioContext.currentTime;
-      player.queueWaveTable(audioContext, audioContext.destination, selectedPreset, origin+1, 35, 11);
+     // player.queueWaveTable(audioContext, audioContext.destination, selectedPreset, origin+0.1, 50, 10,1.0, testSlides);
+      player.queueWaveTable(audioContext, audioContext.destination, selectedPreset, origin+0.1, 57, 12,1.0,testSlides1);
+      player.queueWaveTable(audioContext, audioContext.destination, selectedPreset, origin+0.1, 60, 12,1.0,testSlides2);
+      player.queueWaveTable(audioContext, audioContext.destination, selectedPreset, origin+0.1, 64, 12,1.0,testSlides3);
 
 
-      for (var i = 0; i < selectedPreset.zones.length; i++) {
+
+     /* for (var i = 0; i < selectedPreset.zones.length; i++) {
 					selectedPreset.zones[i].ahdsr = [{
 							duration: 0,
 							volume: 0.02
@@ -561,8 +576,8 @@
 
 					];
 				}
- player.queueWaveTable(audioContext, audioContext.destination, selectedPreset, origin+1, 38, 11);
-
+ player.queueWaveTable(audioContext, audioContext.destination, selectedPreset, origin+1, 36, 11);
+*/
     }
 
 

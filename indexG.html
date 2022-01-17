@@ -115,7 +115,7 @@
     }
 
 
-    function MLine(id, innerArrays, start, finish, instrument, bpm, beats, pitches, noteDuration) {
+    function MLine(id, innerArrays, start, finish, instrument, bpm, rhythmBeats, pitchBeats, noteDuration) {
       this.id = id;
       this.start = start;
       this.finish = finish;
@@ -124,8 +124,8 @@
       this.instrument = instrument;
       this.noteDuration = noteDuration;
       this.innerArrays = innerArrays;
-      this.beats = beats;
-      this.pitches = pitches;
+      this.rhythmBeats = rhythmBeats;
+      this.pitchBeats = pitchBeats;
     }
 
     var beat1 = ['C', 'Q', 'Q', 'C', 'C', 'C', 'C', 'C', 'Q', 'Q', 'CR', 'C', 'C'];
@@ -133,7 +133,7 @@
     var beatSnareDrum1 = ["CR", "S", "SR", "SR", "S", "CR", "C"]
     var beatFlute1 = ["C", "CP", "Q", "QP", "QP", "QP"];
     var beatFlute2 = ["C", "CP", "CP", "CP"];
-    var beatFlute3 = ["B", "CR"]
+    var beatFlute3 = ["B", "C"]
     var beatHighHat1 = ["SF", "S", "S", "S"];
 
 
@@ -142,19 +142,19 @@
       return (1)
     }
 
-    function getTimeIncr(beats, countBeats) {
-      let beatsString = (beats[countBeats]);
+    function getTimeIncr(beats, rhythmBeat) {
+      let beatsString = (beats[rhythmBeat]);
       if (beatsString.length == 1) return (beatsMap.get(beatsString))
       if (beatsString.charAt(1) == 'R') return (-beatsMap.get(beatsString.substr(0, 1)) * dotMult(beatsString))
       if (beatsString.charAt(1) == 'F') return (beatsMap.get(beatsString.substr(0, 1)) * dotMult(beatsString))
       if (beatsString.charAt(1) == 'P') return (beatsMap.get(beatsString.substr(0, 1)) * dotMult(beatsString))
     }
 
-    function getVelocity(beats, countBeats) {
+    function getVelocity(beats, rhythmBeat) {
       let velocityNormal = 0.6;
       let velocityF = 1.0;
       let velocityP = 0.3;
-      let beatsString = (beats[countBeats]);
+      let beatsString = (beats[rhythmBeat]);
       if (beatsString.length == 1) return (velocityNormal);
       if (beatsString.charAt(1) == 'F') return (velocityF);
       if (beatsString.charAt(1) == 'P') return (velocityP);
@@ -220,25 +220,25 @@
       let bpm = mL.bpm;
       let instrumentVar = instrumentsMap.get(mL.instrument);
       let innerArrays = mL.innerArrays;
-      let beats = mL.beats;
-      let pitches = mL.pitches;
-      pitches = reBaseArray(pitches);
+      let rhythmBeats = mL.rhythmBeats;
+      let pitchBeats = mL.pitchBeats;
+      pitchBeats = reBaseArray(pitchBeats);
       let pulse = mL.pulse;
       let noteDuration = mL.noteDuration;
-      let lenBeats = beats.length;
-      let lenPitches = pitches.length;
-      let countBeats = 0;
-      // let countPulse =0;
-      // let lenPulse = pulse.length;
-      let time = 0;
-      let tMult = 60 / bpm;
-      let endTime = mL.start + ((mL.finish - mL.start) / tMult);
-      let start = mL.start;
+      let lenRhythmBeats = rhythmBeats.length;
+      let lenPitches = pitchBeats.length;
+      let rhythmBeat = 0;
 
-      let s, p, d, v; //actual values for playSound
+      let beat = 0;
+      let tMult = 60 / bpm;
+       let start = mL.start;
+      let endBeat = start + ((mL.finish - start) / tMult);
+
+let curBeat;
+      let  p, d, v; //actual values for playSound
       let timeIncr;
       let ws = start; // ignore for time being
-      let we = endTime; //would set endTime to we here
+
 
 // -----------------------------------------------------------------------------------------------------------------
       function playIfArray(pitchesEntry) {
@@ -257,16 +257,16 @@
 
             if (but.getAttribute("data-playing") == "off") return;
 
-            let ss = origin + start + ((s - ws) * tMult);
+            let t = origin + start + ((curBeat - start) * tMult);
 
             let chordNotes = extractNotesFromArrayOfMidiNumbers(pitchesEntry);
 
             // if (but.getAttribute("data-playing") == "off"){but.setAttribute("data-playing","on");return;};
 
-            timeOutsArray.push(setTimeout(showIt, (ss - origin) * 1000, JSON.stringify(chordNotes), mL.instrument, mL.id));
+            timeOutsArray.push(setTimeout(showIt, (t - origin) * 1000, JSON.stringify(chordNotes), mL.instrument, mL.id));
 
             player.queueWaveTable(
-              audioContext, audioContext.destination, instrumentVar, ss, pitchesEntry[j], d * tMult, vInner);
+              audioContext, audioContext.destination, instrumentVar, t, pitchesEntry[j], d * tMult, vInner);
           }
         }
 
@@ -279,12 +279,12 @@
           for (let j = 0; j < lenPitchesEntry; j++) {
 
             if (but.getAttribute("data-playing") == "off") return;
-            let ss = origin + start + ((s - ws) + innerTime) * tMult;
+            let t = origin + start + ((curBeat - start) + innerTime) * tMult;
 
-            timeOutsArray.push(setTimeout(showIt, (ss - origin) * 1000, pitchesEntry[j], mL.instrument, mL.id));
+            timeOutsArray.push(setTimeout(showIt, (t - origin) * 1000, pitchesEntry[j], mL.instrument, mL.id));
             player.queueWaveTable(
               audioContext,
-              audioContext.destination, instrumentVar, ss, pitchesEntry[j],
+              audioContext.destination, instrumentVar, t, pitchesEntry[j],
               innerD, vInner);
 
             innerTime += timeInnerIncr;
@@ -292,32 +292,33 @@
         }
       } // end playIfArray ----------------------------------------------------------------------------------------
 
-      time += ws;// currently sets to start
-      //endTime = we;
+      beat = start;// currently sets to start
 
-      while (time < endTime) { //overall process to stop when past duration
+
+      while (beat < endBeat) { //overall process to stop when past finish time - from which endBeat was computed.
         // if (playState == "off") return;
 
-        while (countBeats < lenBeats) {
+        while (rhythmBeat < lenRhythmBeats) {
 
           if (but.getAttribute("data-playing") == "off") return;
 
-          timeIncr = getTimeIncr(beats, countBeats);
-          v = getVelocity(beats, countBeats);
+          timeIncr = getTimeIncr(rhythmBeats, rhythmBeat);
+          v = getVelocity(rhythmBeats, rhythmBeat);
 
           if (timeIncr > 0) { // we need to set up note parameters
 
-            let ixx = getPitchIndexFromTime(time, lenPitches);
-            s = time;
-            p = pitches[ixx];
+            let ixx = getPitchIndexFromTime(beat, lenPitches);
+            //s = beat;
+            curBeat = beat;
+            p = pitchBeats[ixx];
             d = noteDuration * timeIncr;
 
 
             // if (time % 4  == 0 ) {v =1}  else {v=0.2}
 
             //main place where pitch-time incremented
-            time += timeIncr;//after note parameters set ---add a separate play chord routine that adjusts time Incr.
-            if (time > endTime) break;
+            beat += timeIncr;//after note parameters set ---add a separate play chord routine that adjusts time Incr.
+            if (beat > endBeat) break;
 
             playIfArray(p);
             // if (playState == "off") return;
@@ -325,10 +326,10 @@
             if (!Array.isArray(p)) {
               //  if (playState == "off") return;
 
-              let ss = origin + start + ((s - ws) * tMult);//tMult is to map time to true time
-              timeOutsArray.push(setTimeout(showIt, (ss - origin) * 1000, p, mL.instrument, mL.id));
+              let t = origin + start + ((curBeat - start) * tMult);//tMult is to map time to true time
+              timeOutsArray.push(setTimeout(showIt, (t - origin) * 1000, p, mL.instrument, mL.id));
               player.queueWaveTable(
-                audioContext, audioContext.destination, instrumentVar, ss, p, d * tMult, v);
+                audioContext, audioContext.destination, instrumentVar, t, p, d * tMult, v);
 
             }
             // player.queueWaveTable(
@@ -337,10 +338,10 @@
           // if (playState == "off") return;
           if (but.getAttribute("data-playing") == "off") return;
           if (timeIncr <= 0) {
-            time += Math.abs(timeIncr);
+            beat += Math.abs(timeIncr);
           }
-          countBeats += 1;
-          if (countBeats == lenBeats) countBeats = 0;
+          rhythmBeat += 1;
+          if (rhythmBeat == lenRhythmBeats) rhythmBeat = 0;
         }
       }
     }
@@ -456,19 +457,20 @@
       // var music4 = new MLine(20, "Acoustic Grand Piano", 180, beatFlute1, notePitchArray2, 0.9);
 
 
-      var music10 = new MLine(1, "CHORD", 2, 120, "Flute Pipe 1", 60, beatFlute3, ["C4", ["A3", 0, 3, 7, 0], ["A3", 0, 3, 7, 10],
-        ["G2", 0, 7], ["G3", 7, 0], ["F3", 0, 4, 7, 0], ["F3", 0, 4, 7, 9], ["E4", 7, 0], ["E3", 0, 0]], 0.9);
-      var music12 = new MLine(0, "ARPEGGIO", 2, 120, "Flute Pipe 1", 60, beatFlute3, ["C4", ["A6", 0, 3, 7, 0], ["A5", 0, 3, 7, 0],
-        ["G4", 0, 7], ["G4", 5, 0], ["F4", 0, 4, 7, 0], ["F4", 0, 4, 7, 0], ["E4", 7, 0], ["E4", 0, 0]], 0.9);
+      var music10 = new MLine(1, "CHORD", 2, 120, "Flute Pipe 1", 90, beatFlute3, ["C4", ["A3", 0, 3, 7, 0], ["A3", 0, 3, 7, 10],
+        ["G2", 0, 7], ["G3", 7, 0], ["F3", 0, 4, 7, 0], ["F3", 0, 4, 7, 9], ["E4", 7, 0], ["E3", 0, 0]], 0.99);
+      var music12 = new MLine(0, "ARPEGGIO", 2, 120, "Flute Pipe 1", 90, beatFlute3, ["C4", ["A5", 0, 3, 7, 0], ["A5", 0, 3, 7, 0],
+        ["G4", 0, 7], ["G4", 5, 0], ["F4", 0, 4, 7, 0], ["F4", 0, 4, 7, 0], ["E4", 7, 0], ["E4", 0, 0]], 0.99);
       //var music5 = new MLine("CHORD", 0, 30, "Acoustic Grand Piano", 60, beatFlute1, [Am, Am, G, G], 0.9);
-      //var music7 = new MLine("CHORD", 0, 10, "Bass Drum 2", 60, beatBassDrum1, [33], 0.9);
+      var music7 = new MLine(3,"CHORD", 0, 120, "Bass Drum 2", 90, beatBassDrum1, [33], 0.9);
       // var music8 = new MLine("CHORD", 2, 10, "Snare Drum 1", 60, beatSnareDrum1, [40], 0.9);
       // var music9 = new MLine("CHORD", 0, 10, "Hi-hat 1", 60, beatHighHat1, [57,59], 0.9);
-      var music11 = new MLine(2, "CHORD", 5, 120, "Hi-hat 1", 120, beatHighHat1, [57, 59], 0.9);
+      var music11 = new MLine(2, "CHORD", 5, 120, "Hi-hat 1", 90, beatHighHat1, [60, 60], 0.9);
 
       // var mLineArray = [music4, music5, music7, music8,music9];
       // var mLineArray = [music4, music5];
-      var mLineArray = [music10, music12]// music11,music12];
+      var mLineArray = [music10, music12];// music11,music12];
+
 
 
       //const container = document.getElementById("jsoneditor");

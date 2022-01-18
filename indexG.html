@@ -129,13 +129,7 @@
       this.pitchBeats = pitchBeats;
     }
 
-    var beat1 = ['C', 'Q', 'Q', 'C', 'C', 'C', 'C', 'C', 'Q', 'Q', 'CR', 'C', 'C'];
-    var beatBassDrum1 = ["CF", "CR", "Q", 'Q', "CR", "QF", "Q", "CR", "Q", 'Q', "CR"]
-    var beatSnareDrum1 = ["CR", "S", "SR", "SR", "S", "CR", "C"]
-    var beatFlute1 = ["C", "CP", "Q", "QP", "QP", "QP"];
-    var beatFlute2 = ["C", "CP", "CP", "CP"];
-    var beatFlute3 = ["B", "C"]
-    var beatHighHat1 = ["SF", "S", "S", "S"];
+
 
 
     function dotMult(beatsString) {
@@ -444,49 +438,54 @@
 
 
     function genMusic() {
+
       if (window.playState) {
         player.cancelQueue(audioContext);
         //alert("queue cancelled");
         window.playState = false;
         return;
       }
+
       window.playState = true;
       player.cancelQueue(audioContext);
-      var notePitchArray1 = createNotePitchArray("C4", 8);
 
 
-      var notePitchArray2 = createTransposedPitchArray(notePitchArray1, 0)
-      var Am = [57, 60, 64, 69];
-      var G = [55, 59, 62];
-      // var music4 = new MLine(20, "Acoustic Grand Piano", 180, beatFlute1, notePitchArray2, 0.9);
+      //var notePitchArray1 = createNotePitchArray("C4", 8);
+      //var notePitchArray2 = createTransposedPitchArray(notePitchArray1, 0);
+
+      var beat1 = ['C', 'Q', 'Q', 'C', 'C', 'C', 'C', 'C', 'Q', 'Q', 'CR', 'C', 'C'];
+    var beatBassDrum1 = ["CF", "CR", "Q", 'Q', "CR", "QF", "Q", "CR", "Q", 'Q', "CR"]
+    var beatSnareDrum1 = ["CR", "S", "SR", "SR", "S", "CR", "C"]
+    var beatFlute1 = ["C", "CP", "Q", "QP", "QP", "QP"];
+    var beatFlute2 = ["C", "CP", "CP", "CP"];
+    var beatFlute3 = ["B", "C"]
+    var beatHighHat1 = ["SF", "S", "S", "S"];
+
+
+
+
+
+
 
 
       var music10 = new MLine(1, "CHORD", 2, 120, "Flute Pipe 1", 90, beatFlute3, ["C4", ["A3", 0, 3, 7, 0], ["A3", 0, 3, 7, 10],
         ["G2", 0, 7], ["G3", 7, 0], ["F3", 0, 4, 7, 0], ["F3", 0, 4, 7, 9], ["E4", 7, 0], ["E3", 0, 0]], 0.99);
       var music12 = new MLine(0, "ARPEGGIO", 2, 120, "Flute Pipe 1", 90, beatFlute3, ["C4", ["A5", 0, 3, 7, 0], ["A5", 0, 3, 7, 0],
         ["G4", 0, 7], ["G4", 5, 0], ["F4", 0, 4, 7, 0], ["F4", 0, 4, 7, 0], ["E4", 6, 0], ["E4", 0, 7]], 0.99);
-      //var music5 = new MLine("CHORD", 0, 30, "Acoustic Grand Piano", 60, beatFlute1, [Am, Am, G, G], 0.9);
       var music7 = new MLine(3, "CHORD", 0, 120, "Bass Drum 2", 90, beatBassDrum1, [33], 0.9);
       // var music8 = new MLine("CHORD", 2, 10, "Snare Drum 1", 60, beatSnareDrum1, [40], 0.9);
       // var music9 = new MLine("CHORD", 0, 10, "Hi-hat 1", 60, beatHighHat1, [57,59], 0.9);
       var music11 = new MLine(2, "CHORD", 5, 120, "Hi-hat 1", 90, beatHighHat1, [60, 60], 0.9);
-
       // var mLineArray = [music4, music5, music7, music8,music9];
       // var mLineArray = [music4, music5];
+
+
       var mLineArray = [music10, music12];// music11,music12];
 
-
-      //const container = document.getElementById("jsoneditor");
-      //const options = {};
-      //const editor = new JSONEditor(container, options);
-
+      //json stuff below
 
       var music1Str = JSON.stringify(mLineArray, null, "");
-      //var music2Str =JSON.stringify(mLineArray);
-
-      var pitchesStr1 = JSON.stringify(mLineArray[0], ['bpm', 'instrument']);
-
-      // editor.set({mLineArray});
+      var pitchesStr1 = JSON.stringify(mLineArray[0], ['bpm', 'instrument']);//NB
 
 
       var readArray = JSON.parse(music1Str);
@@ -494,10 +493,7 @@
       //document.getElementById("pre1").innerText = music1Str;
       document.getElementById("ta1").innerText = music1Str;
       document.getElementById("ta2").innerText = pitchesStr1;
-
-
-    }
-
+    }// end gen music - nb does not play
 
   </script>
 </head>
@@ -505,9 +501,7 @@
 <body>
 <p><a href='javascript:genMusic();'>Generate Music</a></p>
 
-
 <textarea id="ta1" wrap="soft" style="width:300px;height:200px;"> test text</textarea>
-
 
 <button id="loadMusicLine" data-playing="off" onclick="loadJSON()">Play</button>
 <button id="playMixNote" onclick="mixNoteTest()">Mix Note Test</button>

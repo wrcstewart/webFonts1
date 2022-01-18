@@ -26,29 +26,27 @@
 
 
     const instrumentsMap = new Map();
-    instrumentsMap.set("Blown bottle Pipe 1", _tone_0760_Aspirin_sf2_file)
-    instrumentsMap.set("Flute Pipe 1", _tone_0730_Aspirin_sf2_file)
-    instrumentsMap.set("Acoustic Grand Piano", _tone_0000_JCLive_sf2_file)
-    instrumentsMap.set("Bass Drum 2", _drum_35_0_Chaos_sf2_file);
-    instrumentsMap.set("Snare Drum 1", _drum_38_0_Chaos_sf2_file);
-    instrumentsMap.set("Hi-hat 1", _drum_42_0_Chaos_sf2_file);
-
-
+    {
+      instrumentsMap.set("Blown bottle Pipe 1", _tone_0760_Aspirin_sf2_file)
+      instrumentsMap.set("Flute Pipe 1", _tone_0730_Aspirin_sf2_file)
+      instrumentsMap.set("Acoustic Grand Piano", _tone_0000_JCLive_sf2_file)
+      instrumentsMap.set("Bass Drum 2", _drum_35_0_Chaos_sf2_file);
+      instrumentsMap.set("Snare Drum 1", _drum_38_0_Chaos_sf2_file);
+      instrumentsMap.set("Hi-hat 1", _drum_42_0_Chaos_sf2_file);
+    }
     const beatsMap = new Map();
-    beatsMap.set('C', 1.0);
-    beatsMap.set('Q', 0.5);
-    beatsMap.set('M', 2.0);
-    beatsMap.set('B', 8.0);
-    beatsMap.set('H', 4.0);
-    beatsMap.set('CR', 1.0);
-    beatsMap.set('QR', 0.5);
-    beatsMap.set('MR', 2.0);
-    beatsMap.set('S', 0.25);
-    beatsMap.set('SR', 0.25);
-    //beatsMap.set('C',1.0);
-    // beatsMap.set('C',1.0);
-
-
+    {
+      beatsMap.set('C', 1.0);
+      beatsMap.set('Q', 0.5);
+      beatsMap.set('M', 2.0);
+      beatsMap.set('B', 8.0);
+      beatsMap.set('H', 4.0);
+      beatsMap.set('CR', 1.0);
+      beatsMap.set('QR', 0.5);
+      beatsMap.set('MR', 2.0);
+      beatsMap.set('S', 0.25);
+      beatsMap.set('SR', 0.25);
+    }
     var noteNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];//used to construct notes[] below
     var notes = []; // this allows easy look up of note name to midi number - but based with A0 = 0
     // a function will add 21 to give the correct official midi number of the notes.
@@ -62,10 +60,13 @@
       }
     }
     //now fill in those notes not covered.
-    notes[0] = "A0";
-    notes[1] = "A#0";
-    notes[2] = "B0";
-    notes[87] = "C8";
+
+    {
+      notes[0] = "A0";
+      notes[1] = "A#0";
+      notes[2] = "B0";
+      notes[87] = "C8";
+    } //notes not generated set here
 
     var probs = [0.2, 0.4, 0.15, 0.15, 0.025, 0.025, 0.025, 0.025];
     //prob of jumping up or down by the index 0 to 7 corresponding to scale notes;
@@ -102,8 +103,8 @@
       return (oldNoteScale8 + step);
     }
 
-    RelativeMidiNumOfHMScalePositive = [0, 2, 3, 5, 7, 8, 11, 12, 14, 15, 17];
-    RelativeMidiNumOfHMScaleNegative = [0, -1, -4, -5, -7, -9, -10, -12, -13, -16, -17];
+    var RelativeMidiNumOfHMScalePositive = [0, 2, 3, 5, 7, 8, 11, 12, 14, 15, 17];
+    var RelativeMidiNumOfHMScaleNegative = [0, -1, -4, -5, -7, -9, -10, -12, -13, -16, -17];
 
     function getMidiNote(scaleNote, midiBaseNote) {
       if (scaleNote >= 0) return (midiBaseNote + RelativeMidiNumOfHMScalePositive[scaleNote]);
@@ -229,19 +230,20 @@
       let lenPitches = pitchBeats.length;
       let rhythmBeat = 0;
 
-      let beat = 0;
+      let pitchBeat = 0;
       let tMult = 60 / bpm;
-       let start = mL.start;
+      let start = mL.start;
       let endBeat = start + ((mL.finish - start) / tMult);
 
-let curBeat;
-      let  p, d, v; //actual values for playSound
+      let curBeat;
+      let p, d, v; //actual values for playSound
       let timeIncr;
       let ws = start; // ignore for time being
 
 
 // -----------------------------------------------------------------------------------------------------------------
       function playIfArray(pitchesEntry) {
+        // the calling function should contain the variables curBeat, start, tMult, origin, mL, some player variables
         pitchesEntry = reBaseArray(pitchesEntry)
         let velocityReCompensationMult = 0.5;
         if (!Array.isArray(pitchesEntry)) return;
@@ -292,24 +294,27 @@ let curBeat;
         }
       } // end playIfArray ----------------------------------------------------------------------------------------
 
-      beat = start;// currently sets to start
+      pitchBeat = start;// currently sets to start
 
 
-      while (beat < endBeat) { //overall process to stop when past finish time - from which endBeat was computed.
+      while (pitchBeat < endBeat) { //overall process to stop when past finish time - from which endBeat was computed.
         // if (playState == "off") return;
 
         while (rhythmBeat < lenRhythmBeats) {
 
           if (but.getAttribute("data-playing") == "off") return;
 
-          timeIncr = getTimeIncr(rhythmBeats, rhythmBeat);
+          timeIncr = getTimeIncr(rhythmBeats, rhythmBeat);//nb timeIncr will be used to increment pitchBeat
+
+
+
           v = getVelocity(rhythmBeats, rhythmBeat);
 
           if (timeIncr > 0) { // we need to set up note parameters
 
-            let ixx = getPitchIndexFromTime(beat, lenPitches);
-            //s = beat;
-            curBeat = beat;
+            let ixx = getPitchIndexFromTime(pitchBeat, lenPitches);//necessary because index is wrapped round to give a loop
+            //s = pitchBeat;
+            curBeat = pitchBeat;
             p = pitchBeats[ixx];
             d = noteDuration * timeIncr;
 
@@ -317,12 +322,11 @@ let curBeat;
             // if (time % 4  == 0 ) {v =1}  else {v=0.2}
 
             //main place where pitch-time incremented
-            beat += timeIncr;//after note parameters set ---add a separate play chord routine that adjusts time Incr.
-            if (beat > endBeat) break;
+            pitchBeat += timeIncr;//after note parameters set ---add a separate play chord routine that adjusts time Incr.
+            if (pitchBeat > endBeat) break;
 
             playIfArray(p);
-            // if (playState == "off") return;
-
+            // if (playState == "off") retur
             if (!Array.isArray(p)) {
               //  if (playState == "off") return;
 
@@ -338,7 +342,7 @@ let curBeat;
           // if (playState == "off") return;
           if (but.getAttribute("data-playing") == "off") return;
           if (timeIncr <= 0) {
-            beat += Math.abs(timeIncr);
+            pitchBeat += Math.abs(timeIncr);
           }
           rhythmBeat += 1;
           if (rhythmBeat == lenRhythmBeats) rhythmBeat = 0;
@@ -460,9 +464,9 @@ let curBeat;
       var music10 = new MLine(1, "CHORD", 2, 120, "Flute Pipe 1", 90, beatFlute3, ["C4", ["A3", 0, 3, 7, 0], ["A3", 0, 3, 7, 10],
         ["G2", 0, 7], ["G3", 7, 0], ["F3", 0, 4, 7, 0], ["F3", 0, 4, 7, 9], ["E4", 7, 0], ["E3", 0, 0]], 0.99);
       var music12 = new MLine(0, "ARPEGGIO", 2, 120, "Flute Pipe 1", 90, beatFlute3, ["C4", ["A5", 0, 3, 7, 0], ["A5", 0, 3, 7, 0],
-        ["G4", 0, 7], ["G4", 5, 0], ["F4", 0, 4, 7, 0], ["F4", 0, 4, 7, 0], ["E4", 7, 0], ["E4", 0, 0]], 0.99);
+        ["G4", 0, 7], ["G4", 5, 0], ["F4", 0, 4, 7, 0], ["F4", 0, 4, 7, 0], ["E4", 6, 0], ["E4", 0, 7]], 0.99);
       //var music5 = new MLine("CHORD", 0, 30, "Acoustic Grand Piano", 60, beatFlute1, [Am, Am, G, G], 0.9);
-      var music7 = new MLine(3,"CHORD", 0, 120, "Bass Drum 2", 90, beatBassDrum1, [33], 0.9);
+      var music7 = new MLine(3, "CHORD", 0, 120, "Bass Drum 2", 90, beatBassDrum1, [33], 0.9);
       // var music8 = new MLine("CHORD", 2, 10, "Snare Drum 1", 60, beatSnareDrum1, [40], 0.9);
       // var music9 = new MLine("CHORD", 0, 10, "Hi-hat 1", 60, beatHighHat1, [57,59], 0.9);
       var music11 = new MLine(2, "CHORD", 5, 120, "Hi-hat 1", 90, beatHighHat1, [60, 60], 0.9);
@@ -470,7 +474,6 @@ let curBeat;
       // var mLineArray = [music4, music5, music7, music8,music9];
       // var mLineArray = [music4, music5];
       var mLineArray = [music10, music12];// music11,music12];
-
 
 
       //const container = document.getElementById("jsoneditor");

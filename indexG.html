@@ -16,14 +16,13 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jsoneditor/9.5.11/jsoneditor.min.js"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/jsoneditor/9.5.11/jsoneditor.css" rel="stylesheet" type="text/css">
 
-
   <script>
 
     var delim = '|';
+
     window.playState = false;
 
-    timeOutsArray = [];
-
+    timeOutsArray = []; //used to track time to display note being played.
 
     const instrumentsMap = new Map();
     {
@@ -200,6 +199,7 @@
       return;
     }
 
+
     function extractNotesFromArrayOfMidiNumbers(pitchesEntry) {
       let result = [];
       for (let j = 0; j < pitchesEntry.length; j++) {
@@ -208,9 +208,12 @@
       return (result);
     }
 
+
+
     function playMLine(mL, origin) {
 
-
+      let id = mL.id;
+      let gainTrack = gainNodeArray[id];
       let but = document.getElementById("loadMusicLine");
       let bpm = mL.bpm;
       let instrumentVar = instrumentsMap.get(mL.instrument);
@@ -262,7 +265,7 @@
             timeOutsArray.push(setTimeout(showIt, (t - origin) * 1000, JSON.stringify(chordNotes), mL.instrument, mL.id));
 
             player.queueWaveTable(
-              audioContext, audioContext.destination, instrumentVar, t, pitchesEntry[j], d * tMult, vInner);
+              audioContext, gainTrack, instrumentVar, t, pitchesEntry[j], d * tMult, vInner);
           }
         }
 
@@ -278,9 +281,10 @@
             let t = origin + start + ((curBeat - start) + innerTime) * tMult;
 
             timeOutsArray.push(setTimeout(showIt, (t - origin) * 1000, pitchesEntry[j], mL.instrument, mL.id));
+            //gainTrack.gain.value =1.0;
             player.queueWaveTable(
               audioContext,
-              audioContext.destination, instrumentVar, t, pitchesEntry[j],
+              gainTrack, instrumentVar, t, pitchesEntry[j],
               innerD, vInner);
 
             innerTime += timeInnerIncr;
@@ -327,7 +331,7 @@
               let t = origin + start + ((curBeat - start) * tMult);//tMult is to map time to true time
               timeOutsArray.push(setTimeout(showIt, (t - origin) * 1000, p, mL.instrument, mL.id));
               player.queueWaveTable(
-                audioContext, audioContext.destination, instrumentVar, t, p, d * tMult, v);
+                audioContext,gainTrack, instrumentVar, t, p, d * tMult, v);
 
             }
             // player.queueWaveTable(
@@ -347,6 +351,41 @@
 
     var audioContext = new (window.AudioContext || window.webkitAudioContext)();
     var player = new WebAudioFontPlayer();
+    var maxTracks
+   var gainNodeArray =[]
+
+    var maxTracks = 10;
+
+    for(let i= 0;i< maxTracks;i++){
+      gainNodeArray[i] = audioContext.createGain();
+       gainNodeArray[i].connect(audioContext.destination);
+    }
+
+
+
+
+    var gainNode = audioContext.createGain();
+    gainNode.connect(audioContext.destination);
+    var gainWeights = [];
+
+    function setGainArray(el) {
+
+      let backgroundGain = 0.2;
+      let foregroundGain = 0.8;
+
+
+      let editTrack = el.value;
+
+      //alert(""+ editTrack);
+
+      for (let track = 0; track < maxTracks; track++) {
+        gainNodeArray[track].gain.value = backgroundGain;
+        if (track == editTrack) gainNodeArray[track].gain.value = foregroundGain;
+    }
+    }
+
+
+    {
     //player.loader.decodeAfterLoading(audioContext,'_tone_0000_JCLive_sf2_file' );
     player.loader.decodeAfterLoading(audioContext, '_tone_0730_Aspirin_sf2_file');
     player.loader.decodeAfterLoading(audioContext, '_drum_47_0_Chaos_sf2_file');
@@ -355,6 +394,8 @@
     player.loader.decodeAfterLoading(audioContext, '_drum_35_0_Chaos_sf2_file');
     player.loader.decodeAfterLoading(audioContext, '_drum_38_0_Chaos_sf2_file');
     player.loader.decodeAfterLoading(audioContext, '_drum_42_0_Chaos_sf2_file');
+    }//loading player DON'T FORGET TO DO THIS !
+
 
     var origin;
     let midiBaseNote;
@@ -423,10 +464,10 @@
 
       //playMLine(loadedML,origin);
       playSection(mLineArray, origin);
-    }
+    }//main PLAY it function !!!!!!!
 
 
-    function playSection(mLineArray, origin) {
+    function playSection(mLineArray, origin,dest) {
       let len = mLineArray.length;
       for (let i = 0; i < len; i++) playMLine(mLineArray[i], origin);
     }
@@ -475,12 +516,12 @@
       var music7 = new MLine(3, "CHORD", 0, 120, "Bass Drum 2", 90, beatBassDrum1, [33], 0.9);
       // var music8 = new MLine("CHORD", 2, 10, "Snare Drum 1", 60, beatSnareDrum1, [40], 0.9);
       // var music9 = new MLine("CHORD", 0, 10, "Hi-hat 1", 60, beatHighHat1, [57,59], 0.9);
-      var music11 = new MLine(2, "CHORD", 5, 120, "Hi-hat 1", 90, beatHighHat1, [60, 60], 0.9);
+       var music11 = new MLine(2, "CHORD", 5, 120, "Hi-hat 1", 90, beatHighHat1, [60, 60], 0.9);
       // var mLineArray = [music4, music5, music7, music8,music9];
       // var mLineArray = [music4, music5];
 
 
-      var mLineArray = [music10, music12];// music11,music12];
+      var mLineArray = [music10, music12,music11];// music11,music12];
 
       //json stuff below
 
@@ -499,17 +540,18 @@
 </head>
 
 <body>
-<p><a href='javascript:genMusic();'>Generate Music</a></p>
 
-<textarea id="ta1" wrap="soft" style="width:300px;height:200px;"> test text</textarea>
+<p><a href='javascript:genMusic();'>Generate Music</a></p>
 
 <button id="loadMusicLine" data-playing="off" onclick="loadJSON()">Play</button>
 <button id="playMixNote" onclick="mixNoteTest()">Mix Note Test</button>
 
-
+<textarea id="ta1" wrap="soft" style="width:300px;height:200px;"> test text</textarea>
 <textarea id="ta2" style="width: 400px; height: 400px;"></textarea>
 <textarea id="ta3" style="width: 400px; height: 400px;"></textarea>
 <textarea id="ta4" style="width: 400px; height: 400px;">ta4</textarea>
 
+<input type="number" name="track" id="track" oninput="setGainArray(this)"
+                min="0" max="9" step="1" value="0">
 
 </body>

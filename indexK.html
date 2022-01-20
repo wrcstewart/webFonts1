@@ -145,8 +145,8 @@
     }
 
     function getVelocity(beats, rhythmBeat) {
-      let velocityNormal = 0.6;
-      let velocityF = 1.0;
+      let velocityNormal = 0.8;
+      let velocityF = 1.2;
       let velocityP = 0.3;
       let beatsString = (beats[rhythmBeat]);
       if (beatsString.length == 1) return (velocityNormal);
@@ -188,10 +188,10 @@
 
     function showIt(s, instrument, id) {
       if (typeof (s) === 'number') {
-        monitor[id] = instrument +   ": " + '"' + " " + s + " " + notes[s - 21] + '"';
+        monitor[id] = "id: "+id+ " "+instrument +   ": " + '"' + " " + s + " " + notes[s - 21] + '"';
       } else {
 
-        monitor[id] = instrument + ": " + s;
+        monitor[id] = "id: "+id+ " "+instrument + ": " + s;
       }
 
 
@@ -254,7 +254,7 @@ var cloneP =[];
         // the calling function should contain the variables curBeat, start, tMult, origin, mL, some player variables
 
         let pitchEntryNew = reBaseArray(pitchesEntry)
-        let velocityReCompensationMult = 0.5;
+        let velocityReCompensationMult = 1.0;
         if (!Array.isArray(pitchEntryNew)) return;
         let lenPitchesEntry = pitchEntryNew.length;
         let vInner = v / lenPitchesEntry;
@@ -394,8 +394,8 @@ var cloneP =[];
 
     function setGainArray(el) {
 
-      let backgroundGain = 0.2;
-      let foregroundGain = 0.8;
+      let backgroundGain = 0.1;
+      let foregroundGain = 0.9;
 
 
       let editTrack = el.value;
@@ -546,7 +546,7 @@ var cloneP =[];
       // var mLineArray = [music4, music5];
 
 
-      var mLineArray = [music10,music11,music12];// music11,music12];
+      var mLineArray = [music11];// music11,music12];
 
       //json stuff below
 
@@ -571,7 +571,7 @@ var cloneP =[];
 <button id="loadMusicLine" data-playing="off" onclick="loadJSON()">Play</button>
 <button id="playMixNote" onclick="mixNoteTest()">Mix Note Test</button>
 
-<textarea id="ta1" wrap="soft" style="width:300px;height:200px;"> test text</textarea>
+<textarea id="ta1" wrap="soft" style="width:400px;height:200px;"> test text</textarea>
 <textarea id="ta2" style="width: 400px; height: 400px;"></textarea>
 <textarea id="ta3" style="width: 400px; height: 400px;"></textarea>
 <textarea id="ta4" style="width: 400px; height: 400px;">ta4</textarea>

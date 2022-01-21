@@ -129,8 +129,6 @@
     }
 
 
-
-
     function getTimeIncr(beats, rhythmBeat) {
       let beatsString = (beats[rhythmBeat]);
       if (beatsString.length == 1) return (beatsMap.get(beatsString))
@@ -138,10 +136,10 @@
       if (beatsString.charAt(1) == 'F') return (beatsMap.get(beatsString.substr(0, 1)) * dotMult(beatsString))
       if (beatsString.charAt(1) == 'P') return (beatsMap.get(beatsString.substr(0, 1)) * dotMult(beatsString))
 
-       function dotMult(beatsString) {
-      if (beatsString.includes("D")) return (1.5);
-      return (1)
-    }
+      function dotMult(beatsString) {
+        if (beatsString.includes("D")) return (1.5);
+        return (1)
+      }
     }
 
     function getVelocity(beats, rhythmBeat) {
@@ -266,8 +264,76 @@
       var cloneP = [];//used for the sounding note monitor.
 
 
-
 // -----------------------------------------------------------------------------------------------------------------
+      //   -------------------------------------------------------------------------------
+
+      pitchBeat = start;// currently sets to start
+
+
+      while (pitchBeat < endBeat) { //overall process to stop when past finish time - from which endBeat was computed.
+        // if (playState == "off") return;
+
+        while (rhythmBeat < lenRhythmBeats) {
+
+          if (but.getAttribute("data-playing") == "off") return;
+
+          timeIncr = getTimeIncr(rhythmBeats, rhythmBeat);//nb timeIncr will be used to increment pitchBeat
+
+
+          v = getVelocity(rhythmBeats, rhythmBeat);
+
+          if (timeIncr > 0) { // we need to set up note parameters
+
+            ixx = getPitchIndexFromTime(pitchBeat, lenPitches);//necessary because index is wrapped round to give a loop
+            //s = pitchBeat;
+            curBeat = pitchBeat;
+            p = pitchBeats[ixx];
+            cloneP.length = 0;
+
+            // copyPitchBeats.length = 0;
+            // for (let jj =0;jj<mL.pitchBeats.length;jj++) copyPitchBeats[jj]= mL.pitchBeats[jj];
+
+            if (Array.isArray(p)) {
+              for (let jj = 0; jj < masterCopyPitchBeats[ixx].length; jj++) cloneP[jj] = masterCopyPitchBeats[ixx][jj];
+            } else {
+
+              cloneP.push(notes[p - 21]);
+            }
+
+            d = noteDuration * timeIncr;
+
+
+            //main place where pitch-time incremented
+            pitchBeat += timeIncr;//after note parameters set ---add a separate play chord routine that adjusts time Incr.
+            if (pitchBeat > endBeat) break;
+
+            playIfArray(p); //this important function defined after outer while loop.
+
+
+            if (!Array.isArray(p)) {
+
+
+              let t = origin + start + ((curBeat - start) * tMult);//tMult is to map time to true time
+              timeOutsArray.push(setTimeout(showIt, (t - origin) * 1000, JSON.stringify(cloneP), mL.instrument + " " + innerArrays, mL.id));
+              player.queueWaveTable(
+                audioContext, gainTrack, instrumentVar, t, p, d * tMult, v);
+
+            }
+            // player.queueWaveTable(
+            //audioContext, audioContext.destination, instrumentVar, origin + start + (s * tMult)+0.02, p +3, d * tMult, v);
+          }
+          // if (playState == "off") return;
+          if (but.getAttribute("data-playing") == "off") return;
+
+
+          if (timeIncr <= 0) {
+            pitchBeat += Math.abs(timeIncr);
+          }
+          rhythmBeat += 1;
+          if (rhythmBeat == lenRhythmBeats) rhythmBeat = 0;
+        }
+      }
+
       function playIfArray(pitchesEntry) {
         // the calling function should contain the variables curBeat, start, tMult, origin, mL, some player variables
 
@@ -324,73 +390,7 @@
             innerTime += timeInnerIncr;
           }
         }
-      } // end playIfArray ----------------------------------------------------------------------------------------
-
-      pitchBeat = start;// currently sets to start
-
-
-      while (pitchBeat < endBeat) { //overall process to stop when past finish time - from which endBeat was computed.
-        // if (playState == "off") return;
-
-        while (rhythmBeat < lenRhythmBeats) {
-
-          if (but.getAttribute("data-playing") == "off") return;
-
-          timeIncr = getTimeIncr(rhythmBeats, rhythmBeat);//nb timeIncr will be used to increment pitchBeat
-
-
-          v = getVelocity(rhythmBeats, rhythmBeat);
-
-          if (timeIncr > 0) { // we need to set up note parameters
-
-            ixx = getPitchIndexFromTime(pitchBeat, lenPitches);//necessary because index is wrapped round to give a loop
-            //s = pitchBeat;
-            curBeat = pitchBeat;
-            p = pitchBeats[ixx];
-            cloneP.length = 0;
-
-            // copyPitchBeats.length = 0;
-            // for (let jj =0;jj<mL.pitchBeats.length;jj++) copyPitchBeats[jj]= mL.pitchBeats[jj];
-
-            if (Array.isArray(p)) {
-              for (let jj = 0; jj < masterCopyPitchBeats[ixx].length; jj++) cloneP[jj] = masterCopyPitchBeats[ixx][jj];
-            } else {
-
-              cloneP.push(notes[p - 21]);
-            }
-
-            d = noteDuration * timeIncr;
-
-
-            // if (time % 4  == 0 ) {v =1}  else {v=0.2}
-
-            //main place where pitch-time incremented
-            pitchBeat += timeIncr;//after note parameters set ---add a separate play chord routine that adjusts time Incr.
-            if (pitchBeat > endBeat) break;
-
-            playIfArray(p);
-            // if (playState == "off") retur
-            if (!Array.isArray(p)) {
-              //  if (playState == "off") return;
-
-              let t = origin + start + ((curBeat - start) * tMult);//tMult is to map time to true time
-              timeOutsArray.push(setTimeout(showIt, (t - origin) * 1000, JSON.stringify(cloneP), mL.instrument + " " + innerArrays, mL.id));
-              player.queueWaveTable(
-                audioContext, gainTrack, instrumentVar, t, p, d * tMult, v);
-
-            }
-            // player.queueWaveTable(
-            //audioContext, audioContext.destination, instrumentVar, origin + start + (s * tMult)+0.02, p +3, d * tMult, v);
-          }
-          // if (playState == "off") return;
-          if (but.getAttribute("data-playing") == "off") return;
-          if (timeIncr <= 0) {
-            pitchBeat += Math.abs(timeIncr);
-          }
-          rhythmBeat += 1;
-          if (rhythmBeat == lenRhythmBeats) rhythmBeat = 0;
-        }
-      }
+      } // end playIfArray ---------
     }
 
 

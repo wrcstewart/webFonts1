@@ -264,8 +264,7 @@
       var cloneP = [];//used for the sounding note monitor.
 
 
-// -----------------------------------------------------------------------------------------------------------------
-      //   -------------------------------------------------------------------------------
+// --------------------------------
 
       pitchBeat = start;// currently sets to start
 
@@ -278,50 +277,56 @@
           if (but.getAttribute("data-playing") == "off") return;
 
           timeIncr = getTimeIncr(rhythmBeats, rhythmBeat);//nb timeIncr will be used to increment pitchBeat
+          // so this is where the rhythm array interacts ultimately with the pitch array
 
 
-          v = getVelocity(rhythmBeats, rhythmBeat);
+          v = getVelocity(rhythmBeats, rhythmBeat);// volume strength of note F or P or not present
 
-          if (timeIncr > 0) { // we need to set up note parameters
+          if (timeIncr > 0) {
 
+            // we need to set up note parameters
             ixx = getPitchIndexFromTime(pitchBeat, lenPitches);//necessary because index is wrapped round to give a loop
             //s = pitchBeat;
-            curBeat = pitchBeat;
+            curBeat = pitchBeat; // needed because need this valaue after pitchBeat is incremented.
+
             p = pitchBeats[ixx];
-            cloneP.length = 0;
 
-            // copyPitchBeats.length = 0;
-            // for (let jj =0;jj<mL.pitchBeats.length;jj++) copyPitchBeats[jj]= mL.pitchBeats[jj];
+            cloneP.length = 0;//reinitialise array.
 
+            //we want cloneP to be an array in the original before rebased form e.g. ["C4",0,3,7]
+            // this is available in the master copy of the original pitch array
             if (Array.isArray(p)) {
               for (let jj = 0; jj < masterCopyPitchBeats[ixx].length; jj++) cloneP[jj] = masterCopyPitchBeats[ixx][jj];
             } else {
-
+              // otherwise just convert the midi note number back to a string version of the note
               cloneP.push(notes[p - 21]);
             }
 
-            d = noteDuration * timeIncr;
+            d = noteDuration * timeIncr; // an easy one!
 
 
             //main place where pitch-time incremented
             pitchBeat += timeIncr;//after note parameters set ---add a separate play chord routine that adjusts time Incr.
             if (pitchBeat > endBeat) break;
 
-            playIfArray(p); //this important function defined after outer while loop.
-
+            playIfArray(p); //this important function defined after the outer while loop.
 
             if (!Array.isArray(p)) {
 
 
               let t = origin + start + ((curBeat - start) * tMult);//tMult is to map time to true time
-              timeOutsArray.push(setTimeout(showIt, (t - origin) * 1000, JSON.stringify(cloneP), mL.instrument + " " + innerArrays, mL.id));
+              // the timeOutsArray sections are to display text of  note being played. This is complicated by the fact
+              // that the player function just queues all the notes for performance at a later time.
+              timeOutsArray.push(setTimeout(showIt, (t - origin) * 1000,
+                JSON.stringify(cloneP), mL.instrument + " " + innerArrays, mL.id));
               player.queueWaveTable(
                 audioContext, gainTrack, instrumentVar, t, p, d * tMult, v);
 
             }
-            // player.queueWaveTable(
-            //audioContext, audioContext.destination, instrumentVar, origin + start + (s * tMult)+0.02, p +3, d * tMult, v);
-          }
+
+          } //end of if timeIncr >0
+
+          //--------------------------
           // if (playState == "off") return;
           if (but.getAttribute("data-playing") == "off") return;
 
@@ -331,9 +336,9 @@
           }
           rhythmBeat += 1;
           if (rhythmBeat == lenRhythmBeats) rhythmBeat = 0;
-        }
-      }
-
+        }//end rhythm beats loop
+      }//end pitch beat loop and main function ( but see helper function below )
+      //---------------------------
       function playIfArray(pitchesEntry) {
         // the calling function should contain the variables curBeat, start, tMult, origin, mL, some player variables
 
@@ -358,7 +363,7 @@
 
             let chordNotes = extractNotesFromArrayOfMidiNumbers(pitchEntryNew);
 
-            // if (but.getAttribute("data-playing") == "off"){but.setAttribute("data-playing","on");return;};
+
 
             timeOutsArray.push(setTimeout(showIt, (t - origin) * 1000, "**" + JSON.stringify(chordNotes)
               + " " + JSON.stringify(cloneP), mL.instrument + " " + innerArrays, mL.id));
@@ -391,7 +396,8 @@
           }
         }
       } // end playIfArray ---------
-    }
+    }//end playMLine
+    //----------------------------------------------------------------------------
 
 
     var audioContext = new (window.AudioContext || window.webkitAudioContext)();

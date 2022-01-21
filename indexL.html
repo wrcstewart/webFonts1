@@ -129,10 +129,7 @@
     }
 
 
-    function dotMult(beatsString) {
-      if (beatsString.includes("D")) return (1.5);
-      return (1)
-    }
+
 
     function getTimeIncr(beats, rhythmBeat) {
       let beatsString = (beats[rhythmBeat]);
@@ -140,6 +137,11 @@
       if (beatsString.charAt(1) == 'R') return (-beatsMap.get(beatsString.substr(0, 1)) * dotMult(beatsString))
       if (beatsString.charAt(1) == 'F') return (beatsMap.get(beatsString.substr(0, 1)) * dotMult(beatsString))
       if (beatsString.charAt(1) == 'P') return (beatsMap.get(beatsString.substr(0, 1)) * dotMult(beatsString))
+
+       function dotMult(beatsString) {
+      if (beatsString.includes("D")) return (1.5);
+      return (1)
+    }
     }
 
     function getVelocity(beats, rhythmBeat) {
@@ -217,23 +219,39 @@
       let but = document.getElementById("loadMusicLine");
       let bpm = mL.bpm;
       let instrumentVar = instrumentsMap.get(mL.instrument);
-      let innerArrays = mL.innerArrays;
+
+      let innerArrays = mL.innerArrays;//this contains mode by which inner arrays within main pitch array are played.
+      // i.e. as a CHORD( including single note) or as an ARPEGGIO split within the current rhythm beat.
+
       let rhythmBeats = mL.rhythmBeats;
 
       let pitchBeatsString = JSON.stringify(mL.pitchBeats);
-      let pitchBeats = JSON.parse(pitchBeatsString);
+      let pitchBeats = JSON.parse(pitchBeatsString);// deep copy of mL.pitchBeats
 
-
-      pitchBeats = reBaseArray(pitchBeats);
+      pitchBeats = reBaseArray(pitchBeats);// any base strings and relative notes made absolute midi numbers
+      // MIGHT have been clearer to return a new array from reBaseArray ?
 
       let pitchBeatsString2 = JSON.stringify(pitchBeats);
-      let masterCopyPitchBeats = JSON.parse(pitchBeatsString2);//master is after rebase
+      let masterCopyPitchBeats = JSON.parse(pitchBeatsString2);//master copy is after rebase
+      // so pitchBeats may be subject to further write alteration but master copy is just read.
 
       let pulse = mL.pulse;
       let noteDuration = mL.noteDuration;
       let lenRhythmBeats = rhythmBeats.length;
       let lenPitches = pitchBeats.length;
       let rhythmBeat = 0;
+
+      // everything best understood as occuring in the outer loop pitch beat space - think one pitch beat per second
+      // final timings given to the sound player queue are adjusted using tMult to achieve different bpm.
+      // e.g. if bpm = 120 then tMult =0.5
+      // different note values are determined by the rhythmBeats array and processed in an inner loop.
+
+      //if the required note is accessed and is a further nested array then it will be played as either a chord or
+      // split into an arpeggio - the arpeggio is used for the melody - the chord mode for harmony.
+      // the arpeggio mode is a compromise solution to introduce variety in the faster notes.
+      // otherwise the way the system works would be to simply repeat notes for faster notes.
+      // in iteslf this monotony problem is caused by the requirement to 'decouple' rhythm and pitch. For ease of interactive
+      // composition.
 
       let pitchBeat = 0;
       let tMult = 60 / bpm;
@@ -245,7 +263,7 @@
       let timeIncr;
       let ws = start; // ignore for time being
       var ixx;
-      var cloneP = [];
+      var cloneP = [];//used for the sounding note monitor.
 
 
 
@@ -276,7 +294,8 @@
 
             // if (but.getAttribute("data-playing") == "off"){but.setAttribute("data-playing","on");return;};
 
-            timeOutsArray.push(setTimeout(showIt, (t - origin) * 1000, "**" + JSON.stringify(chordNotes) + " " + JSON.stringify(cloneP), mL.instrument + " " + innerArrays, mL.id));
+            timeOutsArray.push(setTimeout(showIt, (t - origin) * 1000, "**" + JSON.stringify(chordNotes)
+              + " " + JSON.stringify(cloneP), mL.instrument + " " + innerArrays, mL.id));
 
             player.queueWaveTable(
               audioContext, gainTrack, instrumentVar, t, pitchEntryNew[j], d * tMult, vInner);
@@ -294,7 +313,8 @@
             if (but.getAttribute("data-playing") == "off") return;
             let t = origin + start + ((curBeat - start) + innerTime) * tMult;
 
-            timeOutsArray.push(setTimeout(showIt, (t - origin) * 1000, notes[pitchesEntry[j] - 21], mL.instrument + " " + innerArrays, mL.id));
+            timeOutsArray.push(setTimeout(showIt, (t - origin) * 1000, notes[pitchesEntry[j] - 21], mL.instrument +
+              " " + innerArrays, mL.id));
             //gainTrack.gain.value =1.0;
             player.queueWaveTable(
               audioContext,

@@ -22,6 +22,8 @@
 
     window.playState = false;
 
+    var trackEl ;
+
     timeOutsArray = []; //used to track time to display note being played.
 
     const instrumentsMap = new Map();
@@ -115,8 +117,8 @@
     }
 
 
-    function MLine(id, innerArrays, start, finish, instrument, bpm, rhythmBeats, pitchBeats, noteDuration) {
-      this.id = id;
+    function MLine(track, innerArrays, start, finish, instrument, bpm, rhythmBeats, pitchBeats, noteDuration) {
+      this.track = track;
       this.start = start;
       this.finish = finish;
       // this.duration = finish - start;
@@ -187,12 +189,12 @@
       ta.innerHTML = report;
     }
 
-    function showIt(s, instrument, id) {
+    function showIt(s, instrument, track) {
       if (typeof (s) === 'number') {
-        monitor[id] = "id: " + id + " " + instrument + ": " + '"' + " " + s + " " + notes[s - 21] + '"';
+        monitor[track] = "track: " + track + " " + instrument + ": " + '"' + " " + s + " " + notes[s - 21] + '"';
       } else {
 
-        monitor[id] = "id: " + id + " " + instrument + ": " + s;
+        monitor[track] = "track: " + track + " " + instrument + ": " + s;
       }
 
 
@@ -212,8 +214,8 @@
 
     function playMLine(mL, origin) {
 
-      let id = mL.id;
-      let gainTrack = gainNodeArray[id];
+      let track = mL.track;
+      let gainTrack = gainNodeArray[track];
       let but = document.getElementById("loadMusicLine");
       let bpm = mL.bpm;
       let instrumentVar = instrumentsMap.get(mL.instrument);
@@ -318,7 +320,7 @@
               // the timeOutsArray sections are to display text of  note being played. This is complicated by the fact
               // that the player function just queues all the notes for performance at a later time.
               timeOutsArray.push(setTimeout(showIt, (t - origin) * 1000,
-                JSON.stringify(cloneP), mL.instrument + " " + innerArrays, mL.id));
+                JSON.stringify(cloneP), mL.instrument + " " + innerArrays, mL.track));
               player.queueWaveTable(
                 audioContext, gainTrack, instrumentVar, t, p, d * tMult, v);
 
@@ -366,7 +368,7 @@
 
 
             timeOutsArray.push(setTimeout(showIt, (t - origin) * 1000, "**" + JSON.stringify(chordNotes)
-              + " " + JSON.stringify(cloneP), mL.instrument + " " + innerArrays, mL.id));
+              + " " + JSON.stringify(cloneP), mL.instrument + " " + innerArrays, mL.track));
 
             player.queueWaveTable(
               audioContext, gainTrack, instrumentVar, t, pitchEntryNew[j], d * tMult, vInner);
@@ -385,7 +387,7 @@
             let t = origin + start + ((curBeat - start) + innerTime) * tMult;
 
             timeOutsArray.push(setTimeout(showIt, (t - origin) * 1000, notes[pitchesEntry[j] - 21], mL.instrument +
-              " " + innerArrays, mL.id));
+              " " + innerArrays, mL.track));
             //gainTrack.gain.value =1.0;
             player.queueWaveTable(
               audioContext,
@@ -407,6 +409,7 @@
 
     var maxTracks = 10;
 
+// set up gain tracks
     for (let i = 0; i < maxTracks; i++) {
       gainNodeArray[i] = audioContext.createGain();
       gainNodeArray[i].connect(audioContext.destination);
@@ -416,21 +419,38 @@
     var gainNode = audioContext.createGain();
     gainNode.connect(audioContext.destination);
     var gainWeights = [];
+    var isFeaturing = false;
 
-    function setGainArray(el) {
+    function edit(elTrackSpinner,isFeaturing) {
 
-      let backgroundGain = 0.1;
+      let normalGain = 0.5;
+      let backgroundGain = 0.05;
       let foregroundGain = 0.9;
 
 
-      let editTrack = el.value;
+      let editTrack = elTrackSpinner.value;
 
       //alert(""+ editTrack);
+
+      if (isFeaturing) {
 
       for (let track = 0; track < maxTracks; track++) {
         gainNodeArray[track].gain.value = backgroundGain;
         if (track == editTrack) gainNodeArray[track].gain.value = foregroundGain;
       }
+    }
+
+      if( !isFeaturing) {
+      for (let track = 0; track < maxTracks; track++) {
+        gainNodeArray[track].gain.value = normalGain;
+
+      }
+
+      }
+
+      // do editing  stuff here
+
+
     }
 
 
@@ -564,7 +584,7 @@
       // var mLineArray = [music4, music5, music7, music8,music9];
       // var mLineArray = [music4, music5];
 
-
+// ***** determine a section****
       var mLineArray = [music10, music12, music11];// music11,music12];
 
       //json stuff below
@@ -580,22 +600,46 @@
       document.getElementById("ta2").innerText = pitchesStr1;
     }// end gen music - nb does not play
 
+    function onLoad(){
+
+trackEl = document.getElementById("track");
+
+    }
+
+
+
+
   </script>
 </head>
 
-<body>
+<body onload="onLoad()"()>
 
 <p><a href='javascript:genMusic();'>Generate Music</a></p>
 
 <button id="loadMusicLine" data-playing="off" onclick="loadJSON()">Play</button>
 <button id="playMixNote" onclick="mixNoteTest()">Mix Note Test</button>
+<button id="cloneUnit" onclick="cloneUnit()">Clone</button>
+
+
 
 <textarea id="ta1" wrap="soft" style="width:400px;height:200px;"> test text</textarea>
 <textarea id="ta2" style="width: 400px; height: 400px;"></textarea>
 <textarea id="ta3" style="width: 400px; height: 400px;"></textarea>
 <textarea id="ta4" style="width: 400px; height: 400px;">ta4</textarea>
+<textarea id="taPrivate" style="width: 400px; height: 400px;">Private</textarea>
+<textarea id="taPublic" style="width: 400px; height: 400px;">Public</textarea>
 
-<input type="number" name="track" id="track" oninput="setGainArray(this)"
+
+
+<input type="number" name="track" id="track" oninput="edit(this,true)"
        min="0" max="9" step="1" value="0">
+<label for="track">edit</label>
+
+
+
+<input type="checkbox" name="foreground" id="foreground" oninput="edit(trackEl,this.checked)">
+<label for="foreground">foreground</label>
+
+
 
 </body>

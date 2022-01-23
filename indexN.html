@@ -22,7 +22,7 @@
 
     window.playState = false;
 
-    var trackEl ;
+    var trackEl;
 
     timeOutsArray = []; //used to track time to display note being played.
 
@@ -366,7 +366,6 @@
             let chordNotes = extractNotesFromArrayOfMidiNumbers(pitchEntryNew);
 
 
-
             timeOutsArray.push(setTimeout(showIt, (t - origin) * 1000, "**" + JSON.stringify(chordNotes)
               + " " + JSON.stringify(cloneP), mL.instrument + " " + innerArrays, mL.track));
 
@@ -409,7 +408,7 @@
 
     var maxTracks = 10;
 
-// set up gain tracks
+    // set up gain tracks
     for (let i = 0; i < maxTracks; i++) {
       gainNodeArray[i] = audioContext.createGain();
       gainNodeArray[i].connect(audioContext.destination);
@@ -421,7 +420,7 @@
     var gainWeights = [];
     var isFeaturing = false;
 
-    function edit(elTrackSpinner,isFeaturing) {
+    function edit(elTrackSpinner, isFeaturing) {
 
       let normalGain = 0.5;
       let backgroundGain = 0.05;
@@ -434,18 +433,15 @@
 
       if (isFeaturing) {
 
-      for (let track = 0; track < maxTracks; track++) {
-        gainNodeArray[track].gain.value = backgroundGain;
-        if (track == editTrack) gainNodeArray[track].gain.value = foregroundGain;
+        for (let track = 0; track < maxTracks; track++) {
+          gainNodeArray[track].gain.value = backgroundGain;
+          if (track == editTrack) gainNodeArray[track].gain.value = foregroundGain;
+        }
       }
-    }
-
-      if( !isFeaturing) {
-      for (let track = 0; track < maxTracks; track++) {
-        gainNodeArray[track].gain.value = normalGain;
-
-      }
-
+      if (!isFeaturing) {
+        for (let track = 0; track < maxTracks; track++) {
+          gainNodeArray[track].gain.value = normalGain;
+        }
       }
 
       // do editing  stuff here
@@ -600,19 +596,17 @@
       document.getElementById("ta2").innerText = pitchesStr1;
     }// end gen music - nb does not play
 
-    function onLoad(){
+    function onLoad() {
 
-trackEl = document.getElementById("track");
+      trackEl = document.getElementById("track");
 
     }
-
-
 
 
   </script>
 </head>
 
-<body onload="onLoad()"()>
+<body onload="onLoad()" ()>
 
 <p><a href='javascript:genMusic();'>Generate Music</a></p>
 
@@ -621,14 +615,12 @@ trackEl = document.getElementById("track");
 <button id="cloneUnit" onclick="cloneUnit()">Clone</button>
 
 
-
 <textarea id="ta1" wrap="soft" style="width:400px;height:200px;"> test text</textarea>
-<textarea id="ta2" style="width: 400px; height: 400px;"></textarea>
-<textarea id="ta3" style="width: 400px; height: 400px;"></textarea>
+<textarea id="ta2" style="width: 400px; height: 400px;">edit</textarea>
+<textarea id="ta3" style="width: 400px; height: 400px;">ta3</textarea>
 <textarea id="ta4" style="width: 400px; height: 400px;">ta4</textarea>
 <textarea id="taPrivate" style="width: 400px; height: 400px;">Private</textarea>
 <textarea id="taPublic" style="width: 400px; height: 400px;">Public</textarea>
-
 
 
 <input type="number" name="track" id="track" oninput="edit(this,true)"
@@ -636,10 +628,8 @@ trackEl = document.getElementById("track");
 <label for="track">edit</label>
 
 
-
 <input type="checkbox" name="foreground" id="foreground" oninput="edit(trackEl,this.checked)">
 <label for="foreground">foreground</label>
-
 
 
 </body>

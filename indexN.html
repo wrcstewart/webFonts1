@@ -24,6 +24,8 @@
 
     var trackEl;
 
+    var mLineArray;
+
     timeOutsArray = []; //used to track time to display note being played.
 
     const instrumentsMap = new Map();
@@ -444,9 +446,43 @@
         }
       }
 
-      // do editing  stuff here
+doEdit (editTrack,mLineArray);
 
 
+    }
+
+    function ixOfTrack(mLineArray,targetTrack){
+
+      for (let ix=0;ix<mLineArray.length;ix++){
+        if (mLineArray[ix].track == targetTrack) return(ix)
+      }
+return (null)
+    }
+
+    function doEdit (editTrack,mLineArray){
+
+      let ix = ixOfTrack(mLineArray,editTrack);
+      //let strMusicLine  = JSON.stringify(mLineArray[ix]);//change to link to id
+
+      // alert(""+ editTrack +strMusicLine);
+      //document.getElementById('edit').innerText = strMusicLine;
+      let aMLine = mLineArray[ix];
+      let aTextAreaEl = document.getElementById('edit');
+      doFormat(aMLine,aTextAreaEl);
+
+      return
+    }
+
+    function doFormat(obj,aTextAreaEl){
+
+      let arrayOfKeys = Object.keys(obj);
+      aTextAreaEl.value ="";
+      for(let i =0;i<arrayOfKeys.length;i++){
+        let aKey = arrayOfKeys[i];
+        let aEntryStr = JSON.stringify(obj,[aKey]);
+
+         aTextAreaEl.value = aTextAreaEl.value + aEntryStr + "\n";
+      }
     }
 
 
@@ -581,7 +617,7 @@
       // var mLineArray = [music4, music5];
 
 // ***** determine a section****
-      var mLineArray = [music10, music12, music11];// music11,music12];
+       mLineArray = [music10, music12, music11];// music11,music12];
 
       //json stuff below
 
@@ -593,7 +629,9 @@
 
       //document.getElementById("pre1").innerText = music1Str;
       document.getElementById("ta1").innerText = music1Str;
-      document.getElementById("ta2").innerText = pitchesStr1;
+     // document.getElementById("ta2").innerText = pitchesStr1;
+      doEdit (0,mLineArray);
+
     }// end gen music - nb does not play
 
     function onLoad() {
@@ -616,7 +654,7 @@
 
 
 <textarea id="ta1" wrap="soft" style="width:400px;height:200px;"> test text</textarea>
-<textarea id="ta2" style="width: 400px; height: 400px;">edit</textarea>
+<textarea id="edit" style="width: 400px; height: 400px;">edit</textarea>
 <textarea id="ta3" style="width: 400px; height: 400px;">ta3</textarea>
 <textarea id="ta4" style="width: 400px; height: 400px;">ta4</textarea>
 <textarea id="taPrivate" style="width: 400px; height: 400px;">Private</textarea>

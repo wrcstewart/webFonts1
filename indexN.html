@@ -22,7 +22,7 @@
 
     window.playState = false;
 
-    var trackEl;
+    var trackEl, taNameEl,taValueEl;
 
     var mLineArray;
 
@@ -446,44 +446,58 @@
         }
       }
 
-doEdit (editTrack,mLineArray);
+      doEdit(editTrack, mLineArray);
 
 
     }
 
-    function ixOfTrack(mLineArray,targetTrack){
+    function ixOfTrack(mLineArray, targetTrack) {
 
-      for (let ix=0;ix<mLineArray.length;ix++){
-        if (mLineArray[ix].track == targetTrack) return(ix)
+      for (let ix = 0; ix < mLineArray.length; ix++) {
+        if (mLineArray[ix].track == targetTrack) return (ix)
       }
-return (null)
+      return (null)
     }
 
-    function doEdit (editTrack,mLineArray){
+    function doEdit(editTrack, mLineArray) {
 
-      let ix = ixOfTrack(mLineArray,editTrack);
+      let ix = ixOfTrack(mLineArray, editTrack);
       //let strMusicLine  = JSON.stringify(mLineArray[ix]);//change to link to id
 
       // alert(""+ editTrack +strMusicLine);
       //document.getElementById('edit').innerText = strMusicLine;
       let aMLine = mLineArray[ix];
       let aTextAreaEl = document.getElementById('edit');
-      doFormat(aMLine,aTextAreaEl);
+      doFormat(aMLine, aTextAreaEl);
+      outputField(aMLine,8,taNameEl,taValueEl);
 
       return
     }
 
-    function doFormat(obj,aTextAreaEl){
+    function doFormat(obj, aTextAreaEl) {
 
       let arrayOfKeys = Object.keys(obj);
-      aTextAreaEl.value ="";
-      for(let i =0;i<arrayOfKeys.length;i++){
+      aTextAreaEl.value = "";
+      for (let i = 0; i < arrayOfKeys.length; i++) {
         let aKey = arrayOfKeys[i];
-        let aEntryStr = JSON.stringify(obj,[aKey]);
+        let aEntryStr = JSON.stringify(obj, [aKey]);
 
-         aTextAreaEl.value = aTextAreaEl.value + aEntryStr + "\n";
+        aTextAreaEl.value = aTextAreaEl.value + aEntryStr + "\n";
       }
     }
+
+    function outputField(obj, position, taNameEl, taValueEl)
+    {
+
+      let arr = Object.entries(obj);
+      let aField = arr[position];
+      let aName = aField[0];
+      //let aValue = aField[1];
+      taNameEl.value = aName;
+      valStr = JSON.stringify(obj.aName)
+      taValueEl.value = valStr;
+    }
+
 
 
     {
@@ -556,8 +570,15 @@ return (null)
 
 
       var inString = document.getElementById("ta1").value;
+      var inStringLine = document.getElementById("edit").value;
+      // let aMLine = JSON.parse(inStringLine);
+      //let ix = ixOfTrack(mLineArray,aMLine.track);
+      // mLineArray[ix] = aMLine;
+
       // var inStringExtras = document.getElementById("ta2").value;
+
       var mLineArray = JSON.parse(inString);
+
       // var extras = JSON.parse(inStringExtras);
       // mLineArray[0] = {...mLineArray[0], ...extras};
 
@@ -617,26 +638,28 @@ return (null)
       // var mLineArray = [music4, music5];
 
 // ***** determine a section****
-       mLineArray = [music10, music12, music11];// music11,music12];
+      mLineArray = [music10, music12, music11];// music11,music12];
 
       //json stuff below
 
       var music1Str = JSON.stringify(mLineArray, null, "");
-      var pitchesStr1 = JSON.stringify(mLineArray[0], ['bpm', 'instrument']);//NB
+      //var pitchesStr1 = JSON.stringify(mLineArray[0], ['bpm', 'instrument']);//NB
 
 
       var readArray = JSON.parse(music1Str);
 
       //document.getElementById("pre1").innerText = music1Str;
       document.getElementById("ta1").innerText = music1Str;
-     // document.getElementById("ta2").innerText = pitchesStr1;
-      doEdit (0,mLineArray);
+      // document.getElementById("ta2").innerText = pitchesStr1;
+      doEdit(0, mLineArray);
 
     }// end gen music - nb does not play
 
     function onLoad() {
 
       trackEl = document.getElementById("track");
+       taNameEl = document.getElementById("taName");
+       taValueEl = document.getElementById("taValue");
 
     }
 
@@ -654,10 +677,10 @@ return (null)
 
 
 <textarea id="ta1" wrap="soft" style="width:400px;height:200px;"> test text</textarea>
-<textarea id="edit" style="width: 400px; height: 400px;">edit</textarea>
-<textarea id="ta3" style="width: 400px; height: 400px;">ta3</textarea>
-<textarea id="ta4" style="width: 400px; height: 400px;">ta4</textarea>
-<textarea id="taPrivate" style="width: 400px; height: 400px;">Private</textarea>
+<textarea id="edit" style="width: 300px; height: 400px;">edit</textarea>
+<textarea id="taName" style="width: 300px; height: 100px;">taName</textarea>
+<textarea id="taValue" style="left:600px; width: 300px; height: 100px;">taValue</textarea>
+<textarea id="ta4" style="left:805px;width: 200px; height: 100px;">Private/Temp</textarea>
 <textarea id="taPublic" style="width: 400px; height: 400px;">Public</textarea>
 
 

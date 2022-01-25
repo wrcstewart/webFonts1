@@ -26,6 +26,8 @@
 
     var mLineArray;
 
+    var  curEditTrackIx;
+
     timeOutsArray = []; //used to track time to display note being played.
 
     const instrumentsMap = new Map();
@@ -462,6 +464,7 @@
     function doEdit(editTrack, mLineArray) {
 
       let ix = ixOfTrack(mLineArray, editTrack);
+       curEditTrack =ix;
       //let strMusicLine  = JSON.stringify(mLineArray[ix]);//change to link to id
 
       // alert(""+ editTrack +strMusicLine);
@@ -494,8 +497,17 @@
       let aName = aField[0];
       //let aValue = aField[1];
       taNameEl.value = aName;
-      valStr = JSON.stringify(obj.aName)
+      let origVal = obj[aName];
+      let valStr = JSON.stringify(origVal)
       taValueEl.value = valStr;
+    }
+
+    function inputField(taNameEl, taValueEl){
+      let obj = mLineArray[curEditTrackIx];
+      let aKeyString = taNameEl.value;
+      obj[aKeyString] = JSON.parse(taValueEl.value);
+      mLineArray[curEditTrackIx] = obj; //reinsert into master array of mLine objects
+
     }
 
 
@@ -674,6 +686,7 @@
 <button id="loadMusicLine" data-playing="off" onclick="loadJSON()">Play</button>
 <button id="playMixNote" onclick="mixNoteTest()">Mix Note Test</button>
 <button id="cloneUnit" onclick="cloneUnit()">Clone</button>
+<button id="saveEdit" onclick="inputField(taNameEl,taValueEl)">Save Edit</button>
 
 
 <textarea id="ta1" wrap="soft" style="width:400px;height:200px;"> test text</textarea>

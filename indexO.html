@@ -705,21 +705,28 @@
 <button id="saveEdit" onclick="inputField(taNameEl,taValueEl)">Save Edit</button>
 </div>
 
-<textarea id="ta1"  readonly  wrap="soft" style="width:400px;height:300px;"></textarea>
+<textarea id="ta1"  readonly  wrap="soft" style="position:absolute;left:2px;top:500px;width:400px;height:300px;"></textarea>
 
-<textarea id="taName" style="width: 300px; height: 100px;">taName</textarea>
-<textarea id="taValue" style="left:600px; width: 300px; height: 100px;">taValue</textarea>
-<textarea id="ta4" style="left:805px;width: 200px; height: 100px;">Private/Temp</textarea>
+
+
+<textarea id="ta4" readonly style="left:805px;width: 200px; height: 100px;">Private/Temp</textarea>
 <textarea id="taPublic" style="width: 400px; height: 400px;">Public</textarea>
 
+<div id="editControlsPanel" style="position:absolute;top:100px;left:5px;width:400px;height:200px;background-color: #b3d4fc">
 
-<input type="number" name="track" id="track" oninput="edit(this,true)"
-       min="0" max="9" step="1" value="0">
-<label for="track">edit track</label>
 
-<input type="number" name="fieldNumber" id="fieldNumber" oninput="outputField(mLineArray[curEditTrack], this.value, taNameEl, taValueEl)"
+<input type="number" name="track" id="track" style="position:absolute; left:100px; top:1px; width:30px;" oninput="edit(this,true)"
+       min="0" max="20" step="1" value="0">
+<label style="position:absolute; left:1px; top:1px; width:70px;">edit track</label>
+
+<input type="number" name="fieldNumber" id="fieldNumber"
+       style="position:absolute; left:100px; top:31px;height:20px; width:30px;"
+       oninput="outputField(mLineArray[curEditTrack], this.value, taNameEl, taValueEl)"
        min="1" max="50" step="1" value="1">
-<label for="fieldNumber">edit field</label>
+<label style="position:absolute; left:1px; top:31px; width:70px;">edit field</label>
+<textarea id="taName" readonly style="position:absolute; left:150px; top:31px; width: 240px; height: 20px;">field name</textarea>
+<textarea id="taValue" style="position:absolute;left:1px; top:80px; width: 388px; height:100px;">field value</textarea>
+</div>
 
 
 <input type="checkbox" name="foreground" id="foreground" oninput="edit(trackEl,this.checked)">

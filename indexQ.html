@@ -372,7 +372,7 @@
             let chordNotes = extractNotesFromArrayOfMidiNumbers(pitchEntryNew);
 
 
-            timeOutsArray.push(setTimeout(showIt, (t - origin) * 1000, "**" + JSON.stringify(chordNotes)
+            timeOutsArray.push(setTimeout(showIt, (t - origin) * 1000, "  " + JSON.stringify(chordNotes)
               + " " + JSON.stringify(cloneP), mL.instrument + " " + sequencing, mL.track));
 
             player.queueWaveTable(
@@ -390,8 +390,11 @@
 
             if (but.getAttribute("data-playing") == "off") return;
             let t = origin + start + ((curBeat - start) + innerTime) * tMult;
+let chordNotes = extractNotesFromArrayOfMidiNumbers(pitchEntryNew);
+            timeOutsArray.push(setTimeout(showIt, (t - origin) * 1000,
+              notes[pitchesEntry[j] - 21] +"  " + JSON.stringify(chordNotes) +"  " +  JSON.stringify(cloneP)
 
-            timeOutsArray.push(setTimeout(showIt, (t - origin) * 1000, notes[pitchesEntry[j] - 21], mL.instrument +
+              , mL.instrument +
               " " + sequencing, mL.track));
             //gainTrack.gain.value =1.0;
             player.queueWaveTable(

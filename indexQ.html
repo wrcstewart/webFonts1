@@ -467,7 +467,7 @@
     function doEdit(editTrack, mLineArray) {
 
       let ix = ixOfTrack(mLineArray, editTrack);
-      curEditTrack = ix;
+      curEditTrackIx = ix;
       //let strMusicLine  = JSON.stringify(mLineArray[ix]);//change to link to id
 
       // alert(""+ editTrack +strMusicLine);
@@ -494,11 +494,10 @@
     }
 
     function doFormatArray(mLineArrayParam, aTextAreaEl) {
-
+      aTextAreaEl.value ="";
       for (let j = 0; j < mLineArrayParam.length; j++) {
         doFormat(mLineArrayParam[j], aTextAreaEl);
         aTextAreaEl.value = aTextAreaEl.value + "\n";
-
       }
     }
 
@@ -518,8 +517,8 @@
       let obj = mLineArray[curEditTrackIx];
       let aKeyString = taNameEl.value;
       obj[aKeyString] = JSON.parse(taValueEl.value);
-      mLineArray[curEditTrackIx] = obj; //reinsert into master array of mLine objects
-
+      mLineArray[curEditTrackIx] = obj; //reinsert into master array of mLine objects.
+      doFormatArray(mLineArray,document.getElementById("ta1"));
     }
 
 
@@ -707,7 +706,7 @@
 
 
 <textarea id="ta4" readonly
-          style="position:absolute;top:350px;left:1px;width: 388px; height: 230px;">Playing Now</textarea>
+          style="position:absolute;top:600px;left:1px;width: 1000px; height: 230px;">Playing Now</textarea>
 <textarea id="taPublic"
           style="position:absolute;top:1px;left:840px; width: 400px; height: 580px;">Store: List of Bars</textarea>
 

@@ -30,7 +30,7 @@
    //var testTrack = new MidiWriter.Track();
 
    //testTrack.addEvent(new MidiWriter.ProgramChangeEvent({instrument: 122}));
-
+var isCreatingFile = true;
    var note2 = new MidiWriter.NoteEvent({pitch: ['C3', 'D4', 'E4'], duration: 'T1280'});
    var note3 = new MidiWriter.NoteEvent({pitch: ['C2', 'D5', 'E5'], duration: 'T1280'});
 //testTrack.addEvent(note2);
@@ -40,7 +40,7 @@
 var tracks = [];
 var ticksPerSec =256;
 tracks[0] = new MidiWriter.Track();
-tracks[0].addEvent(new MidiWriter.ProgramChangeEvent({instrument: 0}));
+tracks[0].addEvent(new MidiWriter.ProgramChangeEvent({instrument: 76}));
 //tracks[0].addEvent(note2);
 
 //tracks[1] = new MidiWriter.Track();
@@ -96,6 +96,18 @@ return(track)
       instrumentsMap.set("Snare Drum 1", _drum_38_0_Chaos_sf2_file);
       instrumentsMap.set("Hi-hat 1", _drum_42_0_Chaos_sf2_file);
     }
+
+    const instrumentsNumMap = new Map();
+
+    {
+      instrumentsNumMap.set("Blown bottle Pipe 1", 77)
+      instrumentsNumMap.set("Flute Pipe 1", 74)
+      instrumentsNumMap.set("Acoustic Grand Piano", 1)
+      //instrumentsNumMap.set("Bass Drum 2", _drum_35_0_Chaos_sf2_file);
+     // instrumentsNumMap.set("Snare Drum 1", _drum_38_0_Chaos_sf2_file);
+      //instrumentsNumMap.set("Hi-hat 1", _drum_42_0_Chaos_sf2_file);
+    }
+
     const beatsMap = new Map();
     {
       beatsMap.set('C', 1.0);

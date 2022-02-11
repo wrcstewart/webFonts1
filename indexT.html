@@ -84,6 +84,7 @@ return(track)
     var curEditTrack;
 
    var timeOutsArray = []; //used to track time to display note being played.
+    var percussionMidiNum =43;
 
     //var testTrack = new MidiWriter.Track();
 
@@ -103,9 +104,21 @@ return(track)
       instrumentsNumMap.set("Blown bottle Pipe 1", 77)
       instrumentsNumMap.set("Flute Pipe 1", 74)
       instrumentsNumMap.set("Acoustic Grand Piano", 1)
-      //instrumentsNumMap.set("Bass Drum 2", _drum_35_0_Chaos_sf2_file);
+      instrumentsNumMap.set("Bass Drum 2", percussionMidiNum);
      // instrumentsNumMap.set("Snare Drum 1", _drum_38_0_Chaos_sf2_file);
       //instrumentsNumMap.set("Hi-hat 1", _drum_42_0_Chaos_sf2_file);
+    }
+
+    function  mapPitchForPercusssion(pitch,instrumentNum){
+
+      if (instrumentNum !== percussionMidiNum) {return (pitch)} else{
+
+
+
+
+      }
+
+
     }
 
     const beatsMap = new Map();
@@ -121,6 +134,11 @@ return(track)
       beatsMap.set('S', 0.25);
       beatsMap.set('SR', 0.25);
     }
+
+
+
+
+
     var noteNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];//used to construct notes[] below
     var notes = []; // this allows easy look up of note name to midi number - but based with A0 = 0
     // a function will add 21 to give the correct official midi number of the notes.

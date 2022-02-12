@@ -104,21 +104,25 @@ return(track)
       instrumentsNumMap.set("Blown bottle Pipe 1", 77)
       instrumentsNumMap.set("Flute Pipe 1", 74)
       instrumentsNumMap.set("Acoustic Grand Piano", 1)
+      instrumentsNumMap.set("Acoustic Bass Drum",percussionMidiNum);
       instrumentsNumMap.set("Bass Drum 2", percussionMidiNum);
+      instrumentsNumMap.set("Acoustic Snare", percussionMidiNum);
+      instrumentsNumMap.set("Closed Hi Hat", percussionMidiNum);
+
      // instrumentsNumMap.set("Snare Drum 1", _drum_38_0_Chaos_sf2_file);
       //instrumentsNumMap.set("Hi-hat 1", _drum_42_0_Chaos_sf2_file);
     }
 
-    function  mapPitchForPercusssion(pitch,instrumentNum){
+    function  mapPitchForPercusssion(pitch,instrumentNum, instrument){
 
       if (instrumentNum !== percussionMidiNum) {return (pitch)} else{
+        if(instrument == "Acoustic Bass Drum") return(35);
+        if(instrument == "Bass Drum 2") return(35);
 
-
-
-
+        if(instrument == "Acoustic Snare") return(38);
+        if(instrument == "Closed Hi Hat") return(42);
+        return(45); //Low Tom
       }
-
-
     }
 
     const beatsMap = new Map();

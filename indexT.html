@@ -39,13 +39,14 @@ var isCreatingFile = true;
 
 var tracks = [];
 var ticksPerSec =256;
-tracks[0] = new MidiWriter.Track();
-tracks[0].addEvent(new MidiWriter.ProgramChangeEvent({instrument: 76}));
+//tracks[0] = new MidiWriter.Track();
+//tracks[0].addEvent(new MidiWriter.ProgramChangeEvent({instrument: 76}));
 //tracks[0].addEvent(note2);
 
 //tracks[1] = new MidiWriter.Track();
 //tracks[1].addEvent(new MidiWriter.ProgramChangeEvent({instrument: 122}));
 //tracks[1].addEvent(note3);
+   /*
 tracks[0] =  addNote(tracks[0],1,[69,71,72], 4,70);
 tracks[0] =  addNote(tracks[0],3,71, 4,60);
 tracks[0] =  addNote(tracks[0],5,72, 4,50);
@@ -54,7 +55,7 @@ tracks[0] =  addNote(tracks[0],9,78, 4,30);
 var write = new MidiWriter.Writer(tracks);
 //var mwStr = write.dataUri();
 var mwStr = write.dataUri();
-
+*/
 
 
 var dummy = 256;
@@ -311,6 +312,9 @@ return(track)
     function playMLine(mL, origin) {
 
       let track = mL.track;
+      tracks[track] = new MidiWriter.Track();
+      var instrumentMidiNum = instrumentsNumMap.get(mL.instrument);
+tracks[track].addEvent(new MidiWriter.ProgramChangeEvent({instrument:instrumentMidiNum}));
       let gainTrack = gainNodeArray[track];
       let but = document.getElementById("loadMusicLine");
       let bpm = mL.bpm;
@@ -419,6 +423,7 @@ return(track)
                 JSON.stringify(cloneP), mL.instrument + " " + sequencing, mL.track));
               player.queueWaveTable(
                 audioContext, gainTrack, instrumentVar, t, p, d * tMult, v);
+
 
             }
 
@@ -705,8 +710,13 @@ let chordNotes = extractNotesFromArrayOfMidiNumbers(pitchEntryNew);
 
 
     function playSection(mLineArray, origin, dest) {
+      tracks.length =0;
+      var currentTrack;
       let len = mLineArray.length;
-      for (let i = 0; i < len; i++) playMLine(mLineArray[i], origin);
+      for (let i = 0; i < len; i++) {
+        currentTrack = i;//prob don't need this -will see ...
+        playMLine(mLineArray[i], origin);
+      }
     }
 
     function mixNoteTest() {

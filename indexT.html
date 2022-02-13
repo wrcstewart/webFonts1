@@ -56,16 +56,16 @@ var write = new MidiWriter.Writer(tracks);
 //var mwStr = write.dataUri();
 var mwStr = write.dataUri();
 */
-
+var mwStr;//string for saving midi file.
 
 var dummy = 256;
 
-function addNote(track,time,pitch, duration,vel){
+function addNote(track,time,pitch, duration,vel,channel){
 
   var durationString = "T"+ Math.round(duration * ticksPerSec)
 
 var note = new MidiWriter.NoteEvent(
-{pitch: pitch, duration:durationString,startTick:Math.round(time * ticksPerSec),velocity:vel});
+{pitch: pitch, duration:durationString,startTick:Math.round(time * ticksPerSec),velocity:vel,channel:channel});
  track.addEvent(note);
 return(track)
 }
@@ -85,7 +85,10 @@ return(track)
     var curEditTrack;
 
    var timeOutsArray = []; //used to track time to display note being played.
-    var percussionMidiNum =43;
+    var percussionMidiNum = -1; //arbitary number to signal a percussion instrument
+    var percussionChannel = 10;
+    var defaultChannel =1;
+
 
     //var testTrack = new MidiWriter.Track();
 
@@ -95,8 +98,10 @@ return(track)
       instrumentsMap.set("Flute Pipe 1", _tone_0730_Aspirin_sf2_file)
       instrumentsMap.set("Acoustic Grand Piano", _tone_0000_JCLive_sf2_file)
       instrumentsMap.set("Bass Drum 2", _drum_35_0_Chaos_sf2_file);
+      instrumentsMap.set("Acoustic Bass Drum", _drum_35_0_Chaos_sf2_file);
       instrumentsMap.set("Snare Drum 1", _drum_38_0_Chaos_sf2_file);
       instrumentsMap.set("Hi-hat 1", _drum_42_0_Chaos_sf2_file);
+
     }
 
     const instrumentsNumMap = new Map();
@@ -109,6 +114,7 @@ return(track)
       instrumentsNumMap.set("Bass Drum 2", percussionMidiNum);
       instrumentsNumMap.set("Acoustic Snare", percussionMidiNum);
       instrumentsNumMap.set("Closed Hi Hat", percussionMidiNum);
+      instrumentsNumMap.set("Hi-hat 1", percussionMidiNum);
 
      // instrumentsNumMap.set("Snare Drum 1", _drum_38_0_Chaos_sf2_file);
       //instrumentsNumMap.set("Hi-hat 1", _drum_42_0_Chaos_sf2_file);
@@ -122,6 +128,8 @@ return(track)
 
         if(instrument == "Acoustic Snare") return(38);
         if(instrument == "Closed Hi Hat") return(42);
+        if(instrument == "Hi-hat 1") return(42);
+
         return(45); //Low Tom
       }
     }
@@ -309,12 +317,21 @@ return(track)
     }
 
 
+
+    function getChannel(instrumentMidiNum){
+      if ( instrumentMidiNum == percussionMidiNum) return (percussionChannel);
+      return (defaultChannel)
+    }
+
+
+
     function playMLine(mL, origin) {
 
       let track = mL.track;
       tracks[track] = new MidiWriter.Track();
       var instrumentMidiNum = instrumentsNumMap.get(mL.instrument);
 tracks[track].addEvent(new MidiWriter.ProgramChangeEvent({instrument:instrumentMidiNum}));
+      var channel = getChannel(instrumentMidiNum);
       let gainTrack = gainNodeArray[track];
       let but = document.getElementById("loadMusicLine");
       let bpm = mL.bpm;
@@ -423,6 +440,8 @@ tracks[track].addEvent(new MidiWriter.ProgramChangeEvent({instrument:instrumentM
                 JSON.stringify(cloneP), mL.instrument + " " + sequencing, mL.track));
               player.queueWaveTable(
                 audioContext, gainTrack, instrumentVar, t, p, d * tMult, v);
+              let writePitch =  mapPitchForPercusssion(p,instrumentMidiNum, mL.instrument);
+              addNote(tracks[track],t - origin,writePitch, d * tMult,v * 100,channel);
 
 
             }
@@ -472,6 +491,8 @@ tracks[track].addEvent(new MidiWriter.ProgramChangeEvent({instrument:instrumentM
 
             player.queueWaveTable(
               audioContext, gainTrack, instrumentVar, t, pitchEntryNew[j], d * tMult, vInner);
+            let writePitch =  mapPitchForPercusssion(pitchEntryNew[j],instrumentMidiNum, mL.instrument);
+             addNote(tracks[track],t - origin,writePitch, d * tMult,vInner * 100,channel);
           }
         }
 
@@ -496,6 +517,10 @@ let chordNotes = extractNotesFromArrayOfMidiNumbers(pitchEntryNew);
               audioContext,
               gainTrack, instrumentVar, t, pitchEntryNew[j],
               innerD, vInner);
+            let writePitch =  mapPitchForPercusssion(pitchEntryNew[j],instrumentMidiNum, mL.instrument);
+            addNote(tracks[track],t - origin,writePitch, innerD,vInner * 100,channel);
+
+
 
             innerTime += timeInnerIncr;
           }
@@ -750,20 +775,21 @@ let chordNotes = extractNotesFromArrayOfMidiNumbers(pitchEntryNew);
       var beatHighHat1 = ["C", "C", "C", "C"];
 
 
-      var music10 = new MLine(0, "CHORD", 0, 120, "Flute Pipe 1", 60, beatFlute3, ["C4", 0, 0, ["A3", 0, 3, 7, 0], ["G4", 0, 7], ["G4", 5, 0], ["F4", 0, 4, 7, 0], ["F4", 0, 4, 7, 0], ["E4", 6, 0], ["E4", 0, 7]], 0.98);
+     // var music10 = new MLine(0, "CHORD", 0, 20, "Flute Pipe 1", 60, beatFlute3, ["C4", 0, 0, ["A3", 0, 3, 7, 0], ["G4", 0, 7], ["G4", 5, 0], ["F4", 0, 4, 7, 0], ["F4", 0, 4, 7, 0], ["E4", 6, 0], ["E4", 0, 7]], 0.98);
 
-      var music12 = new MLine(1, "ARPEGGIO", 0, 120, "Flute Pipe 1", 60, beatFlute3, ["C4", ["A5", 0, 3, 7, 0], ["A5", 0, 3, 7, 0],
-        ["G4", 0, 7], ["G4", 5, 0], ["F4", 0, 4, 7, 0], ["F4", 0, 4, 7, 0], ["E4", 6, 0], ["E4", 0, 7]], 0.98);
+     // var music12 = new MLine(1, "ARPEGGIO", 0, 20, "Flute Pipe 1", 60, beatFlute3, ["C4", ["A5", 0, 3, 7, 0], ["A5", 0, 3, 7, 0],
+      //  ["G4", 0, 7], ["G4", 5, 0], ["F4", 0, 4, 7, 0], ["F4", 0, 4, 7, 0], ["E4", 6, 0], ["E4", 0, 7]], 0.98);
 
-      var music7 = new MLine(3, "CHORD", 0, 120, "Bass Drum 2", 90, beatBassDrum1, [33], 0.9);
+     // var music7 = new MLine(3, "CHORD", 0, 120, "Bass Drum 2", 90, beatBassDrum1, [33], 0.9);
       // var music8 = new MLine("CHORD", 2, 10, "Snare Drum 1", 60, beatSnareDrum1, [40], 0.9);
       // var music9 = new MLine("CHORD", 0, 10, "Hi-hat 1", 60, beatHighHat1, [57,59], 0.9);
-      var music11 = new MLine(2, "CHORD", 0, 60, "Hi-hat 1", 60, beatHighHat1, ["C4", 0, 7, 12, 15], 0.9);
+      var music11 = new MLine(0, "CHORD", 0, 20, "Acoustic Bass Drum", 60, beatHighHat1, ["C4", 0, 7, 12, 15], 0.9);
       // var mLineArray = [music4, music5, music7, music8,music9];
       // var mLineArray = [music4, music5];
 
 // ***** determine a section****
-      mLineArray = [music10, music12, music11];// music11,music12];
+      //mLineArray = [music10, music12, music11];// music11,music12];
+      mLineArray = [music11];// music11,music12]
 
       //json stuff below
 
@@ -823,7 +849,11 @@ let chordNotes = extractNotesFromArrayOfMidiNumbers(pitchEntryNew);
             //******end of saving stuff********
  function saveFile(){
       let y =0;
-      saveJSON("testMidiP4.mid",mwStr)
+
+      var write = new MidiWriter.Writer(tracks);
+
+      mwStr = write.dataUri();
+      saveJSON("testMidiP9.mid",mwStr)
  }
 
   </script>

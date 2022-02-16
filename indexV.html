@@ -22,30 +22,20 @@
   <script>
 
 
-    // in future download the above and place in a local directory for devel purposes.
+    // in future download the above sound fonts etc and place in a local directory for devel purposes.
     // also look to including a home made soundfont - specify substitute for file export.
     // how export an mp3 file?
 
-    //var testTrack = new MidiWriter.Track();
 
-    //testTrack.addEvent(new MidiWriter.ProgramChangeEvent({instrument: 122}));
-    var isCreatingFile = true;
-    var note2 = new MidiWriter.NoteEvent({pitch: ['C3', 'D4', 'E4'], duration: 'T1280'});
-    var note3 = new MidiWriter.NoteEvent({pitch: ['C2', 'D5', 'E5'], duration: 'T1280'});
-    //testTrack.addEvent(note2);-
+    var isCreatingFile = true;//when true writing midi file
+    var tracks = [];//used for midi file writing
+    var ticksPerSec = 256;//used for midi file writing
+    var mwStr;//string for saving midi file data.
 
+      var monitor = [];// this is used to print a display of the notes as they are played.
 
-    var tracks = [];
-    var ticksPerSec = 256;
-   
-    var mwStr;//string for saving midi file.
-
-    var dummy = 256;
-
-    function addNote(track, time, pitch, duration, vel, channel) {
-
+    function addNote(track, time, pitch, duration, vel, channel) { // used for midi file writing
       var durationString = "T" + Math.round(duration * ticksPerSec)
-
       var note = new MidiWriter.NoteEvent(
         {
           pitch: pitch,
@@ -59,26 +49,34 @@
     }
 
 
-    var delim = '|';
 
-    window.playState = false;
+    window.playState = false; //used to toggle play and reset of soundfonts i.e. the audio
 
+    var mLineArray;// IMPORTANT DATA STRUCTURE holds the current lines (tracks) of data to play/ edit /file
+
+    var delim = '|';//?
+
+    // following used in the editing system
     var trackEl, taNameEl, taValueEl;
-
-    var mLineArray;
-
-
     var curEditTrackIx = 0;
     var curEditTrack;
 
+// for real time info on notes being played
     var timeOutsArray = []; //used to track time to display note being played.
-    var percussionMidiNum = -1; //arbitary number to signal a percussion instrument
-    var percussionChannel = 10;
+
+// used by midi file writer to arrange output on midi percussion channel or, normal channel
+    var percussionMidiNum = -1; //arbitrary number to signal a percussion instrument
+    var percussionChannel = 10; // this channel is how you play midi drums
     var defaultChannel = 1;
 
+     function getChannel(instrumentMidiNum) {
+       // if instrumentMidiNum is the negative signal percussionMidiNum then select percussion channel
+      if (instrumentMidiNum == percussionMidiNum) return (percussionChannel);
+      return (defaultChannel)
+    }
 
-    //var testTrack = new MidiWriter.Track();
 
+    // information on the provided instruments*******************************
     const instrumentsMap = new Map();
     {
       instrumentsMap.set("Blown bottle Pipe 1", _tone_0760_Aspirin_sf2_file)
@@ -88,11 +86,9 @@
       instrumentsMap.set("Acoustic Bass Drum", _drum_35_0_Chaos_sf2_file);
       instrumentsMap.set("Snare Drum 1", _drum_38_0_Chaos_sf2_file);
       instrumentsMap.set("Hi-hat 1", _drum_42_0_Chaos_sf2_file);
-
     }
 
-    const instrumentsNumMap = new Map();
-
+    const instrumentsNumMap = new Map(); //gives the midi patch num or an arb neg num for percussion
     {
       instrumentsNumMap.set("Blown bottle Pipe 1", 77)
       instrumentsNumMap.set("Flute Pipe 1", 74)
@@ -102,11 +98,8 @@
       instrumentsNumMap.set("Acoustic Snare", percussionMidiNum);
       instrumentsNumMap.set("Closed Hi Hat", percussionMidiNum);
       instrumentsNumMap.set("Hi-hat 1", percussionMidiNum);
-
-      // instrumentsNumMap.set("Snare Drum 1", _drum_38_0_Chaos_sf2_file);
-      //instrumentsNumMap.set("Hi-hat 1", _drum_42_0_Chaos_sf2_file);
     }
-
+// the midi percussion system selects the instrument by outputting a pitch on channel 10
     function mapPitchForPercusssion(pitch, instrumentNum, instrument) {
 
       if (instrumentNum !== percussionMidiNum) {
@@ -122,7 +115,9 @@
         return (45); //Low Tom
       }
     }
-
+    //*****************************************************************************************
+// below a text code to select note length
+    // - might replace this- just use the numbers directly.
     const beatsMap = new Map();
     {
       beatsMap.set('C', 1.0);
@@ -136,6 +131,8 @@
       beatsMap.set('S', 0.25);
       beatsMap.set('SR', 0.25);
     }
+
+    // following handles coding of pitch representation that follows midi system e.g. "C4" =60
 
 
     var noteNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];//used to construct notes[] below
@@ -157,8 +154,23 @@
       notes[1] = "A#0";
       notes[2] = "B0";
       notes[87] = "C8";
-    } //notes not generated set here
+    }
 
+    function getMidiNoteFromName(noteName) {
+      return (notes.indexOf(noteName) + 21)
+    }
+
+     function extractNotesFromArrayOfMidiNumbers(pitchesEntry) {
+      let result = [];
+      for (let j = 0; j < pitchesEntry.length; j++) {
+        result[j] = notes[pitchesEntry[j] - 21]
+      }
+      return (result);
+    }
+
+
+    //*****************************************
+// the next section concerns some experimentation with random generation of notes and is not part of the basic platform
     var probs = [0.2, 0.4, 0.15, 0.15, 0.025, 0.025, 0.025, 0.025];
     //prob of jumping up or down by the index 0 to 7 corresponding to scale notes;
     //var cumulativeProbs = [0.0, 0.2, 0.5, 0.7, 0.8, 0.85, 0.9, 0.95, 1.0];
@@ -202,33 +214,30 @@
       if (scaleNote < 0) return (midiBaseNote + RelativeMidiNumOfHMScaleNegative[-scaleNote]);
     }
 
-    function getMidiNoteFromName(noteName) {
-      return (notes.indexOf(noteName) + 21)
-    }
+    // end ? of experimental section
 
-
+// constructor of text (via JSON stringyfy)  generator for a single track
     function MLine(track, sequencing, start, finish, instrument, bpm, rhythmBeats, pitchBeats, noteDuration) {
       this.track = track;
       this.sequencing = sequencing;
       this.start = start;
       this.finish = finish;
-      // this.duration = finish - start;
       this.bpm = bpm;
       this.instrument = instrument;
       this.noteDuration = noteDuration;
-
       this.rhythmBeats = rhythmBeats;
       this.pitchBeats = pitchBeats;
     }
 
 
-    function getTimeIncr(beats, rhythmBeat) {
+    function getTimeIncr(beats, rhythmBeat) { //calculate time incr from text in beats array
       let beatsString = (beats[rhythmBeat]);
+      // F and P modulate sound intensity - R means rest - D dot the note value
       if (beatsString.length == 1) return (beatsMap.get(beatsString))
+      // a negative value below will be used to signal a rest of the norma value.
       if (beatsString.charAt(1) == 'R') return (-beatsMap.get(beatsString.substr(0, 1)) * dotMult(beatsString))
       if (beatsString.charAt(1) == 'F') return (beatsMap.get(beatsString.substr(0, 1)) * dotMult(beatsString))
       if (beatsString.charAt(1) == 'P') return (beatsMap.get(beatsString.substr(0, 1)) * dotMult(beatsString))
-
       function dotMult(beatsString) {
         if (beatsString.includes("D")) return (1.5);
         return (1)
@@ -247,6 +256,8 @@
     }
 
     function getPitchIndexFromTime(t, lenPitchArray) {
+      // function below takes the nearest index value to the time t modulo the length of the array.
+
       let epsilon = -0.0000001; //(Math.random() - 0.5) * 0.0000000001;
       // for Q choose either current or next, randomly
       return ((Math.round(t + epsilon)) % lenPitchArray);
@@ -271,8 +282,8 @@
       return (inArray)
     }
 
-    var monitor = [];
 
+// these functions concern printing out the notes as they are played. *********************************************
     function refreshMonitor(monitor) {
       let ta = document.getElementById("ta4");
       let report = "";
@@ -281,35 +292,21 @@
     }
 
     function showIt(s, instrument, track) {
+      // if s is a pitch midi number  convert to note else just print it out
+
       if (typeof (s) === 'number') {
         monitor[track] = "track: " + track + " " + instrument + ": " + '"' + " " + s + " " + notes[s - 21] + '"';
       } else {
 
         monitor[track] = "track: " + track + " " + instrument + ": " + s;
       }
-
-
       refreshMonitor(monitor);
-
     }
-
-
-    function extractNotesFromArrayOfMidiNumbers(pitchesEntry) {
-      let result = [];
-      for (let j = 0; j < pitchesEntry.length; j++) {
-        result[j] = notes[pitchesEntry[j] - 21]
-      }
-      return (result);
-    }
-
-
-    function getChannel(instrumentMidiNum) {
-      if (instrumentMidiNum == percussionMidiNum) return (percussionChannel);
-      return (defaultChannel)
-    }
+//******************************************************************************************************************
 
 
     function playMLine(mL, origin) {
+// a big function to interpret and play the text - at moment also to generate midi file
 
       let track = mL.track;
       tracks[track] = new MidiWriter.Track();
@@ -515,9 +512,7 @@
 
     var audioContext = new (window.AudioContext || window.webkitAudioContext)();
     var player = new WebAudioFontPlayer();
-    var maxTracks
     var gainNodeArray = []
-
     var maxTracks = 10;
 
     // set up gain tracks
@@ -798,7 +793,6 @@
     }
 
     function onLoad() {
-
       trackEl = document.getElementById("track");
       taNameEl = document.getElementById("taName");
       taValueEl = document.getElementById("taValue");

@@ -169,7 +169,7 @@
       notes[87] = "C8";
     }
 
-    function getMidiNoteFromName(noteName) {
+    function getMidiNumberFromName(noteName) {
       return (notes.indexOf(noteName) + 21)
     }
 
@@ -222,9 +222,9 @@
     var RelativeMidiNumOfHMScalePositive = [0, 2, 3, 5, 7, 8, 11, 12, 14, 15, 17];
     var RelativeMidiNumOfHMScaleNegative = [0, -1, -4, -5, -7, -9, -10, -12, -13, -16, -17];
 
-    function getMidiNote(scaleNote, midiBaseNote) {
-      if (scaleNote >= 0) return (midiBaseNote + RelativeMidiNumOfHMScalePositive[scaleNote]);
-      if (scaleNote < 0) return (midiBaseNote + RelativeMidiNumOfHMScaleNegative[-scaleNote]);
+    function getMidiNumber(scaleNote, midiBaseNumber) {
+      if (scaleNote >= 0) return (midiBaseNumber + RelativeMidiNumOfHMScalePositive[scaleNote]);
+      if (scaleNote < 0) return (midiBaseNumber + RelativeMidiNumOfHMScaleNegative[-scaleNote]);
     }
 
     // end ? of experimental section
@@ -285,7 +285,7 @@
       //the first entry ie the the string, is removed and the elements are shifted down.
       //so the rebased array will have its length reduced by one
       if (typeof inArray[0] !== 'string') return (inArray);
-      let baseMidiNote = getMidiNoteFromName(inArray[0]);
+      let baseMidiNote =getMidiNumberFromName(inArray[0]);
       for (let i = 1; i < inArray.length; i++) {
         inArray[i - 1] = inArray[i];
         if (!Array.isArray(inArray[i - 1])) (inArray[i - 1]) += baseMidiNote;
@@ -651,16 +651,16 @@
 
 
     function createNotePitchArray(tonicNoteName, len) {
-      let midiBaseNote = getMidiNoteFromName(tonicNoteName);
+      let midiBaseNumber =getMidiNumberFromName(tonicNoteName);
 
       let midiNoteArray = [];
       let oldNoteScale = 0;
       let newNoteScale = 0;
-      midiNoteArray[0] = midiBaseNote;
+      midiNoteArray[0] = midiBaseNumber;
       let count = 1
       while (count < len) {
         newNoteScale = newNoteScale8(oldNoteScale);
-        midiNoteArray[count] = getMidiNote(newNoteScale, midiBaseNote);
+        midiNoteArray[count] = getMidiNumber(newNoteScale,midiBaseNumber);
         oldNoteScale = newNoteScale;
         count++;
       }

@@ -75,6 +75,17 @@
       return (defaultChannel)
     }
 
+     var origin;// this is used by soundfont player to find current time zero in the audio context
+    let midiBaseNote;
+    let midiNote;
+    let oldNoteScale;
+    let newNoteScale;
+    var count;
+    var len;
+    var midiNoteArray = [];
+    var oldNoteScaleArray = [];// used in the pitch generation algorithms
+    var midiPitchArr = [];
+
 
     // information on the provided instruments*******************************
     const instrumentsMap = new Map();
@@ -141,13 +152,15 @@
     // the true note names are only used once per generative run - to allow user to enter start note.
     var notesIx = 3;//index 3 will correspond to the first C
 
+    // next loop adds the octave number to the noteName across th octaves outs result in notes[]
+    // see the array definitions/ inits for clarification.
     for (let octave = 1; octave <= 7; octave++) {
       for (let noteNamesIx = 0; noteNamesIx <= 11; noteNamesIx++) {
         notes[notesIx] = noteNames[noteNamesIx] + octave;
         notesIx++;
       }
     }
-    //now fill in those notes not covered.
+    //now fill in the few notes not covered by the loop above
 
     {
       notes[0] = "A0";
@@ -160,7 +173,7 @@
       return (notes.indexOf(noteName) + 21)
     }
 
-     function extractNotesFromArrayOfMidiNumbers(pitchesEntry) {
+     function extractNotesFromArrayOfMidiNumbers(pitchesEntry) {//sends array of midi pitch mumbers back to note form
       let result = [];
       for (let j = 0; j < pitchesEntry.length; j++) {
         result[j] = notes[pitchesEntry[j] - 21]
@@ -264,14 +277,13 @@
     }
 
     function reBaseArray(inArray) {
+      // e.g. ["C4",0,3,7] is rebased to [60,63,67]
       // if the first element is not a string then inArray is immediately returned.
       //if first array element is a string then this is taken to be the base note
       // and it is translated into its midi pitch value. This value is then added to the rest of the array values.
       // The modified array is returned.
       //the first entry ie the the string, is removed and the elements are shifted down.
       //so the rebased array will have its length reduced by one
-      // so for example ["C4",0,3,7] is rebased to [60,63,67]
-
       if (typeof inArray[0] !== 'string') return (inArray);
       let baseMidiNote = getMidiNoteFromName(inArray[0]);
       for (let i = 1; i < inArray.length; i++) {
@@ -635,16 +647,7 @@
     }//loading player DON'T FORGET TO DO THIS !
 
 
-    var origin;
-    let midiBaseNote;
-    let midiNote;
-    let oldNoteScale;
-    let newNoteScale;
-    var count;
-    var len;
-    var midiNoteArray = [];
-    var oldNoteScaleArray = [];
-    var midiPitchArr = [];
+
 
 
     function createNotePitchArray(tonicNoteName, len) {

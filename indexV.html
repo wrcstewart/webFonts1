@@ -60,6 +60,9 @@
     var trackEl, taNameEl, taValueEl;
     var curEditTrackIx = 0;
     var curEditTrack;
+     var mediaRecorder;
+
+     var chunks =[];
 
 // for real time info on notes being played
     var timeOutsArray = []; //used to track time to display note being played.
@@ -222,7 +225,7 @@
     var RelativeMidiNumOfHMScalePositive = [0, 2, 3, 5, 7, 8, 11, 12, 14, 15, 17];
     var RelativeMidiNumOfHMScaleNegative = [0, -1, -4, -5, -7, -9, -10, -12, -13, -16, -17];
 
-    function getMidiNumber(scaleNote, midiBaseNumber) {
+    function getMidiNumberHarmonicMinorScale(scaleNote, midiBaseNumber) {
       if (scaleNote >= 0) return (midiBaseNumber + RelativeMidiNumOfHMScalePositive[scaleNote]);
       if (scaleNote < 0) return (midiBaseNumber + RelativeMidiNumOfHMScaleNegative[-scaleNote]);
     }
@@ -285,10 +288,10 @@
       //the first entry ie the the string, is removed and the elements are shifted down.
       //so the rebased array will have its length reduced by one
       if (typeof inArray[0] !== 'string') return (inArray);
-      let baseMidiNote =getMidiNumberFromName(inArray[0]);
+      let baseMidiNumber =getMidiNumberFromName(inArray[0]);
       for (let i = 1; i < inArray.length; i++) {
         inArray[i - 1] = inArray[i];
-        if (!Array.isArray(inArray[i - 1])) (inArray[i - 1]) += baseMidiNote;
+        if (!Array.isArray(inArray[i - 1])) (inArray[i - 1]) += baseMidiNumber;
       }
       inArray.pop();
       return (inArray)
@@ -410,7 +413,7 @@
             if (Array.isArray(p)) {
               for (let jj = 0; jj < masterCopyPitchBeats[ixx].length; jj++) cloneP[jj] = masterCopyPitchBeats[ixx][jj];
             } else {
-              // otherwise just convert the midi note number back to a string version of the note
+              // otherwise just convert the midi number back to a string version of the note
               cloneP.push(notes[p - 21]);
             }
 
@@ -526,12 +529,53 @@
     var player = new WebAudioFontPlayer();
     var gainNodeArray = []
     var maxTracks = 10;
+     var fileDest = audioContext.createMediaStreamDestination();
+    mediaRecorder= new MediaRecorder(fileDest.stream);
+
+    mediaRecorder.ondataavailable = function(evt) {
+         // push each chunk (blobs) in an array
+         chunks.push(evt.data);
+         let dummy =4;
+       };
+
+
+
+
+
 
     // set up gain tracks
     for (let i = 0; i < maxTracks; i++) {
       gainNodeArray[i] = audioContext.createGain();
       gainNodeArray[i].connect(audioContext.destination);
+      gainNodeArray[i].connect(fileDest);
+
     }
+
+
+    mediaRecorder.onstop = function(evt) {
+         // Make blob out of our blobs, and open it.
+         let blob = new Blob(chunks, { 'type' : 'audio/ogg; codecs=opus'  });
+
+         let audioTag = document.createElement('audio');
+
+         document.querySelector("audio").src = URL.createObjectURL(blob);
+
+
+         //var link = document.createElement("a");
+
+          // Browsers that support HTML5 download attribute
+         // var url = URL.createObjectURL(document.querySelector("audio").src);
+
+          audioTag.setAttribute("href", url);
+         audioTag.setAttribute("download","testAudioFile3");
+         audioTag.style.visibility = 'hidden';
+          document.body.appendChild(audioTag);
+         audioTag.click();
+          document.body.removeChild(audioTag);
+
+       };
+
+
 
 
     var gainNode = audioContext.createGain();
@@ -606,13 +650,7 @@
       }
     }
 
-    function doFormatArray(mLineArrayParam, aTextAreaEl) {
-      aTextAreaEl.value = "";
-      for (let j = 0; j < mLineArrayParam.length; j++) {
-        doFormat(mLineArrayParam[j], aTextAreaEl);
-        aTextAreaEl.value = aTextAreaEl.value + "\n";
-      }
-    }
+
 
     function outputField(obj, position, taNameEl, taValueEl) {
 
@@ -653,24 +691,24 @@
     function createNotePitchArray(tonicNoteName, len) {
       let midiBaseNumber =getMidiNumberFromName(tonicNoteName);
 
-      let midiNoteArray = [];
+      let midiNumberArray = [];
       let oldNoteScale = 0;
       let newNoteScale = 0;
-      midiNoteArray[0] = midiBaseNumber;
+      midiNumberArray[0] = midiBaseNumber;
       let count = 1
       while (count < len) {
         newNoteScale = newNoteScale8(oldNoteScale);
-        midiNoteArray[count] = getMidiNumber(newNoteScale,midiBaseNumber);
+        midiNumberArray[count] = getMidiNumberHarmonicMinorScale(newNoteScale,midiBaseNumber);
         oldNoteScale = newNoteScale;
         count++;
       }
-      return (midiNoteArray)
+      return (midiNumberArray)
     }
 
-    function createTransposedPitchArray(notePitchArray, semitoneShift) {
-      let len = notePitchArray.length;
+    function createTransposedPitchArray(AMidiNumberArray, semitoneShift) {
+      let len = AMidiNumberArray.length;
       let result = [];
-      for (let i = 0; i < len; i++) result[i] = notePitchArray[i] + semitoneShift;
+      for (let i = 0; i < len; i++) result[i] = AMidiNumberArray[i] + semitoneShift;
       return (result)
     }
 
@@ -700,18 +738,18 @@
       // let aMLine = JSON.parse(inStringLine);
       //let ix = ixOfTrack(mLineArray,aMLine.track);
       // mLineArray[ix] = aMLine;
-
       // var inStringExtras = document.getElementById("ta2").value;
-
       // var mLineArray = JSON.parse(inString);
-
       // var extras = JSON.parse(inStringExtras);
       // mLineArray[0] = {...mLineArray[0], ...extras};
 
       origin = audioContext.currentTime;
 
       //playMLine(loadedML,origin);
+      mediaRecorder.start();
       playSection(mLineArray, origin);
+      mediaRecorder.requestData()
+      mediaRecorder.stop();
     }//main PLAY it function !!!!!!!
 
 
@@ -744,8 +782,7 @@
       player.cancelQueue(audioContext);
 
 
-      //var notePitchArray1 = createNotePitchArray("C4", 8);
-      //var notePitchArray2 = createTransposedPitchArray(notePitchArray1, 0);
+// ---------------------- start of devel section ------------------------------------------------
 
       var beat1 = ['C', 'Q', 'Q', 'C', 'C', 'C', 'C', 'C', 'Q', 'Q', 'CR', 'C', 'C'];
       var beatBassDrum1 = ["CF", "CR", "Q", 'Q', "CR", "QF", "Q", "CR", "Q", 'Q', "CR"]
@@ -768,23 +805,27 @@
       // var mLineArray = [music4, music5, music7, music8,music9];
       // var mLineArray = [music4, music5];
 
-// ***** determine a section****
-      //mLineArray = [music10, music12, music11];// music11,music12];
+// ***** determine a section***
+
       mLineArray = [music10,music12,music11];// music11,music12]
 
-      //json stuff below
+      // ---------------------end of devel section --------------------------------------------------------------------------
 
-      //var mLineArrayStr = JSON.stringify(mLineArray, null, "");
-      //var pitchesStr1 = JSON.stringify(mLineArray[0], ['bpm', 'instrument']);//NB
+// now allow editing
+      doEdit(0, mLineArray);//initialise the edit boxes
 
 
-      //var readArray = JSON.parse(music1Str);
+// --- show what is being suggested in read only mode.
+      function doFormatArray(mLineArrayParam, aTextAreaEl) {
+      aTextAreaEl.value = "";
+      for (let j = 0; j < mLineArrayParam.length; j++) {
+        doFormat(mLineArrayParam[j], aTextAreaEl);
+        aTextAreaEl.value = aTextAreaEl.value + "\n";
+      }
+    }
+      doFormatArray(mLineArray, document.getElementById("ta1"));// show the summary of section.
 
-      //document.getElementById("pre1").innerText = music1Str;
-      //document.getElementById("ta1").innerText = mLineArrayStr;
-      // document.getElementById("ta2").innerText = pitchesStr1;
-      doEdit(0, mLineArray);
-      doFormatArray(mLineArray, document.getElementById("ta1"));
+      // ----
 
     }// end gen music - nb does not play
 
@@ -795,7 +836,7 @@
 
     }
 
-    function onLoad() {
+    function onLoad() { //normal onLoad statement
       trackEl = document.getElementById("track");
       taNameEl = document.getElementById("taName");
       taValueEl = document.getElementById("taValue");
@@ -804,13 +845,35 @@
 
     function saveJSON(filename, obj2) {
 
-      //var jsonString = JSON.stringify(obj2);
-      // var blob = new Blob([jsonString], {type: 'text/plain'});
-      //var blob = new Blob([obj2], {type: 'audio/midi'});
+      var jsonString = JSON.stringify(obj2);
+      var blob = new Blob([jsonString], {type: 'text/plain'});
+
       if (navigator.msSaveBlob) { // IE 10+
         navigator.msSaveBlob(blob, filename);
       } else {
         var link = document.createElement("a");
+        if (link.download !== undefined) { // feature detection
+          // Browsers that support HTML5 download attribute
+          var url = URL.createObjectURL(blob);
+
+          link.setAttribute("href", url);
+          link.setAttribute("download", filename);
+          link.style.visibility = 'hidden';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        }
+      }
+    }
+
+    //******end of saving stuff********
+    function saveMidiFile() {
+
+let filename = "MettatreeMusic.mid";
+      var write = new MidiWriter.Writer(tracks);
+
+      mwStr = write.dataUri();
+      var link = document.createElement("a");
         if (link.download !== undefined) { // feature detection
           // Browsers that support HTML5 download attribute
           //var url = URL.createObjectURL(blob);
@@ -823,17 +886,8 @@
           link.click();
           document.body.removeChild(link);
         }
-      }
-    }
 
-    //******end of saving stuff********
-    function saveFile() {
-      let y = 0;
-
-      var write = new MidiWriter.Writer(tracks);
-
-      mwStr = write.dataUri();
-      saveJSON("testMidiP9.mid", mwStr)
+      //saveJSON("testMidiP9.mid", mwStr)
     }
 
   </script>
@@ -845,7 +899,7 @@
 <div id="butPanel" style="position:absolute;top:1px;left:1px;width:400px;height:60px;background-color: linen">
   <button id="genMusic" onclick="genMusic()">Suggest</button>
   <button id="loadMusicLine" data-playing="off" onclick="loadJSON()">Play</button>
-  <button id="save" onclick="saveFile()">Save File</button>
+  <button id="save" onclick="saveMidiFile()">Save Midi File</button>
   <button id="cloneUnit" onclick="cloneUnit()">Clone</button>
   <button id="saveEdit" onclick="inputField(taNameEl,taValueEl)">Save Edit</button>
 </div>

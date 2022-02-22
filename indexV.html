@@ -733,8 +733,9 @@
 
 mediaRecorder.onstop = function(evt) {
   // Make blob out of our blobs, and open it.
- // let blob = new Blob(chunks, {'type': 'audio/ogg; codecs=opus'});
-  let blob = new Blob(chunks, {'type': 'audio/mpeg; codecs=audio/mp3'});
+  //let blob = new Blob(chunks, {'type': 'audio/ogg; codecs=opus'});
+  let blob = new Blob(chunks, {'type': 'audio/webm; codecs=opus'});
+ // let blob = new Blob(chunks, {'type': 'audio/mpeg; codecs=audio/mp3'});
 
 
   //let audioTag = document.createElement('audio');
@@ -749,7 +750,7 @@ mediaRecorder.onstop = function(evt) {
 
  var link = document.createElement("a");
           link.setAttribute("href", url);
-          link.setAttribute("download", "audiotestAmp.mp3");
+          link.setAttribute("download", "audiotestAmpF");
           link.style.visibility = 'hidden';
           document.body.appendChild(link);
           link.click();

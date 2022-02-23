@@ -12,6 +12,8 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {
-    "parcel-bundler": "^1.12.4"
+    "midi-writer-js": "^2.0.1",
+    "parcel-bundler": "^1.12.4",
+    "tonal-midi": "^0.69.7"
   }
 }

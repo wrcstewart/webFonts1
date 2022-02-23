@@ -18,9 +18,11 @@
   <script src='https://surikov.github.io/webaudiofontdata/sound/12842_0_Chaos_sf2_file.js'></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jsoneditor/9.5.11/jsoneditor.min.js"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/jsoneditor/9.5.11/jsoneditor.css" rel="stylesheet" type="text/css">
-  <script src= './midiInstrumentStuff.js'></script>
-<script src= './playerStuff.js'></script>
-<script src= './jsonediting.js'></script>
+  <script src='./midiInstrumentStuff.js'></script>
+  <script src='./playerStuff.js'></script>
+  <script src='./jsonediting.js'></script>
+  <script src='./generationUtils.js'></script>
+
 
 
   <script>
@@ -36,7 +38,7 @@
     var ticksPerSec = 256;//used for midi file writing
     var mwStr;//string for saving midi file data.
 
-      var monitor = [];// this is used to print a display of the notes as they are played.
+    var monitor = [];// this is used to print a display of the notes as they are played.
 
     function addNote(track, time, pitch, duration, vel, channel) { // used for midi file writing
       var durationString = "T" + Math.round(duration * ticksPerSec)
@@ -53,7 +55,6 @@
     }
 
 
-
     window.playState = false; //used to toggle play and reset of soundfonts i.e. the audio
 
     var mLineArray;// IMPORTANT DATA STRUCTURE holds the current lines (tracks) of data to play/ edit /file
@@ -64,25 +65,25 @@
     var trackEl, taNameEl, taValueEl;
     var curEditTrackIx = 0;
     var curEditTrack;
-     var mediaRecorder;
+    var mediaRecorder;
 
-     var chunks =[];
+    var chunks = [];
 
-// for real time info on notes being played
+    // for real time info on notes being played
     var timeOutsArray = []; //used to track time to display note being played.
 
-// used by midi file writer to arrange output on midi percussion channel or, normal channel
-   // var percussionMidiNum = -1; //arbitrary number to signal a percussion instrument
+    // used by midi file writer to arrange output on midi percussion channel or, normal channel
+    // var percussionMidiNum = -1; //arbitrary number to signal a percussion instrument
     var percussionChannel = 10; // this channel is how you play midi drums
     var defaultChannel = 1;
 
-     function getChannel(instrumentMidiNum) {
-       // if instrumentMidiNum is the negative signal percussionMidiNum then select percussion channel
+    function getChannel(instrumentMidiNum) {
+      // if instrumentMidiNum is the negative signal percussionMidiNum then select percussion channel
       if (instrumentMidiNum == percussionMidiNum) return (percussionChannel);
       return (defaultChannel)
     }
 
-     var origin;// this is used by soundfont player to find current time zero in the audio context
+    var origin;// this is used by soundfont player to find current time zero in the audio context
     let midiBaseNote;
     let midiNote;
     let oldNoteScale;
@@ -95,136 +96,6 @@
 
 
 
-
-
-
-
-
-
-/*
-     var fileDest = audioContext.createMediaStreamDestination();
-    mediaRecorder= new MediaRecorder(fileDest.stream);
-
-    mediaRecorder.ondataavailable = function(evt) {
-         // push each chunk (blobs) in an array
-         chunks.push(evt.data);
-         let dummy =4;
-       };
-
-
-
-
-
-
-    // set up gain tracks
-    for (let i = 0; i < maxTracks; i++) {
-      gainNodeArray[i] = audioContext.createGain();
-      gainNodeArray[i].connect(audioContext.destination);
-      gainNodeArray[i].connect(fileDest);
-
-    }
-
-
-
-
-
-
-
-    var gainNode = audioContext.createGain();
-    gainNode.connect(audioContext.destination);
-    var gainWeights = [];
-    var isFeaturing = false;
-
-    function edit(elTrackSpinner, isFeaturing) {
-
-      let normalGain = 0.5;
-      let backgroundGain = 0.05;
-      let foregroundGain = 0.9;
-
-
-      let editTrack = elTrackSpinner.value;
-
-
-      //alert(""+ editTrack);
-
-      if (isFeaturing) {
-
-        for (let track = 0; track < maxTracks; track++) {
-          gainNodeArray[track].gain.value = backgroundGain;
-          if (track == editTrack) gainNodeArray[track].gain.value = foregroundGain;
-        }
-      }
-      if (!isFeaturing) {
-        for (let track = 0; track < maxTracks; track++) {
-          gainNodeArray[track].gain.value = normalGain;
-        }
-      }
-
-      doEdit(editTrack, mLineArray);
-
-
-    }
-
-    function ixOfTrack(mLineArray, targetTrack) {
-
-      for (let ix = 0; ix < mLineArray.length; ix++) {
-        if (mLineArray[ix].track == targetTrack) return (ix)
-      }
-      return (null)
-    }
-
-    function doEdit(editTrack, mLineArray) {
-
-      let ix = ixOfTrack(mLineArray, editTrack);
-      curEditTrackIx = ix;
-      //let strMusicLine  = JSON.stringify(mLineArray[ix]);//change to link to id
-
-      // alert(""+ editTrack +strMusicLine);
-      //document.getElementById('edit').innerText = strMusicLine;
-      let aMLine = mLineArray[ix];
-      //let aTextAreaEl = document.getElementById('edit');
-      //doFormat(aMLine, aTextAreaEl);
-
-      outputField(aMLine, document.getElementById("fieldNumber").value, taNameEl, taValueEl);
-
-      return
-    }
-
-    function doFormat(obj, aTextAreaEl) {
-
-      let arrayOfKeys = Object.keys(obj);
-      // aTextAreaEl.value = "";
-      for (let i = 0; i < arrayOfKeys.length; i++) {
-        let aKey = arrayOfKeys[i];
-        let aEntryStr = JSON.stringify(obj, [aKey]);
-
-        aTextAreaEl.value = aTextAreaEl.value + aEntryStr + "\n";
-      }
-    }
-
-
-
-    function outputField(obj, position, taNameEl, taValueEl) {
-
-      let arr = Object.entries(obj);
-      let aField = arr[position];
-      let aName = aField[0];
-      //let aValue = aField[1];
-      taNameEl.value = aName;
-      let origVal = obj[aName];
-      let valStr = JSON.stringify(origVal)
-      taValueEl.value = valStr;
-    }
-
-    function inputField(taNameEl, taValueEl) {
-      let obj = mLineArray[curEditTrackIx];
-      let aKeyString = taNameEl.value;
-      obj[aKeyString] = JSON.parse(taValueEl.value);
-      mLineArray[curEditTrackIx] = obj; //reinsert into master array of mLine objects.
-      doFormatArray(mLineArray, document.getElementById("ta1"));
-    }
-*/
-
     {
       //player.loader.decodeAfterLoading(audioContext,'_tone_0000_JCLive_sf2_file' );
       player.loader.decodeAfterLoading(audioContext, '_tone_0730_Aspirin_sf2_file');
@@ -236,36 +107,7 @@
       player.loader.decodeAfterLoading(audioContext, '_drum_42_0_Chaos_sf2_file');
     }//loading player DON'T FORGET TO DO THIS !
 
-
-
-
-
-    function createNotePitchArray(tonicNoteName, len) {
-      let midiBaseNumber =getMidiNumberFromName(tonicNoteName);
-
-      let midiNumberArray = [];
-      let oldNoteScale = 0;
-      let newNoteScale = 0;
-      midiNumberArray[0] = midiBaseNumber;
-      let count = 1
-      while (count < len) {
-        newNoteScale = newNoteScale8(oldNoteScale);
-        midiNumberArray[count] = getMidiNumberHarmonicMinorScale(newNoteScale,midiBaseNumber);
-        oldNoteScale = newNoteScale;
-        count++;
-      }
-      return (midiNumberArray)
-    }
-
-    function createTransposedPitchArray(AMidiNumberArray, semitoneShift) {
-      let len = AMidiNumberArray.length;
-      let result = [];
-      for (let i = 0; i < len; i++) result[i] = AMidiNumberArray[i] + semitoneShift;
-      return (result)
-    }
-
-
-    function loadJSON() {
+function loadJSON() {
       let but = document.getElementById("loadMusicLine");
 
       let playState = but.getAttribute("data-playing");
@@ -304,40 +146,45 @@
 
     }//main PLAY it function !!!!!!!
 
-mediaRecorder.onstop = function(evt) {
-  // Make blob out of our blobs, and open it.
-  //let blob = new Blob(chunks, {'type': 'audio/ogg; codecs=opus'});
-  let blob = new Blob(chunks, {'type': 'audio/webm; codecs=opus'});
- // let blob = new Blob(chunks, {'type': 'audio/mpeg; codecs=audio/mp3'});
-
-
-  //let audioTag = document.createElement('audio');
-
-  //document.querySelector("audio").src = URL.createObjectURL(blob);
-
-
-  //var link = document.createElement("a");
-
-  // Browsers that support HTML5 download attribute
-   var url = URL.createObjectURL(blob);
-
- var link = document.createElement("a");
-          link.setAttribute("href", url);
-          link.setAttribute("download", "audiotestAmpF");
-          link.style.visibility = 'hidden';
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-}
 
 
 
-    function stoppingRecorder(){
+
+
+    mediaRecorder.onstop = function (evt) {
+      // Make blob out of our blobs, and open it.
+      //let blob = new Blob(chunks, {'type': 'audio/ogg; codecs=opus'});
+      let blob = new Blob(chunks, {'type': 'audio/webm; codecs=opus'});
+      // let blob = new Blob(chunks, {'type': 'audio/mpeg; codecs=audio/mp3'});
+
+
+      //let audioTag = document.createElement('audio');
+
+      //document.querySelector("audio").src = URL.createObjectURL(blob);
+
+
+      //var link = document.createElement("a");
+
+      // Browsers that support HTML5 download attribute
+      var url = URL.createObjectURL(blob);
+
+      var link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", "audiotestAmpF");
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+
+    function stoppingRecorder() {
       mediaRecorder.requestData()
       mediaRecorder.stop();
 
 
-}
+    }
+
     function playSection(mLineArray, origin, dest) {
       tracks.length = 0;
       var currentTrack;
@@ -378,9 +225,9 @@ mediaRecorder.onstop = function(evt) {
       var beatHighHat1 = ["C", "C", "C", "C"];
 
 
-       var music10 = new MLine(0, "CHORD", 0, 20, "Flute Pipe 1", 60, beatFlute3, ["C4", 0, 0, ["A3", 0, 3, 7, 0], ["G4", 0, 7], ["G4", 5, 0], ["F4", 0, 4, 7, 0], ["F4", 0, 4, 7, 0], ["E4", 6, 0], ["E4", 0, 7]], 0.98);
+      var music10 = new MLine(0, "CHORD", 0, 20, "Flute Pipe 1", 60, beatFlute3, ["C4", 0, 0, ["A3", 0, 3, 7, 0], ["G4", 0, 7], ["G4", 5, 0], ["F4", 0, 4, 7, 0], ["F4", 0, 4, 7, 0], ["E4", 6, 0], ["E4", 0, 7]], 0.98);
 
-       var music12 = new MLine(1, "ARPEGGIO", 0, 20, "Flute Pipe 1", 60, beatFlute3, ["C4", ["A5", 0, 3, 7, 0], ["A5", 0, 3, 7, 0],
+      var music12 = new MLine(1, "ARPEGGIO", 0, 20, "Flute Pipe 1", 60, beatFlute3, ["C4", ["A5", 0, 3, 7, 0], ["A5", 0, 3, 7, 0],
         ["G4", 0, 7], ["G4", 5, 0], ["F4", 0, 4, 7, 0], ["F4", 0, 4, 7, 0], ["E4", 6, 0], ["E4", 0, 7]], 0.98);
 
       // var music7 = new MLine(3, "CHORD", 0, 120, "Bass Drum 2", 90, beatBassDrum1, [33], 0.9);
@@ -392,7 +239,7 @@ mediaRecorder.onstop = function(evt) {
 
 // ***** determine a section***
 
-      mLineArray = [music10,music12,music11];// music11,music12]
+      mLineArray = [music10, music12, music11];// music11,music12]
 
       // ---------------------end of devel section --------------------------------------------------------------------------
 
@@ -402,17 +249,20 @@ mediaRecorder.onstop = function(evt) {
 
 // --- show what is being suggested in read only mode.
       function doFormatArray(mLineArrayParam, aTextAreaEl) {
-      aTextAreaEl.value = "";
-      for (let j = 0; j < mLineArrayParam.length; j++) {
-        doFormat(mLineArrayParam[j], aTextAreaEl);
-        aTextAreaEl.value = aTextAreaEl.value + "\n";
+        aTextAreaEl.value = "";
+        for (let j = 0; j < mLineArrayParam.length; j++) {
+          doFormat(mLineArrayParam[j], aTextAreaEl);
+          aTextAreaEl.value = aTextAreaEl.value + "\n";
+        }
       }
-    }
+
       doFormatArray(mLineArray, document.getElementById("ta1"));// show the summary of section.
 
       // ----
 
     }// end gen music - nb does not play
+
+
 
     function genProtoMLineArray() {
       // generate a 7 line bar of 4/4 using different instruments including 'none' that can then be directly edited or cloned
@@ -454,23 +304,23 @@ mediaRecorder.onstop = function(evt) {
     //******end of saving stuff********
     function saveMidiFile() {
 
-let filename = "MettatreeMusic.mid";
+      let filename = "MettatreeMusic.mid";
       var write = new MidiWriter.Writer(tracks);
 
       mwStr = write.dataUri();
       var link = document.createElement("a");
-        if (link.download !== undefined) { // feature detection
-          // Browsers that support HTML5 download attribute
-          //var url = URL.createObjectURL(blob);
-          //var url = URL.createObjectURL(mwStr);
-          var url = mwStr;
-          link.setAttribute("href", url);
-          link.setAttribute("download", filename);
-          link.style.visibility = 'hidden';
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-        }
+      if (link.download !== undefined) { // feature detection
+        // Browsers that support HTML5 download attribute
+        //var url = URL.createObjectURL(blob);
+        //var url = URL.createObjectURL(mwStr);
+        var url = mwStr;
+        link.setAttribute("href", url);
+        link.setAttribute("download", filename);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
 
       //saveJSON("testMidiP9.mid", mwStr)
     }

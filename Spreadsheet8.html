@@ -1,0 +1,961 @@
+
+<!DOCTYPE html>
+<!--pqGrid Work-->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <!--jQuery dependencies-->
+    <link rel="stylesheet"
+          href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.9.2/themes/base/jquery-ui.css" />
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.9.2/jquery-ui.min.js"></script>
+
+    <script src="plotly-latest.min.js"></script>
+
+
+    <!--Include Touch Punch file to provide support for touch devices
+    <script type="text/javascript" src="path to touch-punch.js" ></script> -->
+
+    <!--ParamQuery Grid files-->
+    <link rel="stylesheet" href="./pqgrid.min.css" />
+    <script type="text/javascript" src="./pqgrid.min.js" ></script>
+
+
+
+
+<style>
+
+    #grid_array.pq-grid *
+
+    {
+
+    font-size: 12px;
+        padding: 1px;
+
+    }
+
+
+
+    .redState {
+         background-color: rgb(100%,70%,70%)
+
+    }
+
+    .yellowState {
+
+        background-color: rgb(100%,100%,70%)
+
+    }
+
+    .greenState {
+
+        background-color: rgb(50%,100%,50%)
+
+    }
+
+    .blueState {
+
+        background-color: rgb(7%,70%,100%)
+
+    }
+
+    .INIT {
+
+        background-color: rgb(7%,70%,100%)
+
+    }
+
+    .POSTED {
+
+        background-color: rgb(100%,80%,80%)
+
+    }
+
+    .ACTIVE {
+        background-color: rgb(80%,100%,80%);
+
+    }
+
+
+
+
+
+
+</style>
+
+
+    <script>
+
+      
+
+        function initC(idStr,colStr,l,w,t,h) {
+            $("#"+idStr).css({
+
+                "background-color":colStr,
+                "position":"absolute",
+                "left":l+"%",
+                "width":w+"%",
+                "top":t+"%",
+                "height":h+"%",
+                "visibility": "visible",
+                "box-sizing":"border-box",
+                "border-style":"none"
+            })
+        }
+
+
+        // some global state variables
+        const IX = 0;
+        const TYPE = 1;
+        const COND1 = 2;
+        const MESSAGE = 3;
+        const SP = 4;
+        const FITNESS = 5;
+        const STATE = 6;
+        const BID0 = 7;
+        const ACCEPTED = 8;
+        const MATCHES = 9;
+        const ON = 10;
+        const NPOSTED =11;
+
+        var rePostDetectorMessages = true;
+        // at beginning of each cycle whether to re post the detector messag
+        var nRows =51;
+        var nColumns = 4;
+        var data2 =[];
+        var data2WithHeader =[];
+        var inputArray= [];
+        var states = ["STATE0","STATE1","STATE2","STATE3"];
+        var nStates = 5;
+        var curStateIx = 0;
+        var condLength =8;
+        var msgLength = 8;
+
+        var nLoop = 100000;
+        //determine how many steps to loop if loop button pressed
+
+        var doRefresh = true;
+
+        var nEffectorPays=0;
+
+
+
+
+
+
+
+
+
+
+
+
+
+         function matchHash(aString,hashedString,hashChar ) {
+
+             // matches two strings of same length
+             // a hash char in second string counts as always matched
+
+             if (aString.length !== hashedString.length) return(false);
+
+
+             var len = aString.length;
+
+             for (k = 0; k < len; k++){
+
+                 if (hashedString[k] !== hashChar) {
+                     if (aString[k] !== hashedString[k]) return (false);
+                 }
+
+             };
+
+             return(true);
+
+         }
+
+
+
+
+
+
+        function step() {
+
+            if (curStateIx === nStates - 1) {
+                curStateIx = 1
+            } // not 0 which is a pre start state
+            else {
+                curStateIx++
+            }
+            ;
+
+
+            if (curStateIx === 1) {
+                //initRules(data2,1,4,"I","10###555","11005555",1.0,100.0,10.0);
+                // $( "#grid_array" ).pqGrid( "refreshDataAndView" );
+
+                postDetectors();
+
+
+                // alert(curStateIx.toString())
+            }
+
+
+            if (curStateIx === 2) {
+
+                matchAnyPostedAndCalcBid();
+
+            }
+
+           if (curStateIx === 3){
+
+               payUp();
+
+           }
+
+            if (curStateIx === 4){
+
+                repost();
+                updateNumberPosted();
+            }
+
+
+        }
+
+        function loop(){
+
+             doRefresh = false;
+
+
+             for (kk=1;kk<nLoop;kk++) {step()};
+
+             doRefresh =true;
+
+            $( "#grid_array" ).pqGrid( "refreshDataAndView" );
+            alert(nEffectorPays.toString());
+
+        }
+
+
+function updateNumberPosted(){
+    for (var ix = 0; ix < nRows; ix++) {
+
+        if (getState(ix) === "POSTED") {
+        data2[ix][NPOSTED] = data2[ix][NPOSTED] +1;
+        }
+    }
+    if(doRefresh)  $( "#grid_array" ).pqGrid( "refreshDataAndView" );
+}
+
+
+
+        function postDetectors() {
+
+            for (ix = 0; ix < nRows; ix++) {
+
+                if (isDetector(ix)) {
+                    setState(ix, "POSTED");
+                   // $("#grid_array").pqGrid("addClass", {rowIndx: ix, dataIndx:MESSAGE, cls: data2[ix][STATE]});
+                }
+            }
+
+            if(doRefresh)  $( "#grid_array" ).pqGrid( "refreshDataAndView" );
+        }
+
+        function typeOfRule(ix){
+             return(data2[ix][TYPE]);
+        }
+
+        function isDetector(ix){
+             if (typeOfRule(ix) === "D" ) return (true);
+             return(false)
+        }
+
+        function isEffector(ix){
+            if (typeOfRule(ix) === "E" ) return (true);
+            return(false)
+
+        }
+
+        function setState(ix,state){
+             data2[ix][STATE] = state;
+        }
+
+        function hasConditions(ix){
+
+             if (typeOfRule(ix) === "E" || typeOfRule(ix) === "I") return(true);
+             return(false)
+        }
+
+        function findSp(ix){
+             return( data2[ix][SP]  )
+        }
+
+        function fire(prob){
+
+             if (Math.random() < prob) return(true);
+             return(false)
+        }
+
+        function isAccepted(ix){
+            if (data2[ix][ACCEPTED] === 1)  return(true);
+           return(false)
+        }
+
+        function on(ix){
+             if(data2[ix][ON] === 1) return(true);
+             return(false)
+        }
+
+        function matchAnyPostedAndCalcBid(){
+            for(ix = 0;ix<nRows;ix++){
+                matchCount=0;
+                if (hasConditions(ix) && on(ix)) {
+                  var cond = findCond(ix);
+                     for (r=0;r<nRows;r++){
+                        if (r=== ix) continue;
+
+                        if (getState(r) !== "POSTED") continue;
+
+                        msg =findMsg(r);
+
+                        if (matchHash(msg,cond,'#')) {
+
+                            //alert(cond + "    "+msg);
+                            matchCount++;
+                           var bid = calcAndSetBid(ix);
+
+                            //setState(ix,"BID");
+                            if (fire(bid)) {
+
+                                data2[ix][ACCEPTED] =1;
+
+                            }
+                            else {
+                                data2[ix][ACCEPTED] =0;
+                            }
+                        }
+
+                     }
+                }
+                data2[ix][MATCHES] = matchCount;
+
+            }
+
+            if(doRefresh)  $( "#grid_array" ).pqGrid( "refreshDataAndView" );
+
+        }
+
+        function payUp(){
+            for(ix = 0;ix<nRows;ix++){
+
+                if (hasConditions(ix) && on(ix)) {
+                    var cond = findCond(ix);
+                    for (r=0;r<nRows;r++){
+                        if (r=== ix) continue;
+
+                        if (getState(r) !== "POSTED") continue;
+
+                        msg =findMsg(r);
+
+                        if (matchHash(msg,cond,'#')) {
+
+                            //alert(cond + "    "+msg);
+                            if (isAccepted(ix)) {
+                                var pay = data2[ix][BID0]/data2[ix][MATCHES];
+
+                                var fitness =  data2[r][FITNESS];
+                                fitness += pay;
+
+                                data2[r][FITNESS]  = rounded (fitness,8);
+                                if (isEffector(ix)) nEffectorPays ++;
+
+
+
+                                fitness =  data2[ix][FITNESS];
+                                if (!isEffector(ix)) fitness -= pay;
+                                if (fitness < 0) fitness =0;//necessary ?
+                                data2[ix][FITNESS]  = rounded (fitness,8);
+
+
+
+                            }
+                            //setState(ix,"BID");
+                            /*
+                            if (fire(bid)) {
+
+                                data2[ix][ACCEPTED] =1;
+
+                            }
+                            else {
+                                data2[ix][ACCEPTED] =0;
+                            }
+
+                             */
+                        }
+
+                    }
+                }
+               // data2[ix][MATCHES] = matchCount;
+
+            }
+
+
+
+            if(doRefresh)  $( "#grid_array" ).pqGrid( "refreshDataAndView" );
+
+        }
+
+
+        function hasMsg(ix) {
+
+           if (  (data2[ix][TYPE] === "D") || (data2[ix][TYPE] === "I") ) return(true);
+           return(false);
+
+        }
+
+        function zeroStates(ix){
+             data2[ix][BID0] = 0;
+             data2[ix][ACCEPTED] =0;
+             data2[ix][MATCHES] =0;
+        }
+
+        function repost(){
+
+             for(ix =0;ix<nRows;ix++){
+
+                 if( hasMsg(ix)){
+                     if ((rePostDetectorMessages && (data2[ix][TYPE] === "D" )   ) || (isAccepted(ix) && on(ix)))
+                     {setState(ix,"POSTED")} //***POSTING HERE****
+                     else {setState(ix,"-")}
+
+
+
+
+                 }
+
+                 zeroStates(ix); //inactive
+             }
+
+
+
+
+            if(doRefresh)  $( "#grid_array" ).pqGrid( "refreshDataAndView" );
+        }
+
+
+        function getState(ix){
+
+             return(data2[ix][STATE])
+        }
+
+        function isPosted(ix){
+
+             if (getState(ix) === "POSTED" ) return (true);
+             return(false)
+        }
+
+        function findMsg(ix){
+         return( data2[ix][MESSAGE]   )
+
+
+        }
+
+        function rounded(x,places){
+
+            var mult = Math.pow(10,places);
+
+             return ((Math.round(x * mult))/ mult )
+
+        }
+
+        function calcAndSetBid(ix){
+            var scale = 0.95; //Hollands "b" scale value
+            var sp = findSp(ix);
+            var s = getFitness(ix);
+            var bid;
+            bid = rounded(scale * sp * s, 6);
+            if (bid > 0.999999) bid = 0.999999;
+            data2[ix][BID0]  = bid;
+           return(bid)
+        }
+
+        function getFitness(ix) {
+
+            return(data2[ix][FITNESS]);
+        }
+
+        function updateSheet(){
+            //test updating button.
+            //alert(data2[0][0] * data2[0][4]);
+            //data2[1][1] = 6;
+
+
+            //$(cell).removeClass();
+            //$(cell).toggleClass("myborder");
+
+            //var className = "INIT"; // put global.
+            var className = data2[2][STATE];
+
+            // write an updateDisplay(row, state);
+
+
+            $( "#grid_array" ).pqGrid( "addClass", {rowIndx: 2, dataIndx:2, cls: className} );
+            //$( "#grid_array" ).pqGrid( "addClass", {rowIndx: 2, cls: data2[2][STATE]} );
+            //$( "#grid_array" ).pqGrid( "removeClass", {rowIndx: 2, dataIndx:2, cls: className} );
+
+
+            if(doRefresh)  $( "#grid_array" ).pqGrid( "refreshDataAndView" );
+        }
+
+
+        function initRules(d,ixStart,ixEnd,ruleType,initCond,initMsg,initSp,initFit,initBid){
+            //d is the data array.
+            //ix same as row in spreadsheet
+            //function called to initialise rows between ixStart and ixEnd, inclusive.
+            // ruleType - "D" for detector,"E" for effector, "I" for internal
+
+            // cond and msg are strings that determine how to init condition and message of rules.
+            //they include an optional randomising feature
+            // see global declaration for details.
+
+            // other parameters are initial specificity, FITNESS (fitness), and bid.
+
+            // usually the D and E rows will be called first in the first few rows
+            //then one or more row blocks of internal rules.
+
+
+
+            for(var r = ixStart;r <= ixEnd; r++){ //row loop
+
+                var msg, cond, sp;
+                sp = initSp;
+
+                if (ruleType === "D"){
+                    cond =""; msg = getMsg(initMsg);
+                    sp = 0;
+                }
+                if (ruleType === "E"){
+                    cond = getCond(initCond); msg = "";
+                    sp = getSp(cond);
+                }
+
+                if (ruleType === "I"){
+                    cond =getCond(initCond);
+                    sp = getSp(cond);
+                    msg = getMsg(initMsg);
+                }
+
+                d[r][IX] = r;
+                d[r][TYPE] = ruleType;
+                d[r][COND1] = cond;
+                d[r][MESSAGE] = msg;
+                d[r][SP] = sp;
+                d[r][FITNESS] = initFit;
+                d[r][STATE] = "-";
+                d[r][BID0] =initBid;
+                d[r][ACCEPTED] = 0;
+                d[r][MATCHES] = 0;
+                d[r][ON] = 1; //rule turned on by default
+                d[r][NPOSTED] =0;
+
+               // $( "#grid_array" ).pqGrid( "addClass", {rowIndx: r, cls: ".INIT"} );
+
+            }
+        } //after calling don't forget refresh!
+
+        function getSp(cond){
+            var L = cond.length;
+            var count = L;
+            for(pos =0;pos<L;pos++){
+             if( cond[pos] === '#') count--;
+            }
+            return(count/L)
+        }
+
+        function findCond(ix){
+
+            return( data2[ix][COND1])
+}
+
+        function getMsg(initMsg){
+
+            var baseChar = [];
+
+
+            var bound =1.0;
+            var pick =1.0;
+
+            for(i=0;i<msgLength;i++){
+                if(initMsg[i] === '0') {baseChar[i] = '0'; continue}
+                if(initMsg[i] === '1') {baseChar[i] = '1'; continue}
+                bound = initMsg[i]/10.0;//therefore tween 0,2 and 0.9
+                pick = Math.random();
+                if (pick <= bound) {baseChar[i] = '1'; continue}
+                baseChar[i] = '0';
+
+            }
+            return(baseChar.join(""));
+            // for reference use spli to go the other way. String to char array
+        }
+
+        // var myChar = [];
+        // myChar[0]  ='a'; myChar[1] ='b';
+        // var myString = myChar.join("");
+
+        function getCond(initCond){
+
+            var baseChar = [];
+
+
+            var bound =1.0;
+            var pick =1.0;
+
+            for(i=0;i<condLength;i++){
+                if(initCond[i] === '0') {baseChar[i] = '0'; continue}
+                if(initCond[i] === '1') {baseChar[i] = '1'; continue}
+                if(initCond[i] === '#') {baseChar[i] = '#'; continue}
+                bound = initCond[i]/10.0;//therefore tween 0,2 and 0.9
+                pick = Math.random();
+                if (pick <= bound) {baseChar[i] = '#'; continue}
+                if (pick <= (0.5 + bound/2)) {{baseChar[i] = '0'; continue}}
+                baseChar[i] = '1';
+
+            }
+            return(baseChar.join(""));
+            // for reference: use split to go the other way. String to char array
+        }//gen the cond
+
+
+
+        function turnOffDuplicates() {
+
+            for (var ix = 0; ix < nRows; ix++) {
+                if (typeOfRule(ix) === "I") {
+                    var earlyCond = findCond(ix);
+                    var earlyMsg = findMsg(ix);
+
+                    for (var r = ix+1; r < nRows; r++) {
+                        if (typeOfRule(r) === "I") {
+
+                            var lateCond = findCond(r);
+                            var lateMsg = findMsg(r);
+
+                            var isZeroConds = earlyCond.localeCompare(lateCond);
+                            var isZeroMsgs = earlyMsg.localeCompare(lateMsg);
+
+                            if ((isZeroConds === 0) && (isZeroMsgs === 0)){
+
+                                data2[r][ON] =0;
+
+                            }
+
+
+                        }
+
+                    }
+
+                }
+            }
+        }
+
+
+
+
+        //-------------------------------------------main on load func------------------------------
+
+
+        let $1 = $(function() {
+
+
+            var leftE =75; //left Edge of buttons.
+            initC("mainPanel1", "Blue", 0, 100, 0, 100);
+            initC("button1", "Red", leftE, 18, 5, 5);
+            initC("export-file", "Yellow", leftE, 18, 15, 5);
+            initC("step", "Green", leftE, 18, 25, 5);
+            initC("loop", "Yellow", leftE, 18, 45, 5);
+            initC("loadJSON","Gray",leftE,18,35,5);
+            initC("inputfile","Gray",5,95,30,30);
+            initC("tester","White",65,34,55,44);
+            //initC("output","Red",0,80,85,5); -- output not needed
+
+
+            // style the load button manually
+            $("#loadJSON").css({"text-align" : "center" });
+            $("#loadJSON").css({"line-height" : "100%" });
+
+
+            var hashChar = '#';
+            //var matchResult = true;
+
+            //matchResult = matchHash("1011","####",hashChar);
+           // alert(matchResult.toString());
+
+
+
+
+
+
+
+
+
+            //************************************************
+
+           // format of init strings for cond and msg strings.
+            //same number of chars as cond and msg.
+            //a cond or msg string is a sequence out of 0,1,#
+            // for example if the length is 8 then 1100#1#1
+            // 1 or 0 or # are literal. ie 1 or 0 or #
+            //
+            // in a message string 5 means 50% randomisation of 1 and 0
+            // in a cond string 5 means 50% randomisation of # ; 1 25% 0 25%
+            // similarly for all numbers 2 or above
+            // eg 2 in msg means 20% chance of 1 and 80% of 0
+            // 2 in cond string means 20% chance of # and 40% 1 40% 0
+
+            // the init cond for a detector is ""
+            //the init msg for an effector is ""
+
+
+
+            //alert( getCond("10#12222"));
+            //initialise data array
+
+            for(var i = 0;i <nRows;i++) {
+                data2[i] = [];
+                /*data2[i][IX] = i;
+                data2[i][TYPE] = "TEST";
+                data2[i][COND1] = "1###0111";
+                data2[i][MESSAGE] = "10101010";
+                data2[i][SP] = 0.1;
+                data2[i][FITNESS] = 100.00;
+                data2[i][STATE] = "STATE0";
+                data2[i][BID0] =10.0;
+                data2[i][BID_1] = 9.999;
+                data2[i][BID_2] = 9.998;
+                data2[i][BID_3] = 9.997;
+                */
+            }
+
+            var TESTER = document.getElementById('tester');
+            Plotly.newPlot( TESTER, [{
+                x: [1, 2, 3, 4, 5],
+                y: [1, 2, 4, 8, 16] }], {
+                margin: { t: 0 } } );
+
+        /*
+         // initialise with headers for possible CSV save.
+            var colNamesOnly = ["IX","TYPE","COND1","MESSAGE","SP","FITNESS","STATE","BID0","BID_1","BID_2","BID_3"];
+          data2WithHeader[0] =[];
+            for (var j = 0; j < colNamesOnly.length; j++)  data2WithHeader[0][j] = colNamesOnly[j];
+            for(var i = 1;i <=nRows;i++) {
+                data2WithHeader[i] = [];
+                data2WithHeader[i][IX] = data2[i-1][IX];
+                data2WithHeader[i][TYPE] = data2[i-1][TYPE];
+                data2WithHeader[i][COND1] = data2[i-1][COND1];
+                data2WithHeader[i][MESSAGE] = data2[i-1][MESSAGE];
+                 data2WithHeader[i][SP] = data2[i-1][SP];
+                data2WithHeader[i][FITNESS] = data2[i-1][FITNESS];
+                data2WithHeader[i][STATE] = data2[i-1][STATE];
+                data2WithHeader[i][BID0] = data2[i-1][BID0];
+                data2WithHeader[i][BID_1] = data2[i-1][BID_1];
+                data2WithHeader[i][BID_2] = data2[i-1][BID_2];
+                data2WithHeader[i][BID_3] = data2[i-1][BID_3];
+            }
+        */
+
+
+            var obj = {};
+            obj.width = "60%";
+            obj.height = "98%";
+            obj.resizable = true;
+            obj.title = "test";
+            obj.toolbar = toolbar;
+            obj.editModel = {clicksToEdit:2};
+
+             // obj.showHeader = true;
+
+             obj.colModel = [{title:"IX", width:100, dataType:"integer"},
+                {title:"TYPE", width:30, dataType:"string"},
+                {title:"COND1", width:80, dataType:"string"},
+                {title:"MESSAGE", width:80, dataType:"string"},
+                {title:"SP", width:50, dataType:"float"},
+                {title:"FITNESS", width:80, dataType:"float"},
+                {title:"STATE", width:80, dataType:"string"},
+                {title:"BID0", width:80, dataType:"float"},
+                {title:"ACCEPTED", width:80, dataType:"float"},
+                {title:"MATCHES", width:70, dataType:"float"},
+                {title:"ON", width:50, dataType:"float"},
+                 {title:"NPOSTED", width:80, dataType:"float"},
+            ];
+
+             obj.dataModel = {data:data2};
+
+            $("#grid_array").pqGrid( obj );
+            $( "#grid_array" ).pqGrid( { numberCell: {show: false} } );
+
+            initRules(data2,0,4,"D","","11005555",1.0,1.0,0.0);
+
+            initRules(data2,5,5,"E","1100111","",1.0,1.0,0.0);
+           // initRules(data2,6,6,"E","11000001","",1.0,1.0,0.0);
+
+            initRules(data2,6,50,"I","11###555","11005555",1.0,1.0,0.0);
+
+            turnOffDuplicates();
+
+
+            $( "#grid_array" ).pqGrid( "refreshDataAndView" );
+
+
+            //********json save button filename based on time stamp*********
+            var button1 = document.getElementById('export-file');
+            button1.addEventListener('click', function() {
+                var d = new Date();
+               var n =d.getTime();
+                var tempFileName = 'EXPT1' + (Math.round(n/1000)).toString() +'.txt';
+               // exportToCsv(tempFileName, obj); //by passes data2 later whilst developing.
+                $( "#grid_array" ).pqGrid( "refreshDataAndView" );
+                var grid3 = $( "#grid_array" ).pqGrid( "getInstance" ).grid;
+                var myObj = grid3.options;
+                //basics of function below found on stack overflow - contrib josef harush
+                // https://stackoverflow.com/questions/14964035/how-to-export-javascript-array-info-to-csv-on-client-side
+                //https://jsfiddle.net/jossef/m3rrLzk0/
+                saveJSON(tempFileName,myObj);
+                //saveJSON(tempFileName,grid3);
+                //document.getElementById('download_link').click();
+                // alert("not downloading");
+            });
+
+       /*     function exportToCsv(filename, rows) {
+                var processRow = function (row) {
+                    var finalVal = '';
+                    for (var j = 0; j < row.length; j++) {
+                        var innerValue = row[j] === null ? '' : row[j].toString();
+                        if (row[j] instanceof Date) {
+                            innerValue = row[j].toLocaleString();
+                        };
+                        var result = innerValue.replace(/"/g, '""');
+                        if (result.search(/("|,|\n)/g) >= 0)
+                            result = '"' + result + '"';
+                        if (j > 0)
+                            finalVal += ',';
+                        finalVal += result;
+                    }
+                    return finalVal + '\n';
+                };
+
+                var csvFile = '';
+                for (var i = 0; i < rows.length; i++) {
+                    csvFile += processRow(rows[i]);
+                }
+                // **** FOR USE TODUMP CSV use line below commment out JSON stiff
+                //var blob = new Blob([csvFile], { type: 'text/csv;charset=utf-8;' });
+
+                //try out json on obj structure.
+
+                var jsonString = JSON.stringify(obj);
+                //var jsonString = JSON.stringify(rows);
+
+
+                var blob = new Blob([jsonString], {type:'text/plain'});
+
+
+                if (navigator.msSaveBlob) { // IE 10+
+                    navigator.msSaveBlob(blob, filename);
+                } else {
+                    var link = document.createElement("a");
+                    if (link.download !== undefined) { // feature detection
+                        // Browsers that support HTML5 download attribute
+                        var url = URL.createObjectURL(blob);
+                        link.setAttribute("href", url);
+                        link.setAttribute("download", filename);
+                        link.style.visibility = 'hidden';
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                    }
+                }
+            }//end export csv functionrounded bids
+
+        */
+            function saveJSON(filename,obj2) {
+
+                var jsonString = JSON.stringify(obj2);
+                var blob = new Blob([jsonString], {type: 'text/plain'});
+                if (navigator.msSaveBlob) { // IE 10+
+                    navigator.msSaveBlob(blob, filename);
+                } else {
+                    var link = document.createElement("a");
+                    if (link.download !== undefined) { // feature detection
+                        // Browsers that support HTML5 download attribute
+                        var url = URL.createObjectURL(blob);
+                        link.setAttribute("href", url);
+                        link.setAttribute("download", filename);
+                        link.style.visibility = 'hidden';
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                    }
+                }
+            }
+            //******end of saving stuff********
+
+
+
+
+
+            document.getElementById('inputfile')
+                    .addEventListener('change', function() {
+                        var fr=new FileReader();
+                        fr.readAsText(this.files[0]);
+                        fr.onload=function(){
+                           //document.getElementById('output').textContent= fr.result;
+                            //var x = document.getElementById('output').textContent;
+                            var x = fr.result;
+                            updateDataArray(x);
+                        }
+                        //fr.readAsText(this.files[0]);
+                        //var inputString1 = document.getElementById('output').textContent;
+                        // alert(inputString);
+                        //var inputString = fr.result;
+                        //fr.readAsText(this.files[0]);
+                        //alert(inputString1);
+                    })
+
+                function updateDataArray(aString){
+                    //data2 = JSON.parse(aString);
+                    var obj =  JSON.parse(aString);
+                    // $( "#grid_array" ).pqGrid( "option","dataModel.data",data2 );
+                    $("#grid_array").pqGrid("destroy");
+
+                    $("#grid_array").pqGrid( obj );
+
+                    $( "#grid_array" ).pqGrid( "refreshDataAndView" );
+                }
+
+
+
+
+
+
+
+        });//end of on load function.
+    </script>
+
+
+</head>
+
+<div id="mainPanel1" ></div>
+<div id="tester"></div>
+<div id="grid_array"></div>
+<button id="button1" type="button" onclick="updateSheet()">Update Test</button>
+<button id="export-file" >Save JSON</button>
+<button id="step" type="button" onclick="step()">Step</button>
+<button id="loop" type="button" onclick="loop()">Loop</button>
+<div id="loadJSON">Open JSON
+    <input type="file" name="inputfile" id="inputfile">
+</div>>
+<!-- during devel of file input / may need putting back if prog shows bugs in testing
+<pre id="output"></pre>
+-->
+</body>
+</html>

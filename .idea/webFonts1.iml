@@ -11,5 +11,11 @@
     <orderEntry type="library" name="0730_Aspirin_sf2_file" level="application" />
     <orderEntry type="library" name="0740_Aspirin_sf2_file" level="application" />
     <orderEntry type="library" name="0760_Aspirin_sf2_file" level="application" />
+    <orderEntry type="library" name="0000_JCLive_sf2_file" level="application" />
+    <orderEntry type="library" name="12836_0_Chaos_sf2_file" level="application" />
+    <orderEntry type="library" name="12835_0_Chaos_sf2_file" level="application" />
+    <orderEntry type="library" name="12838_0_Chaos_sf2_file" level="application" />
+    <orderEntry type="library" name="12842_0_Chaos_sf2_file" level="application" />
+    <orderEntry type="library" name="jsoneditor" level="application" />
   </component>
 </module>

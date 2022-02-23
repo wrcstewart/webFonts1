@@ -23,6 +23,10 @@ const instrumentsMap = new Map();
       instrumentsNumMap.set("Hi-hat 1", percussionMidiNum);
     }
 
+
+
+
+
      function mapPitchForPercusssion(pitch, instrumentNum, instrument) {
 
       if (instrumentNum !== percussionMidiNum) {

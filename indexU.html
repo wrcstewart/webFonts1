@@ -4,8 +4,8 @@
 
 <head>
   <meta charset="UTF-8">
-  <script src= 'WebAudioFontPlayer.js'  ></script>
-  <script src= 'bundle2.js'  ></script>
+  <script src='WebAudioFontPlayer.js'></script>
+  <script src='bundle2.js'></script>
 
 
   <script src='https://surikov.github.io/webaudiofontdata/sound/0000_JCLive_sf2_file.js'></script>
@@ -22,54 +22,41 @@
   <script>
 
 
+    // in future download the above and place in a local directory for devel purposes.
+    // also look to including a home made soundfont - specify substitute for file export.
+    // how export an mp3 file?
+
+    //var testTrack = new MidiWriter.Track();
+
+    //testTrack.addEvent(new MidiWriter.ProgramChangeEvent({instrument: 122}));
+    var isCreatingFile = true;
+    var note2 = new MidiWriter.NoteEvent({pitch: ['C3', 'D4', 'E4'], duration: 'T1280'});
+    var note3 = new MidiWriter.NoteEvent({pitch: ['C2', 'D5', 'E5'], duration: 'T1280'});
+    //testTrack.addEvent(note2);-
 
 
+    var tracks = [];
+    var ticksPerSec = 256;
 
+    var mwStr;//string for saving midi file.
 
+    var dummy = 256;
 
-   //var testTrack = new MidiWriter.Track();
+    function addNote(track, time, pitch, duration, vel, channel) {
 
-   //testTrack.addEvent(new MidiWriter.ProgramChangeEvent({instrument: 122}));
-var isCreatingFile = true;// ppp
-   var note2 = new MidiWriter.NoteEvent({pitch: ['C3', 'D4', 'E4'], duration: 'T1280'});
-   var note3 = new MidiWriter.NoteEvent({pitch: ['C2', 'D5', 'E5'], duration: 'T1280'});
-//testTrack.addEvent(note2);-
+      var durationString = "T" + Math.round(duration * ticksPerSec)
 
-
-
-var tracks = [];
-var ticksPerSec =256;
-//tracks[0] = new MidiWriter.Track();
-//tracks[0].addEvent(new MidiWriter.ProgramChangeEvent({instrument: 76}));
-//tracks[0].addEvent(note2);
-
-//tracks[1] = new MidiWriter.Track();
-//tracks[1].addEvent(new MidiWriter.ProgramChangeEvent({instrument: 122}));
-//tracks[1].addEvent(note3);
-   /*
-tracks[0] =  addNote(tracks[0],1,[69,71,72], 4,70);
-tracks[0] =  addNote(tracks[0],3,71, 4,60);
-tracks[0] =  addNote(tracks[0],5,72, 4,50);
-tracks[0] =  addNote(tracks[0],7,76, 4,40);
-tracks[0] =  addNote(tracks[0],9,78, 4,30);
-var write = new MidiWriter.Writer(tracks);
-//var mwStr = write.dataUri();
-var mwStr = write.dataUri();
-*/
-var mwStr;//string for saving midi file.
-
-var dummy = 256;
-
-function addNote(track,time,pitch, duration,vel,channel){
-
-  var durationString = "T"+ Math.round(duration * ticksPerSec)
-
-var note = new MidiWriter.NoteEvent(
-{pitch: pitch, duration:durationString,startTick:Math.round(time * ticksPerSec),velocity:vel,channel:channel});
- track.addEvent(note);
-return(track)
-}
-
+      var note = new MidiWriter.NoteEvent(
+        {
+          pitch: pitch,
+          duration: durationString,
+          startTick: Math.round(time * ticksPerSec),
+          velocity: vel,
+          channel: channel
+        });
+      track.addEvent(note);
+      return (track)
+    }
 
 
     var delim = '|';
@@ -84,10 +71,10 @@ return(track)
     var curEditTrackIx = 0;
     var curEditTrack;
 
-   var timeOutsArray = []; //used to track time to display note being played.
+    var timeOutsArray = []; //used to track time to display note being played.
     var percussionMidiNum = -1; //arbitary number to signal a percussion instrument
     var percussionChannel = 10;
-    var defaultChannel =1;
+    var defaultChannel = 1;
 
 
     //var testTrack = new MidiWriter.Track();
@@ -110,27 +97,29 @@ return(track)
       instrumentsNumMap.set("Blown bottle Pipe 1", 77)
       instrumentsNumMap.set("Flute Pipe 1", 74)
       instrumentsNumMap.set("Acoustic Grand Piano", 1)
-      instrumentsNumMap.set("Acoustic Bass Drum",percussionMidiNum);
+      instrumentsNumMap.set("Acoustic Bass Drum", percussionMidiNum);
       instrumentsNumMap.set("Bass Drum 2", percussionMidiNum);
       instrumentsNumMap.set("Acoustic Snare", percussionMidiNum);
       instrumentsNumMap.set("Closed Hi Hat", percussionMidiNum);
       instrumentsNumMap.set("Hi-hat 1", percussionMidiNum);
 
-     // instrumentsNumMap.set("Snare Drum 1", _drum_38_0_Chaos_sf2_file);
+      // instrumentsNumMap.set("Snare Drum 1", _drum_38_0_Chaos_sf2_file);
       //instrumentsNumMap.set("Hi-hat 1", _drum_42_0_Chaos_sf2_file);
     }
 
-    function  mapPitchForPercusssion(pitch,instrumentNum, instrument){
+    function mapPitchForPercusssion(pitch, instrumentNum, instrument) {
 
-      if (instrumentNum !== percussionMidiNum) {return (pitch)} else{
-        if(instrument == "Acoustic Bass Drum") return(35);
-        if(instrument == "Bass Drum 2") return(35);
+      if (instrumentNum !== percussionMidiNum) {
+        return (pitch)
+      } else {
+        if (instrument == "Acoustic Bass Drum") return (35);
+        if (instrument == "Bass Drum 2") return (35);
 
-        if(instrument == "Acoustic Snare") return(38);
-        if(instrument == "Closed Hi Hat") return(42);
-        if(instrument == "Hi-hat 1") return(42);
+        if (instrument == "Acoustic Snare") return (38);
+        if (instrument == "Closed Hi Hat") return (42);
+        if (instrument == "Hi-hat 1") return (42);
 
-        return(45); //Low Tom
+        return (45); //Low Tom
       }
     }
 
@@ -147,9 +136,6 @@ return(track)
       beatsMap.set('S', 0.25);
       beatsMap.set('SR', 0.25);
     }
-
-
-
 
 
     var noteNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];//used to construct notes[] below
@@ -317,12 +303,10 @@ return(track)
     }
 
 
-
-    function getChannel(instrumentMidiNum){
-      if ( instrumentMidiNum == percussionMidiNum) return (percussionChannel);
+    function getChannel(instrumentMidiNum) {
+      if (instrumentMidiNum == percussionMidiNum) return (percussionChannel);
       return (defaultChannel)
     }
-
 
 
     function playMLine(mL, origin) {
@@ -330,7 +314,7 @@ return(track)
       let track = mL.track;
       tracks[track] = new MidiWriter.Track();
       var instrumentMidiNum = instrumentsNumMap.get(mL.instrument);
-tracks[track].addEvent(new MidiWriter.ProgramChangeEvent({instrument:instrumentMidiNum}));
+      tracks[track].addEvent(new MidiWriter.ProgramChangeEvent({instrument: instrumentMidiNum}));
       var channel = getChannel(instrumentMidiNum);
       let gainTrack = gainNodeArray[track];
       let but = document.getElementById("loadMusicLine");
@@ -440,8 +424,8 @@ tracks[track].addEvent(new MidiWriter.ProgramChangeEvent({instrument:instrumentM
                 JSON.stringify(cloneP), mL.instrument + " " + sequencing, mL.track));
               player.queueWaveTable(
                 audioContext, gainTrack, instrumentVar, t, p, d * tMult, v);
-              let writePitch =  mapPitchForPercusssion(p,instrumentMidiNum, mL.instrument);
-              addNote(tracks[track],t - origin,writePitch, d * tMult,v * 100,channel);
+              let writePitch = mapPitchForPercusssion(p, instrumentMidiNum, mL.instrument);
+              addNote(tracks[track], t - origin, writePitch, d * tMult, v * 100, channel);
 
 
             }
@@ -491,8 +475,8 @@ tracks[track].addEvent(new MidiWriter.ProgramChangeEvent({instrument:instrumentM
 
             player.queueWaveTable(
               audioContext, gainTrack, instrumentVar, t, pitchEntryNew[j], d * tMult, vInner);
-            let writePitch =  mapPitchForPercusssion(pitchEntryNew[j],instrumentMidiNum, mL.instrument);
-             addNote(tracks[track],t - origin,writePitch, d * tMult,vInner * 100,channel);
+            let writePitch = mapPitchForPercusssion(pitchEntryNew[j], instrumentMidiNum, mL.instrument);
+            addNote(tracks[track], t - origin, writePitch, d * tMult, vInner * 100, channel);
           }
         }
 
@@ -506,9 +490,9 @@ tracks[track].addEvent(new MidiWriter.ProgramChangeEvent({instrument:instrumentM
 
             if (but.getAttribute("data-playing") == "off") return;
             let t = origin + start + ((curBeat - start) + innerTime) * tMult;
-let chordNotes = extractNotesFromArrayOfMidiNumbers(pitchEntryNew);
+            let chordNotes = extractNotesFromArrayOfMidiNumbers(pitchEntryNew);
             timeOutsArray.push(setTimeout(showIt, (t - origin) * 1000,
-              notes[pitchesEntry[j] - 21] +"  " + JSON.stringify(chordNotes) +"  " +  JSON.stringify(cloneP)
+              notes[pitchesEntry[j] - 21] + "  " + JSON.stringify(chordNotes) + "  " + JSON.stringify(cloneP)
 
               , mL.instrument +
               " " + sequencing, mL.track));
@@ -517,9 +501,8 @@ let chordNotes = extractNotesFromArrayOfMidiNumbers(pitchEntryNew);
               audioContext,
               gainTrack, instrumentVar, t, pitchEntryNew[j],
               innerD, vInner);
-            let writePitch =  mapPitchForPercusssion(pitchEntryNew[j],instrumentMidiNum, mL.instrument);
-            addNote(tracks[track],t - origin,writePitch, innerD,vInner * 100,channel);
-
+            let writePitch = mapPitchForPercusssion(pitchEntryNew[j], instrumentMidiNum, mL.instrument);
+            addNote(tracks[track], t - origin, writePitch, innerD, vInner * 100, channel);
 
 
             innerTime += timeInnerIncr;
@@ -617,7 +600,7 @@ let chordNotes = extractNotesFromArrayOfMidiNumbers(pitchEntryNew);
     }
 
     function doFormatArray(mLineArrayParam, aTextAreaEl) {
-      aTextAreaEl.value ="";
+      aTextAreaEl.value = "";
       for (let j = 0; j < mLineArrayParam.length; j++) {
         doFormat(mLineArrayParam[j], aTextAreaEl);
         aTextAreaEl.value = aTextAreaEl.value + "\n";
@@ -641,7 +624,7 @@ let chordNotes = extractNotesFromArrayOfMidiNumbers(pitchEntryNew);
       let aKeyString = taNameEl.value;
       obj[aKeyString] = JSON.parse(taValueEl.value);
       mLineArray[curEditTrackIx] = obj; //reinsert into master array of mLine objects.
-      doFormatArray(mLineArray,document.getElementById("ta1"));
+      doFormatArray(mLineArray, document.getElementById("ta1"));
     }
 
 
@@ -735,7 +718,7 @@ let chordNotes = extractNotesFromArrayOfMidiNumbers(pitchEntryNew);
 
 
     function playSection(mLineArray, origin, dest) {
-      tracks.length =0;
+      tracks.length = 0;
       var currentTrack;
       let len = mLineArray.length;
       for (let i = 0; i < len; i++) {
@@ -775,21 +758,21 @@ let chordNotes = extractNotesFromArrayOfMidiNumbers(pitchEntryNew);
       var beatHighHat1 = ["C", "C", "C", "C"];
 
 
-     // var music10 = new MLine(0, "CHORD", 0, 20, "Flute Pipe 1", 60, beatFlute3, ["C4", 0, 0, ["A3", 0, 3, 7, 0], ["G4", 0, 7], ["G4", 5, 0], ["F4", 0, 4, 7, 0], ["F4", 0, 4, 7, 0], ["E4", 6, 0], ["E4", 0, 7]], 0.98);
+       var music10 = new MLine(0, "CHORD", 0, 20, "Flute Pipe 1", 60, beatFlute3, ["C4", 0, 0, ["A3", 0, 3, 7, 0], ["G4", 0, 7], ["G4", 5, 0], ["F4", 0, 4, 7, 0], ["F4", 0, 4, 7, 0], ["E4", 6, 0], ["E4", 0, 7]], 0.98);
 
-     // var music12 = new MLine(1, "ARPEGGIO", 0, 20, "Flute Pipe 1", 60, beatFlute3, ["C4", ["A5", 0, 3, 7, 0], ["A5", 0, 3, 7, 0],
-      //  ["G4", 0, 7], ["G4", 5, 0], ["F4", 0, 4, 7, 0], ["F4", 0, 4, 7, 0], ["E4", 6, 0], ["E4", 0, 7]], 0.98);
+       var music12 = new MLine(1, "ARPEGGIO", 0, 20, "Flute Pipe 1", 60, beatFlute3, ["C4", ["A5", 0, 3, 7, 0], ["A5", 0, 3, 7, 0],
+        ["G4", 0, 7], ["G4", 5, 0], ["F4", 0, 4, 7, 0], ["F4", 0, 4, 7, 0], ["E4", 6, 0], ["E4", 0, 7]], 0.98);
 
-     // var music7 = new MLine(3, "CHORD", 0, 120, "Bass Drum 2", 90, beatBassDrum1, [33], 0.9);
+      // var music7 = new MLine(3, "CHORD", 0, 120, "Bass Drum 2", 90, beatBassDrum1, [33], 0.9);
       // var music8 = new MLine("CHORD", 2, 10, "Snare Drum 1", 60, beatSnareDrum1, [40], 0.9);
       // var music9 = new MLine("CHORD", 0, 10, "Hi-hat 1", 60, beatHighHat1, [57,59], 0.9);
-      var music11 = new MLine(0, "CHORD", 0, 20, "Acoustic Bass Drum", 60, beatHighHat1, ["C4", 0, 7, 12, 15], 0.9);
+      var music11 = new MLine(2, "CHORD", 0, 20, "Acoustic Bass Drum", 60, beatHighHat1, ["C4", 0, 7, 12, 15], 0.9);
       // var mLineArray = [music4, music5, music7, music8,music9];
       // var mLineArray = [music4, music5];
 
 // ***** determine a section****
       //mLineArray = [music10, music12, music11];// music11,music12];
-      mLineArray = [music11];// music11,music12]
+      mLineArray = [music10,music12,music11];// music11,music12]
 
       //json stuff below
 
@@ -807,10 +790,9 @@ let chordNotes = extractNotesFromArrayOfMidiNumbers(pitchEntryNew);
 
     }// end gen music - nb does not play
 
-    function genProtoMLineArray(){
+    function genProtoMLineArray() {
       // generate a 7 line bar of 4/4 using different instruments including 'none' that can then be directly edited or cloned
       // for editing. The distinction being how it is saved ie as a root or a second bar/ generation.
-
 
 
     }
@@ -823,38 +805,39 @@ let chordNotes = extractNotesFromArrayOfMidiNumbers(pitchEntryNew);
       curEditTrack = 0;
     }
 
-    function saveJSON(filename,obj2) {
+    function saveJSON(filename, obj2) {
 
-                //var jsonString = JSON.stringify(obj2);
-               // var blob = new Blob([jsonString], {type: 'text/plain'});
-               //var blob = new Blob([obj2], {type: 'audio/midi'});
-                if (navigator.msSaveBlob) { // IE 10+
-                    navigator.msSaveBlob(blob, filename);
-                } else {
-                    var link = document.createElement("a");
-                    if (link.download !== undefined) { // feature detection
-                        // Browsers that support HTML5 download attribute
-                        //var url = URL.createObjectURL(blob);
-                        //var url = URL.createObjectURL(mwStr);
-                      var url = mwStr;
-                        link.setAttribute("href", url);
-                        link.setAttribute("download", filename);
-                        link.style.visibility = 'hidden';
-                        document.body.appendChild(link);
-                        link.click();
-                        document.body.removeChild(link);
-                    }
-                }
-            }
-            //******end of saving stuff********
- function saveFile(){
-      let y =0;
+      //var jsonString = JSON.stringify(obj2);
+      // var blob = new Blob([jsonString], {type: 'text/plain'});
+      //var blob = new Blob([obj2], {type: 'audio/midi'});
+      if (navigator.msSaveBlob) { // IE 10+
+        navigator.msSaveBlob(blob, filename);
+      } else {
+        var link = document.createElement("a");
+        if (link.download !== undefined) { // feature detection
+          // Browsers that support HTML5 download attribute
+          //var url = URL.createObjectURL(blob);
+          //var url = URL.createObjectURL(mwStr);
+          var url = mwStr;
+          link.setAttribute("href", url);
+          link.setAttribute("download", filename);
+          link.style.visibility = 'hidden';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        }
+      }
+    }
+
+    //******end of saving stuff********
+    function saveFile() {
+      let y = 0;
 
       var write = new MidiWriter.Writer(tracks);
 
       mwStr = write.dataUri();
-      saveJSON("testMidiP9.mid",mwStr)
- }
+      saveJSON("testMidiP9.mid", mwStr)
+    }
 
   </script>
 </head>

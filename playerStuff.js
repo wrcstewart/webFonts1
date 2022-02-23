@@ -1,7 +1,4 @@
- var audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    var player = new WebAudioFontPlayer();
-    var gainNodeArray = []
-    var maxTracks = 10;
+
 
 // constructor ie generator for a single track
     function MLine(track, sequencing, start, finish, instrument, bpm, rhythmBeats, pitchBeats, noteDuration) {

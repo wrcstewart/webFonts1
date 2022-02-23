@@ -5,7 +5,8 @@
 <head>
   <meta charset="UTF-8">
   <script src='WebAudioFontPlayer.js'></script>
-  <script src='bundle2.js'></script>
+  <script src='bundle2.js'></script><!-- midi-writer-js lib / i used browerify
+   on the npm version but I believe there is now a browser version on github -->
 
 
   <script src='https://surikov.github.io/webaudiofontdata/sound/0000_JCLive_sf2_file.js'></script>
@@ -18,10 +19,12 @@
   <script src='https://surikov.github.io/webaudiofontdata/sound/12842_0_Chaos_sf2_file.js'></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jsoneditor/9.5.11/jsoneditor.min.js"></script>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/jsoneditor/9.5.11/jsoneditor.css" rel="stylesheet" type="text/css">
+  <script src='./earlyDeclarations.js'></script>
   <script src='./midiInstrumentStuff.js'></script>
   <script src='./playerStuff.js'></script>
   <script src='./jsonediting.js'></script>
   <script src='./generationUtils.js'></script>
+  <script src='./loadJSONandStartPlay.js'></script>
 
 
 
@@ -31,6 +34,12 @@
     // in future download the above sound fonts etc and place in a local directory for devel purposes.
     // also look to including a home made soundfont - specify substitute for file export.
     // how export an mp3 file?
+
+/*var audioContext = new (window.AudioContext || window.webkitAudioContext)();*/
+ /*   var player = new WebAudioFontPlayer();
+    var maxTracks = 10;
+    var gainNodeArray = []
+*/
 
 
     var isCreatingFile = true;//when true writing midi file
@@ -83,7 +92,7 @@
       return (defaultChannel)
     }
 
-    var origin;// this is used by soundfont player to find current time zero in the audio context
+
     let midiBaseNote;
     let midiNote;
     let oldNoteScale;
@@ -93,8 +102,8 @@
     var midiNoteArray = [];
     var oldNoteScaleArray = [];// used in the pitch generation algorithms
     var midiPitchArr = [];
-
-
+/*
+     var origin;// this is used by soundfont player to find current time zero in the audio context
 
     {
       //player.loader.decodeAfterLoading(audioContext,'_tone_0000_JCLive_sf2_file' );
@@ -128,14 +137,7 @@ function loadJSON() {
 
 
       var inString = document.getElementById("ta1").value;
-      //var inStringLine = document.getElementById("edit").value;
-      // let aMLine = JSON.parse(inStringLine);
-      //let ix = ixOfTrack(mLineArray,aMLine.track);
-      // mLineArray[ix] = aMLine;
-      // var inStringExtras = document.getElementById("ta2").value;
-      // var mLineArray = JSON.parse(inString);
-      // var extras = JSON.parse(inStringExtras);
-      // mLineArray[0] = {...mLineArray[0], ...extras};
+
 
       origin = audioContext.currentTime;
 
@@ -145,6 +147,8 @@ function loadJSON() {
       playSection(mLineArray, origin);
 
     }//main PLAY it function !!!!!!!
+
+ */
 
 
 

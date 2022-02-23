@@ -22,6 +22,19 @@ const instrumentsMap = new Map();
       instrumentsNumMap.set("Closed Hi Hat", percussionMidiNum);
       instrumentsNumMap.set("Hi-hat 1", percussionMidiNum);
     }
+    /*
+
+    //player.loader.decodeAfterLoading(audioContext,'_tone_0000_JCLive_sf2_file' );
+      player.loader.decodeAfterLoading(audioContext, '_tone_0730_Aspirin_sf2_file');
+      player.loader.decodeAfterLoading(audioContext, '_drum_47_0_Chaos_sf2_file');
+      player.loader.decodeAfterLoading(audioContext, '_tone_0760_Aspirin_sf2_file');
+      player.loader.decodeAfterLoading(audioContext, '_tone_0000_JCLive_sf2_file');
+      player.loader.decodeAfterLoading(audioContext, '_drum_35_0_Chaos_sf2_file');
+      player.loader.decodeAfterLoading(audioContext, '_drum_38_0_Chaos_sf2_file');
+      player.loader.decodeAfterLoading(audioContext, '_drum_42_0_Chaos_sf2_file');
+    }//loading player DON'T FORGET TO DO THIS !
+
+     */
 
 
 

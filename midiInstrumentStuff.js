@@ -23,6 +23,8 @@ const instrumentsMap = new Map();
       instrumentsNumMap.set("Hi-hat 1", percussionMidiNum);
     }
     /*
+    CHECK THE UNCOMMENTED SECTION BELOW IN loadJSONandStartPlay.js
+    is consistent with the Maps above. I don't know why I can't put the following statements here.
 
     //player.loader.decodeAfterLoading(audioContext,'_tone_0000_JCLive_sf2_file' );
       player.loader.decodeAfterLoading(audioContext, '_tone_0730_Aspirin_sf2_file');
@@ -32,9 +34,26 @@ const instrumentsMap = new Map();
       player.loader.decodeAfterLoading(audioContext, '_drum_35_0_Chaos_sf2_file');
       player.loader.decodeAfterLoading(audioContext, '_drum_38_0_Chaos_sf2_file');
       player.loader.decodeAfterLoading(audioContext, '_drum_42_0_Chaos_sf2_file');
-    }//loading player DON'T FORGET TO DO THIS !
+    }
 
      */
+
+ {
+  // the assignment to a variable below seems to allow the block to be placed here - otherwise
+   // I had to have the statements later on in the scripts. I prefer here so the
+   //instrument stuff is together.
+
+   // this one not in use at moment.
+      //player.loader.decodeAfterLoading(audioContext,'_tone_0000_JCLive_sf2_file' );
+
+      var decodeAfterLoading = player.loader.decodeAfterLoading(audioContext, '_tone_0730_Aspirin_sf2_file');
+   decodeAfterLoading =   player.loader.decodeAfterLoading(audioContext, '_drum_47_0_Chaos_sf2_file');
+     decodeAfterLoading = player.loader.decodeAfterLoading(audioContext, '_tone_0760_Aspirin_sf2_file');
+      decodeAfterLoading =player.loader.decodeAfterLoading(audioContext, '_tone_0000_JCLive_sf2_file');
+      decodeAfterLoading =player.loader.decodeAfterLoading(audioContext, '_drum_35_0_Chaos_sf2_file');
+      decodeAfterLoading =player.loader.decodeAfterLoading(audioContext, '_drum_38_0_Chaos_sf2_file');
+      decodeAfterLoading = player.loader.decodeAfterLoading(audioContext, '_drum_42_0_Chaos_sf2_file');
+    }//loading player DON'T FORGET TO DO THIS !
 
 
 

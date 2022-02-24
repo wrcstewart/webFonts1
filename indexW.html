@@ -18,8 +18,12 @@
   <script src='https://surikov.github.io/webaudiofontdata/sound/12838_0_Chaos_sf2_file.js'></script>
   <script src='https://surikov.github.io/webaudiofontdata/sound/12842_0_Chaos_sf2_file.js'></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jsoneditor/9.5.11/jsoneditor.min.js"></script>
+
   <link href="https://cdnjs.cloudflare.com/ajax/libs/jsoneditor/9.5.11/jsoneditor.css" rel="stylesheet" type="text/css">
+
+  <!-- the following files should be used together - they exist separately to split an overlong program-->
   <script src='./earlyDeclarations.js'></script>
+  <script src='./midiFileSave.js'></script>
   <script src='./midiInstrumentStuff.js'></script>
   <script src='./playerStuff.js'></script>
   <script src='./jsonediting.js'></script>
@@ -35,33 +39,13 @@
     // also look to including a home made soundfont - specify substitute for file export.
     // how export an mp3 file?
 
-/*var audioContext = new (window.AudioContext || window.webkitAudioContext)();*/
- /*   var player = new WebAudioFontPlayer();
-    var maxTracks = 10;
-    var gainNodeArray = []
-*/
 
 
-    var isCreatingFile = true;//when true writing midi file
-    var tracks = [];//used for midi file writing
-    var ticksPerSec = 256;//used for midi file writing
-    var mwStr;//string for saving midi file data.
+
+
 
     var monitor = [];// this is used to print a display of the notes as they are played.
 
-    function addNote(track, time, pitch, duration, vel, channel) { // used for midi file writing
-      var durationString = "T" + Math.round(duration * ticksPerSec)
-      var note = new MidiWriter.NoteEvent(
-        {
-          pitch: pitch,
-          duration: durationString,
-          startTick: Math.round(time * ticksPerSec),
-          velocity: vel,
-          channel: channel
-        });
-      track.addEvent(note);
-      return (track)
-    }
 
 
     window.playState = false; //used to toggle play and reset of soundfonts i.e. the audio
@@ -83,14 +67,14 @@
 
     // used by midi file writer to arrange output on midi percussion channel or, normal channel
     // var percussionMidiNum = -1; //arbitrary number to signal a percussion instrument
-    var percussionChannel = 10; // this channel is how you play midi drums
-    var defaultChannel = 1;
+    //var percussionChannel = 10; // this channel is how you play midi drums
+   // var defaultChannel = 1;
 
-    function getChannel(instrumentMidiNum) {
+   // function getChannel(instrumentMidiNum) {
       // if instrumentMidiNum is the negative signal percussionMidiNum then select percussion channel
-      if (instrumentMidiNum == percussionMidiNum) return (percussionChannel);
-      return (defaultChannel)
-    }
+     // if (instrumentMidiNum == percussionMidiNum) return (percussionChannel);
+     // return (defaultChannel)
+   // }
 
 
     let midiBaseNote;
@@ -102,53 +86,7 @@
     var midiNoteArray = [];
     var oldNoteScaleArray = [];// used in the pitch generation algorithms
     var midiPitchArr = [];
-/*
-     var origin;// this is used by soundfont player to find current time zero in the audio context
 
-    {
-      //player.loader.decodeAfterLoading(audioContext,'_tone_0000_JCLive_sf2_file' );
-      player.loader.decodeAfterLoading(audioContext, '_tone_0730_Aspirin_sf2_file');
-      player.loader.decodeAfterLoading(audioContext, '_drum_47_0_Chaos_sf2_file');
-      player.loader.decodeAfterLoading(audioContext, '_tone_0760_Aspirin_sf2_file');
-      player.loader.decodeAfterLoading(audioContext, '_tone_0000_JCLive_sf2_file');
-      player.loader.decodeAfterLoading(audioContext, '_drum_35_0_Chaos_sf2_file');
-      player.loader.decodeAfterLoading(audioContext, '_drum_38_0_Chaos_sf2_file');
-      player.loader.decodeAfterLoading(audioContext, '_drum_42_0_Chaos_sf2_file');
-    }//loading player DON'T FORGET TO DO THIS !
-
-function loadJSON() {
-      let but = document.getElementById("loadMusicLine");
-
-      let playState = but.getAttribute("data-playing");
-
-      if (playState == "off") {
-        but.setAttribute("data-playing", "on");
-        but.innerHTML = "Reset";
-      } else {
-        but.setAttribute("data-playing", "off");
-        but.innerHTML = "Play";
-        player.cancelQueue(audioContext);
-        timeOutsArray.forEach((item) => {
-          clearTimeout(item)
-        });
-        timeOutsArray.length = 0;
-        return;
-      }
-
-
-      var inString = document.getElementById("ta1").value;
-
-
-      origin = audioContext.currentTime;
-
-      //playMLine(loadedML,origin);
-      mediaRecorder.start();
-      setTimeout(stoppingRecorder,(mLineArray[0].finish)*1000);
-      playSection(mLineArray, origin);
-
-    }//main PLAY it function !!!!!!!
-
- */
 
 
 

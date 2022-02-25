@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="en">
+
+
+<head>
+  <meta charset="UTF-8">
+  <script src='WebAudioFontPlayer.js'></script>
+  <script src='bundle2.js'></script><!-- midi-writer-js lib / i used browerify
+   on the npm version but I believe there is now a browser version on github -->
+
+
+  <script src='https://surikov.github.io/webaudiofontdata/sound/0000_JCLive_sf2_file.js'></script>
+  <script src='https://surikov.github.io/webaudiofontdata/sound/0730_Aspirin_sf2_file.js'></script>
+  <script src='https://surikov.github.io/webaudiofontdata/sound/12847_0_Chaos_sf2_file.js'></script>
+  <script src='https://surikov.github.io/webaudiofontdata/sound/0760_Aspirin_sf2_file.js'></script>
+  <script src='https://surikov.github.io/webaudiofontdata/sound/0000_JCLive_sf2_file.js'></script>
+  <script src='https://surikov.github.io/webaudiofontdata/sound/12835_0_Chaos_sf2_file.js'></script>
+  <script src='https://surikov.github.io/webaudiofontdata/sound/12838_0_Chaos_sf2_file.js'></script>
+  <script src='https://surikov.github.io/webaudiofontdata/sound/12842_0_Chaos_sf2_file.js'></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jsoneditor/9.5.11/jsoneditor.min.js"></script>
+
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/jsoneditor/9.5.11/jsoneditor.css" rel="stylesheet" type="text/css">
+
+  <!-- the following files should be used together - they exist separately to split an overlong program-->
+  <script src='./earlyDeclarations.js'></script>
+  <script src='./midiFileSave.js'></script>
+  <script src='./midiInstrumentStuff.js'></script>
+  <script src='./playerStuff.js'></script>
+  <script src='./jsonediting.js'></script>
+  <script src='./generationUtils.js'></script>
+  <script src='./loadJSONandStartPlay.js'></script>
+
+
+
+  <script>
+
+
+    // in future download the above sound fonts etc and place in a local directory for devel purposes.
+    // also look to including a home made soundfont - specify substitute for file export.
+    // how export an mp3 file?
+
+
+
+
+
+
+    var monitor = [];// this is used to print a display of the notes as they are played.
+
+
+
+    window.playState = false; //used to toggle play and reset of soundfonts i.e. the audio
+
+    var mLineArray;// IMPORTANT DATA STRUCTURE holds the current lines (tracks) of data to play/ edit /file
+
+    var delim = '|';//?
+
+    // following used in the editing system
+    var trackEl, taNameEl, taValueEl;
+    var curEditTrackIx = 0;
+    var curEditTrack;
+    var mediaRecorder;
+
+    var chunks = [];
+
+    // for real time info on notes being played
+    var timeOutsArray = []; //used to track time to display note being played.
+
+    // used by midi file writer to arrange output on midi percussion channel or, normal channel
+    // var percussionMidiNum = -1; //arbitrary number to signal a percussion instrument
+    //var percussionChannel = 10; // this channel is how you play midi drums
+   // var defaultChannel = 1;
+
+   // function getChannel(instrumentMidiNum) {
+      // if instrumentMidiNum is the negative signal percussionMidiNum then select percussion channel
+     // if (instrumentMidiNum == percussionMidiNum) return (percussionChannel);
+     // return (defaultChannel)
+   // }
+
+// below prob. no longer needed.
+    //let midiBaseNote;
+
+    //let midiNote;
+
+
+   // var count;
+   // var len;
+   // var midiNoteArray = [];
+   // var oldNoteScaleArray = [];// used in the pitch generation algorithms
+   // var midiPitchArr = [];
+
+
+
+
+
+
+
+    mediaRecorder.onstop = function (evt) {
+      // Make blob out of our blobs, and open it.
+      //let blob = new Blob(chunks, {'type': 'audio/ogg; codecs=opus'});
+      let blob = new Blob(chunks, {'type': 'audio/webm; codecs=opus'});
+      // let blob = new Blob(chunks, {'type': 'audio/mpeg; codecs=audio/mp3'});
+
+
+      //let audioTag = document.createElement('audio');
+
+      //document.querySelector("audio").src = URL.createObjectURL(blob);
+
+
+      //var link = document.createElement("a");
+
+      // Browsers that support HTML5 download attribute
+      var url = URL.createObjectURL(blob);
+
+      var link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", "audiotestAmpF");
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+
+    function stoppingRecorder() {
+      mediaRecorder.requestData()
+      mediaRecorder.stop();
+
+
+    }
+
+    function playSection(mLineArray, origin, dest) {
+      tracks.length = 0;
+      var currentTrack;
+      let len = mLineArray.length;
+      for (let i = 0; i < len; i++) {
+        currentTrack = i;//prob don't need this -will see ...
+        playMLine(mLineArray[i], origin);
+      }
+    }
+
+    function mixNoteTest() {
+      //fill in at a later date
+      let selectedPreset = _tone_0730_Aspirin_sf2_file;
+    }
+
+
+    function genMusic() {
+
+      if (window.playState) {
+        player.cancelQueue(audioContext);
+        //alert("queue cancelled");
+        window.playState = false;
+        return;
+      }
+
+      window.playState = true;
+      player.cancelQueue(audioContext);
+
+
+// ---------------------- start of devel section ------------------------------------------------
+
+      var beat1 = ['C', 'Q', 'Q', 'C', 'C', 'C', 'C', 'C', 'Q', 'Q', 'CR', 'C', 'C'];
+      var beatBassDrum1 = ["CF", "CR", "Q", 'Q', "CR", "QF", "Q", "CR", "Q", 'Q', "CR"]
+      var beatSnareDrum1 = ["CR", "S", "SR", "SR", "S", "CR", "C"]
+      var beatFlute1 = ["C", "CP", "Q", "QP", "QP", "QP"];
+      var beatFlute2 = ["C", "CP", "CP", "CP"];
+      var beatFlute3 = ["C"]
+      var beatHighHat1 = ["C", "C", "C", "C"];
+
+
+      var music10 = new MLine(0, "CHORD", 0, 10, "Flute Pipe 1", 60, beatFlute3, ["C4", 0, 0, ["A3", 0, 3, 7, 0], ["G4", 0, 7], ["G4", 5, 0], ["F4", 0, 4, 7, 0], ["F4", 0, 4, 7, 0], ["E4", 6, 0], ["E4", 0, 7]], 0.98);
+
+      var music12 = new MLine(1, "ARPEGGIO", 0, 10, "Flute Pipe 1", 60, beatFlute3, ["C4", ["A5", 0, 3, 7, 0], ["A5", 0, 3, 7, 0],
+        ["G4", 0, 7], ["G4", 5, 0], ["F4", 0, 4, 7, 0], ["F4", 0, 4, 7, 0], ["E4", 6, 0], ["E4", 0, 7]], 0.98);
+
+      // var music7 = new MLine(3, "CHORD", 0, 120, "Bass Drum 2", 90, beatBassDrum1, [33], 0.9);
+      // var music8 = new MLine("CHORD", 2, 10, "Snare Drum 1", 60, beatSnareDrum1, [40], 0.9);
+      // var music9 = new MLine("CHORD", 0, 10, "Hi-hat 1", 60, beatHighHat1, [57,59], 0.9);
+      var music11 = new MLine(2, "CHORD", 0, 10, "Acoustic Bass Drum", 60, beatHighHat1, ["C4", 0, 7, 12, 15], 0.9);
+      // var mLineArray = [music4, music5, music7, music8,music9];
+      // var mLineArray = [music4, music5];
+
+// ***** determine a section***
+
+      mLineArray = [music10, music12, music11];// music11,music12]
+
+      // ---------------------end of devel section --------------------------------------------------------------------------
+
+// now allow editing
+      doEdit(0, mLineArray);//initialise the edit boxes
+
+
+// --- show what is being suggested in read only mode.
+      function doFormatArray(mLineArrayParam, aTextAreaEl) {
+        aTextAreaEl.value = "";
+        for (let j = 0; j < mLineArrayParam.length; j++) {
+          doFormat(mLineArrayParam[j], aTextAreaEl);
+          aTextAreaEl.value = aTextAreaEl.value + "\n";
+        }
+      }
+
+      doFormatArray(mLineArray, document.getElementById("ta1"));// show the summary of section.
+
+      // ----
+
+    }// end gen music - nb does not play
+
+
+
+    function genProtoMLineArray() {
+      // generate a 7 line bar of 4/4 using different instruments including 'none' that can then be directly edited or cloned
+      // for editing. The distinction being how it is saved ie as a root or a second bar/ generation.
+
+
+    }
+
+    function onLoad() { //normal onLoad statement
+      trackEl = document.getElementById("track");
+      taNameEl = document.getElementById("taName");
+      taValueEl = document.getElementById("taValue");
+      curEditTrack = 0;
+    }
+
+    function saveJSON(filename, obj2) {
+
+      var jsonString = JSON.stringify(obj2);
+      var blob = new Blob([jsonString], {type: 'text/plain'});
+
+      if (navigator.msSaveBlob) { // IE 10+
+        navigator.msSaveBlob(blob, filename);
+      } else {
+        var link = document.createElement("a");
+        if (link.download !== undefined) { // feature detection
+          // Browsers that support HTML5 download attribute
+          var url = URL.createObjectURL(blob);
+
+          link.setAttribute("href", url);
+          link.setAttribute("download", filename);
+          link.style.visibility = 'hidden';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        }
+      }
+    }
+
+    //******end of saving stuff********
+    function saveMidiFile() {
+
+      let filename = "MettatreeMusic.mid";
+      var write = new MidiWriter.Writer(tracks);
+
+      mwStr = write.dataUri();
+      var link = document.createElement("a");
+      if (link.download !== undefined) { // feature detection
+        // Browsers that support HTML5 download attribute
+        //var url = URL.createObjectURL(blob);
+        //var url = URL.createObjectURL(mwStr);
+        var url = mwStr;
+        link.setAttribute("href", url);
+        link.setAttribute("download", filename);
+        link.style.visibility = 'hidden';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+
+      //saveJSON("testMidiP9.mid", mwStr)
+    }
+
+  </script>
+</head>
+
+<body onload="onLoad()" ()>
+
+
+<div id="butPanel" style="position:absolute;top:1px;left:1px;width:400px;height:60px;background-color: linen">
+  <button id="genMusic" onclick="genMusic()">Suggest</button>
+  <button id="loadMusicLine" data-playing="off" onclick="loadJSON()">Play</button>
+  <button id="save" onclick="saveMidiFile()">Save Midi File</button>
+  <button id="cloneUnit" onclick="cloneUnit()">Clone</button>
+  <button id="saveEdit" onclick="inputField(taNameEl,taValueEl)">Save Edit</button>
+</div>
+
+<textarea id="ta1" readonly wrap="soft"
+          style="position:absolute;left:420px;top:1px;width:400px;height:580px;">awaiting load</textarea>
+
+
+<textarea id="ta4" readonly
+          style="position:absolute;top:600px;left:1px;width: 1000px; height: 230px;">Playing Now</textarea>
+<textarea id="taPublic"
+          style="position:absolute;top:1px;left:840px; width: 400px; height: 580px;">Store: List of Bars</textarea>
+
+<div id="editControlsPanel"
+     style="position:absolute;top:50px;left:1px;width:400px;height:300px;background-color: #b3d4fc">
+
+  <input type="checkbox" name="foreground" id="foreground" style="position:absolute; left:250px; top:1px; width:30px;"
+         oninput="edit(trackEl,this.checked)">
+  <label style="position:absolute; left:180px; top:1px; width:30px;">foreground</label>
+
+  <input type="number" name="track" id="track" style="position:absolute; left:100px; top:1px; width:30px;"
+         oninput="edit(this,true)"
+         min="0" max="20" step="1" value="0">
+  <label style="position:absolute; left:1px; top:1px; width:70px;">edit track</label>
+
+  <input type="number" name="fieldNumber" id="fieldNumber"
+         style="position:absolute; left:100px; top:31px;height:20px; width:30px;"
+         oninput="outputField(mLineArray[curEditTrack], this.value, taNameEl, taValueEl)"
+         min="1" max="50" step="1" value="1">
+  <label style="position:absolute; left:1px; top:31px; width:70px;">edit field</label>
+  <textarea id="taName" readonly
+            style="position:absolute; left:1px; top:51px; width: 388px; height: 20px;">field name</textarea>
+  <textarea id="taValue"
+            style="position:absolute;left:1px; top:80px; width: 388px; height:100px;">field value</textarea>
+</div>
+
+
+</body>

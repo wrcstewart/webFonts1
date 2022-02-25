@@ -29,6 +29,7 @@
   <script src='./jsonediting.js'></script>
   <script src='./generationUtils.js'></script>
   <script src='./loadJSONandStartPlay.js'></script>
+  <script src='./audioFileSave.js'></script>
 
 
 
@@ -58,42 +59,15 @@
     var trackEl, taNameEl, taValueEl;
     var curEditTrackIx = 0;
     var curEditTrack;
-    var mediaRecorder;
+  //  var mediaRecorder;
 
-    var chunks = [];
+  //  var chunks = [];
 
     // for real time info on notes being played
     var timeOutsArray = []; //used to track time to display note being played.
 
-    // used by midi file writer to arrange output on midi percussion channel or, normal channel
-    // var percussionMidiNum = -1; //arbitrary number to signal a percussion instrument
-    //var percussionChannel = 10; // this channel is how you play midi drums
-   // var defaultChannel = 1;
 
-   // function getChannel(instrumentMidiNum) {
-      // if instrumentMidiNum is the negative signal percussionMidiNum then select percussion channel
-     // if (instrumentMidiNum == percussionMidiNum) return (percussionChannel);
-     // return (defaultChannel)
-   // }
-
-// below prob. no longer needed.
-    //let midiBaseNote;
-
-    //let midiNote;
-
-
-   // var count;
-   // var len;
-   // var midiNoteArray = [];
-   // var oldNoteScaleArray = [];// used in the pitch generation algorithms
-   // var midiPitchArr = [];
-
-
-
-
-
-
-
+/*
     mediaRecorder.onstop = function (evt) {
       // Make blob out of our blobs, and open it.
       //let blob = new Blob(chunks, {'type': 'audio/ogg; codecs=opus'});
@@ -121,12 +95,17 @@
     }
 
 
+
+
     function stoppingRecorder() {
       mediaRecorder.requestData()
       mediaRecorder.stop();
 
 
     }
+
+
+ */
 
     function playSection(mLineArray, origin, dest) {
       tracks.length = 0;

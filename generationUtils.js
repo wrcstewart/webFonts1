@@ -1,3 +1,10 @@
+let oldNoteScale;
+    let newNoteScale;
+
+
+
+
+
 function createNotePitchArray(tonicNoteName, len) {
       let midiBaseNumber = getMidiNumberFromName(tonicNoteName);
 

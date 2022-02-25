@@ -76,16 +76,17 @@
      // return (defaultChannel)
    // }
 
+// below prob. no longer needed.
+    //let midiBaseNote;
 
-    let midiBaseNote;
-    let midiNote;
-    let oldNoteScale;
-    let newNoteScale;
-    var count;
-    var len;
-    var midiNoteArray = [];
-    var oldNoteScaleArray = [];// used in the pitch generation algorithms
-    var midiPitchArr = [];
+    //let midiNote;
+
+
+   // var count;
+   // var len;
+   // var midiNoteArray = [];
+   // var oldNoteScaleArray = [];// used in the pitch generation algorithms
+   // var midiPitchArr = [];
 
 
 
@@ -167,15 +168,15 @@
       var beatHighHat1 = ["C", "C", "C", "C"];
 
 
-      var music10 = new MLine(0, "CHORD", 0, 20, "Flute Pipe 1", 60, beatFlute3, ["C4", 0, 0, ["A3", 0, 3, 7, 0], ["G4", 0, 7], ["G4", 5, 0], ["F4", 0, 4, 7, 0], ["F4", 0, 4, 7, 0], ["E4", 6, 0], ["E4", 0, 7]], 0.98);
+      var music10 = new MLine(0, "CHORD", 0, 10, "Flute Pipe 1", 60, beatFlute3, ["C4", 0, 0, ["A3", 0, 3, 7, 0], ["G4", 0, 7], ["G4", 5, 0], ["F4", 0, 4, 7, 0], ["F4", 0, 4, 7, 0], ["E4", 6, 0], ["E4", 0, 7]], 0.98);
 
-      var music12 = new MLine(1, "ARPEGGIO", 0, 20, "Flute Pipe 1", 60, beatFlute3, ["C4", ["A5", 0, 3, 7, 0], ["A5", 0, 3, 7, 0],
+      var music12 = new MLine(1, "ARPEGGIO", 0, 10, "Flute Pipe 1", 60, beatFlute3, ["C4", ["A5", 0, 3, 7, 0], ["A5", 0, 3, 7, 0],
         ["G4", 0, 7], ["G4", 5, 0], ["F4", 0, 4, 7, 0], ["F4", 0, 4, 7, 0], ["E4", 6, 0], ["E4", 0, 7]], 0.98);
 
       // var music7 = new MLine(3, "CHORD", 0, 120, "Bass Drum 2", 90, beatBassDrum1, [33], 0.9);
       // var music8 = new MLine("CHORD", 2, 10, "Snare Drum 1", 60, beatSnareDrum1, [40], 0.9);
       // var music9 = new MLine("CHORD", 0, 10, "Hi-hat 1", 60, beatHighHat1, [57,59], 0.9);
-      var music11 = new MLine(2, "CHORD", 0, 20, "Acoustic Bass Drum", 60, beatHighHat1, ["C4", 0, 7, 12, 15], 0.9);
+      var music11 = new MLine(2, "CHORD", 0, 10, "Acoustic Bass Drum", 60, beatHighHat1, ["C4", 0, 7, 12, 15], 0.9);
       // var mLineArray = [music4, music5, music7, music8,music9];
       // var mLineArray = [music4, music5];
 

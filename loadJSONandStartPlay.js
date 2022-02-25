@@ -12,6 +12,7 @@
         but.setAttribute("data-playing", "off");
         but.innerHTML = "Play";
         player.cancelQueue(audioContext);
+        stoppingRecorder()
         timeOutsArray.forEach((item) => {
           clearTimeout(item)
         });

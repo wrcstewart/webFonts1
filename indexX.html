@@ -29,7 +29,7 @@
   <script src='./jsonediting.js'></script>
   <script src='./generationUtils.js'></script>
   <script src='./loadJSONandStartPlay.js'></script>
-  <script src='./audioFileSave.js'></script>
+
   <script src='./saveJSON.js'></script>
 
 
@@ -43,22 +43,19 @@
 
 
 
-    var monitor = [];// this is used to print a display of the notes as they are played.
 
     window.playState = false; //used to toggle play and reset of soundfonts i.e. the audio
 
     var mLineArray;// IMPORTANT DATA STRUCTURE holds the current lines (tracks) of data to play/ edit /file
-
-
 
     // following used in the editing system
     var trackEl, taNameEl, taValueEl;
     var curEditTrackIx = 0;
     var curEditTrack;
 
-
     // for real time info on notes being played
     var timeOutsArray = []; //used to track time to display note being played.
+    var monitor = [];// this is used to print a display of the notes as they are played.
 
 
 
@@ -72,14 +69,17 @@
         playMLine(mLineArray[i], origin);
       }
     }
-
+/*
     function mixNoteTest() {
       //fill in at a later date
       let selectedPreset = _tone_0730_Aspirin_sf2_file;
     }
+    */
+
 
 
     function genMusic() {
+      /*
 
       if (window.playState) {
         player.cancelQueue(audioContext);
@@ -87,8 +87,8 @@
         window.playState = false;
         return;
       }
-
-      window.playState = true;
+ window.playState = true;
+      */
       player.cancelQueue(audioContext);
 
 
@@ -155,30 +155,7 @@
       taValueEl = document.getElementById("taValue");
       curEditTrack = 0;
     }
-/*
-    function saveJSON(filename, obj2) {
 
-      var jsonString = JSON.stringify(obj2);
-      var blob = new Blob([jsonString], {type: 'text/plain'});
-
-      if (navigator.msSaveBlob) { // IE 10+
-        navigator.msSaveBlob(blob, filename);
-      } else {
-        var link = document.createElement("a");
-        if (link.download !== undefined) { // feature detection
-          // Browsers that support HTML5 download attribute
-          var url = URL.createObjectURL(blob);
-
-          link.setAttribute("href", url);
-          link.setAttribute("download", filename);
-          link.style.visibility = 'hidden';
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-        }
-      }
-    }
-    */
 
 
     //******end of saving stuff********

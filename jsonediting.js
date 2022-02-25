@@ -1,5 +1,11 @@
- var fileDest = audioContext.createMediaStreamDestination();
-    mediaRecorder= new MediaRecorder(fileDest.stream);
+// INCLUDES AUDIO FILE SAVE AS WELL AS EDITING JSON
+
+// First section is audio file save
+var fileDest = audioContext.createMediaStreamDestination();
+    var mediaRecorder= new MediaRecorder(fileDest.stream);
+    var chunks = [];
+
+
 
     mediaRecorder.ondataavailable = function(evt) {
          // push each chunk (blobs) in an array
@@ -7,14 +13,49 @@
          let dummy =4;
        };
 
+    mediaRecorder.onstop = function (evt) {
+      // Make blob out of our blobs, and open it.
+      //let blob = new Blob(chunks, {'type': 'audio/ogg; codecs=opus'});
+      let blob = new Blob(chunks, {'type': 'audio/webm; codecs=opus'});
+      // let blob = new Blob(chunks, {'type': 'audio/mpeg; codecs=audio/mp3'});
+chunks =[]; // try and stop cocatenation
+
+      //let audioTag = document.createElement('audio');
+
+      //document.querySelector("audio").src = URL.createObjectURL(blob);
+
+
+      //var link = document.createElement("a");
+
+      // Browsers that support HTML5 download attribute
+      var url = URL.createObjectURL(blob);
+
+      var link = document.createElement("a");
+      link.setAttribute("href", url);
+      link.setAttribute("download", "audiotestAmpF");
+      link.style.visibility = 'hidden';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+     function stoppingRecorder() {
+      mediaRecorder.requestData()
+      mediaRecorder.stop();
+    }
+
+    // after this it is gain control plus routing to the fileDest for the audio file
+
+
 
     // set up gain tracks
     for (let i = 0; i < maxTracks; i++) {
       gainNodeArray[i] = audioContext.createGain();
       gainNodeArray[i].connect(audioContext.destination);
-      gainNodeArray[i].connect(fileDest);
-
+      gainNodeArray[i].connect(fileDest);// this line for the creating audio file
     }
+
+
 
     var gainNode = audioContext.createGain();
     gainNode.connect(audioContext.destination);
@@ -73,8 +114,6 @@
         aTextAreaEl.value = aTextAreaEl.value + aEntryStr + "\n";
       }
     }
-
-
 
     function outputField(obj, position, taNameEl, taValueEl) {
       let arr = Object.entries(obj);

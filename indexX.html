@@ -46,13 +46,14 @@
     window.playState = false; //used to toggle play and reset of soundfonts i.e. the audio
   var isCreatingFile = true;//when true writing midi file
     //var tracks = [];//used for midi file writing
-    var ticksPerSec = 256;//used for midi file writing
+   ;//used for midi file writing
     var mLineArray =[];// IMPORTANT DATA STRUCTURE holds the current lines (tracks) of data to play/ edit /file
     var sectionsArray =[];
     // following used in the editing system
     var trackEl, taNameEl, taValueEl;
     var curEditTrackIx = 0;
     var curEditTrack;
+    //var tracksA =[];
 
 
     // for real time info on notes being played
@@ -84,6 +85,14 @@
       taValueEl = document.getElementById("taValue");
       curEditTrack = 0;
       //initC("ta4","Red",5,90,5,90);
+
+      for(let k =0;k<2;k++){
+
+        tracksA[k] = new MidiWriter.Track();
+      }
+
+
+
     }
 
     function genMusic() {

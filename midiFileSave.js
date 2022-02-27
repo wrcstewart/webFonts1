@@ -1,6 +1,6 @@
  var isCreatingFile = true;//when true writing midi file
-    var tracks = [];//used for midi file writing
-    var ticksPerSec = 256;//used for midi file writing
+    //var tracks = [];//used for midi file writing
+    //var ticksPerSec = 256;//used for midi file writing
 
 
 // init tracks at a diff point
@@ -34,7 +34,7 @@ function addNote(track, time, pitch, duration, vel, channel) { // used for midi 
       function saveMidiFile() {
 
       let filename = "MettatreeMusic.mid";
-      var write = new MidiWriter.Writer(tracks);
+      var write = new MidiWriter.Writer(tracksA);
 
       let mwStr = write.dataUri();
       var link = document.createElement("a");

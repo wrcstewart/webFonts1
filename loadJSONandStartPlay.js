@@ -42,7 +42,7 @@
       let len = mLineArray.length;
       for (let i = 0; i < len; i++) {
         currentTrack = i;//prob don't need this -will see ...
-        playMLine(mLineArray[i], origin);
+        playMLine(mLineArray[i], origin,tracksA);
       }
     }
 

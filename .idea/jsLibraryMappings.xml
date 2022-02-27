@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="JavaScriptLibraryMappings">
-    <file url="file://$PROJECT_DIR$" libraries="{0000_Aspirin_sf2_file, 0000_JCLive_sf2_file, 0250_SoundBlasterOld_sf2, 0730_Aspirin_sf2_file, 0740_Aspirin_sf2_file, 0760_Aspirin_sf2_file, 12835_0_Chaos_sf2_file, 12836_0_Chaos_sf2_file, 12838_0_Chaos_sf2_file, 12842_0_Chaos_sf2_file, 12847_0_Chaos_sf2_file, WebAudioFontPlayer, jsoneditor}" />
+    <file url="file://$PROJECT_DIR$" libraries="{0000_Aspirin_sf2_file, 0000_JCLive_sf2_file, 0250_SoundBlasterOld_sf2, 0730_Aspirin_sf2_file, 0740_Aspirin_sf2_file, 0760_Aspirin_sf2_file, 12835_0_Chaos_sf2_file, 12836_0_Chaos_sf2_file, 12838_0_Chaos_sf2_file, 12842_0_Chaos_sf2_file, 12847_0_Chaos_sf2_file, WebAudioFontPlayer, jquery, jsoneditor, webFonts1/node_modules}" />
+    <file url="PROJECT" libraries="{0000_Aspirin_sf2_file, 0000_JCLive_sf2_file, 0250_SoundBlasterOld_sf2, 0730_Aspirin_sf2_file, 0740_Aspirin_sf2_file, 0760_Aspirin_sf2_file, 12835_0_Chaos_sf2_file, 12836_0_Chaos_sf2_file, 12838_0_Chaos_sf2_file, 12842_0_Chaos_sf2_file, 12847_0_Chaos_sf2_file, WebAudioFontPlayer, jquery, jsoneditor, tone, webFonts1/node_modules}" />
+    <includedPredefinedLibrary name="HTTP Response Handler" />
   </component>
 </project>

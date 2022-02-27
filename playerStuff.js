@@ -92,7 +92,11 @@
 // a big function to interpret and play the text - at moment also to generate midi file
 
       let track = mL.track;
-      tracks[track] = new MidiWriter.Track();
+      if (tracks[track] == undefined) {
+
+        tracks[track] = new MidiWriter.Track();
+        let dummy = 6;
+      }
       var instrumentMidiNum = instrumentsNumMap.get(mL.instrument);
       tracks[track].addEvent(new MidiWriter.ProgramChangeEvent({instrument: instrumentMidiNum}));
       var channel = getChannel(instrumentMidiNum);

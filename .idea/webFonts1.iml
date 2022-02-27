@@ -17,5 +17,7 @@
     <orderEntry type="library" name="12838_0_Chaos_sf2_file" level="application" />
     <orderEntry type="library" name="12842_0_Chaos_sf2_file" level="application" />
     <orderEntry type="library" name="jsoneditor" level="application" />
+    <orderEntry type="library" name="jquery" level="application" />
+    <orderEntry type="library" name="tone" level="application" />
   </component>
 </module>

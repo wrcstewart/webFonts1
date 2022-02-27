@@ -21,7 +21,7 @@
 
   <link href="https://cdnjs.cloudflare.com/ajax/libs/jsoneditor/9.5.11/jsoneditor.css" rel="stylesheet" type="text/css">
 
-  <!-- the following files should be used together - they exist separately to split an overlong program-->
+  <!-- the following files should be used together - they exist separately to split an overlong program -->
   <script src='./earlyDeclarations.js'></script>
   <script src='./midiFileSave.js'></script>
   <script src='./midiInstrumentStuff.js'></script>
@@ -29,8 +29,9 @@
   <script src='./jsonediting.js'></script>
   <script src='./generationUtils.js'></script>
   <script src='./loadJSONandStartPlay.js'></script>
-
   <script src='./saveJSON.js'></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" ></script>
+<script src='./transfer.js'></script><!-- jquery developed functions -->
 
 
 
@@ -42,58 +43,56 @@
     // how export an mp3 file?
 
 
-
-
     window.playState = false; //used to toggle play and reset of soundfonts i.e. the audio
-
-    var mLineArray;// IMPORTANT DATA STRUCTURE holds the current lines (tracks) of data to play/ edit /file
-
+  var isCreatingFile = true;//when true writing midi file
+    //var tracks = [];//used for midi file writing
+    var ticksPerSec = 256;//used for midi file writing
+    var mLineArray =[];// IMPORTANT DATA STRUCTURE holds the current lines (tracks) of data to play/ edit /file
+    var sectionsArray =[];
     // following used in the editing system
     var trackEl, taNameEl, taValueEl;
     var curEditTrackIx = 0;
     var curEditTrack;
 
+
     // for real time info on notes being played
     var timeOutsArray = []; //used to track time to display note being played.
     var monitor = [];// this is used to print a display of the notes as they are played.
-
-
-
-
-    function playSection(mLineArray, origin, dest) {
-      tracks.length = 0;
-      var currentTrack;
-      let len = mLineArray.length;
-      for (let i = 0; i < len; i++) {
-        currentTrack = i;//prob don't need this -will see ...
-        playMLine(mLineArray[i], origin);
-      }
-    }
 /*
-    function mixNoteTest() {
-      //fill in at a later date
-      let selectedPreset = _tone_0730_Aspirin_sf2_file;
+    function initC(idStr,colStr,l,w,t,h) {
+
+            $("#"+idStr).css({
+
+                    "background-color":colStr,
+                    "position":"absolute",
+                    "left":l+"%",
+                    "width":w+"%",
+                    "top":t+"%",
+                    "height":h+"%"
+            })
+
+
+
+    };
+*/
+
+
+
+    function onLoad() { //normal onLoad statement
+      trackEl = document.getElementById("track");
+      taNameEl = document.getElementById("taName");
+      taValueEl = document.getElementById("taValue");
+      curEditTrack = 0;
+      //initC("ta4","Red",5,90,5,90);
     }
-    */
-
-
 
     function genMusic() {
-      /*
 
-      if (window.playState) {
-        player.cancelQueue(audioContext);
-        //alert("queue cancelled");
-        window.playState = false;
-        return;
-      }
- window.playState = true;
-      */
-      player.cancelQueue(audioContext);
+      player.cancelQueue(audioContext);// advisable ???
 
 
-// ---------------------- start of devel section ------------------------------------------------
-
+// ---------------------- start of music setup section ------------------------------------------------
+// set up some basic beats
       var beat1 = ['C', 'Q', 'Q', 'C', 'C', 'C', 'C', 'C', 'Q', 'Q', 'CR', 'C', 'C'];
       var beatBassDrum1 = ["CF", "CR", "Q", 'Q', "CR", "QF", "Q", "CR", "Q", 'Q', "CR"]
       var beatSnareDrum1 = ["CR", "S", "SR", "SR", "S", "CR", "C"]
@@ -101,31 +100,38 @@
       var beatFlute2 = ["C", "CP", "CP", "CP"];
       var beatFlute3 = ["C"]
       var beatHighHat1 = ["C", "C", "C", "C"];
+      var basic4Beat = ["CF","C","C","C"];
 
+      //-------------------------------------------------------------------------------------
 
       var music10 = new MLine(0, "CHORD", 0, 10, "Flute Pipe 1", 60, beatFlute3, ["C4", 0, 0, ["A3", 0, 3, 7, 0], ["G4", 0, 7], ["G4", 5, 0], ["F4", 0, 4, 7, 0], ["F4", 0, 4, 7, 0], ["E4", 6, 0], ["E4", 0, 7]], 0.98);
 
       var music12 = new MLine(1, "ARPEGGIO", 0, 10, "Flute Pipe 1", 60, beatFlute3, ["C4", ["A5", 0, 3, 7, 0], ["A5", 0, 3, 7, 0],
         ["G4", 0, 7], ["G4", 5, 0], ["F4", 0, 4, 7, 0], ["F4", 0, 4, 7, 0], ["E4", 6, 0], ["E4", 0, 7]], 0.98);
 
-      // var music7 = new MLine(3, "CHORD", 0, 120, "Bass Drum 2", 90, beatBassDrum1, [33], 0.9);
-      // var music8 = new MLine("CHORD", 2, 10, "Snare Drum 1", 60, beatSnareDrum1, [40], 0.9);
-      // var music9 = new MLine("CHORD", 0, 10, "Hi-hat 1", 60, beatHighHat1, [57,59], 0.9);
-      var music11 = new MLine(2, "CHORD", 0, 10, "Acoustic Bass Drum", 60, beatHighHat1, ["C4", 0, 7, 12, 15], 0.9);
-      // var mLineArray = [music4, music5, music7, music8,music9];
-      // var mLineArray = [music4, music5];
+      var music11 = new MLine(2, "CHORD", 0, 10, "Acoustic Bass Drum", 60,
+        beatHighHat1, ["C4", 0, 7, 12, 15], 0.9);
+
 
 // ***** determine a section***
 
-      mLineArray = [music10, music12, music11];// music11,music12]
+      sectionsArray[0] = [music10, music12];// music11,music12];
+      sectionsArray[1] = [music10,music11];
 
-      // ---------------------end of devel section --------------------------------------------------------------------------
+      mLineArray = sectionsArray[0];
+
+
+
+
+
+
+      // ---------------------end of setup section --------------------------------------------------------------------------
 
 // now allow editing
-      doEdit(0, mLineArray);//initialise the edit boxes
+      doEdit(0, mLineArray);//initialise the edit boxes with the first entry of array
 
 
-// --- show what is being suggested in read only mode.
+// --- show what is being suggested in read only mode in separate text area
       function doFormatArray(mLineArrayParam, aTextAreaEl) {
         aTextAreaEl.value = "";
         for (let j = 0; j < mLineArrayParam.length; j++) {
@@ -134,12 +140,11 @@
         }
       }
 
-      doFormatArray(mLineArray, document.getElementById("ta1"));// show the summary of section.
+      doFormatArray(mLineArray, document.getElementById("ta1"));
 
       // ----
 
     }// end gen music - nb does not play
-
 
 
     function genProtoMLineArray() {
@@ -149,22 +154,14 @@
 
     }
 
-    function onLoad() { //normal onLoad statement
-      trackEl = document.getElementById("track");
-      taNameEl = document.getElementById("taName");
-      taValueEl = document.getElementById("taValue");
-      curEditTrack = 0;
-    }
 
-
-
-    //******end of saving stuff********
 
 
 
   </script>
 </head>
 
+<!-- ------------------------------------------------------------------------- -->
 <body onload="onLoad()" ()>
 
 
@@ -176,36 +173,46 @@
   <button id="saveEdit" onclick="inputField(taNameEl,taValueEl)">Save Edit</button>
 </div>
 
+<!-- will show the json version of the music section -->
 <textarea id="ta1" readonly wrap="soft"
           style="position:absolute;left:420px;top:1px;width:400px;height:580px;">awaiting load</textarea>
 
-
+<!-- will show the notes as they are played -->
 <textarea id="ta4" readonly
           style="position:absolute;top:600px;left:1px;width: 1000px; height: 230px;">Playing Now</textarea>
+<!-- will show the development area that will hold the list of pieces -->
+<!-- the list of the pieces functions will be developed here  -->
 <textarea id="taPublic"
           style="position:absolute;top:1px;left:840px; width: 400px; height: 580px;">Store: List of Bars</textarea>
 
-<div id="editControlsPanel"
-     style="position:absolute;top:50px;left:1px;width:400px;height:300px;background-color: #b3d4fc">
+
+<div id="editControlsPanel"   style="position:absolute;top:50px;left:1px;width:400px;height:300px;background-color: #b3d4fc">
 
   <input type="checkbox" name="foreground" id="foreground" style="position:absolute; left:250px; top:1px; width:30px;"
          oninput="edit(trackEl,this.checked)">
   <label style="position:absolute; left:180px; top:1px; width:30px;">foreground</label>
 
+<!-- set track number -->
   <input type="number" name="track" id="track" style="position:absolute; left:100px; top:1px; width:30px;"
          oninput="edit(this,true)"
          min="0" max="20" step="1" value="0">
   <label style="position:absolute; left:1px; top:1px; width:70px;">edit track</label>
 
+<!-- set field number -->
   <input type="number" name="fieldNumber" id="fieldNumber"
          style="position:absolute; left:100px; top:31px;height:20px; width:30px;"
          oninput="outputField(mLineArray[curEditTrack], this.value, taNameEl, taValueEl)"
          min="1" max="50" step="1" value="1">
   <label style="position:absolute; left:1px; top:31px; width:70px;">edit field</label>
+
+<!-- field name is read only  -->
   <textarea id="taName" readonly
             style="position:absolute; left:1px; top:51px; width: 388px; height: 20px;">field name</textarea>
+
+  <!-- field value can be edited  -->
   <textarea id="taValue"
             style="position:absolute;left:1px; top:80px; width: 388px; height:100px;">field value</textarea>
+
 </div>
 
 

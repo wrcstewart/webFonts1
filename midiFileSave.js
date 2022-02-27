@@ -3,7 +3,7 @@
     var ticksPerSec = 256;//used for midi file writing
 
 
-
+// init tracks at a diff point
 
 
 function addNote(track, time, pitch, duration, vel, channel) { // used for midi file writing

@@ -127,9 +127,10 @@ chunks =[]; // try and stop cocatenation
     }
 
     function inputField(taNameEl, taValueEl) {
-      let obj = mLineArray[curEditTrackIx];
+       mLineArrayEdit = sectionsArray[1];
+      let obj = mLineArrayEdit[curEditTrackIx];
       let aKeyString = taNameEl.value;
       obj[aKeyString] = JSON.parse(taValueEl.value);
-      mLineArray[curEditTrackIx] = obj; //reinsert into master array of mLine objects.
-      doFormatArray(mLineArray, document.getElementById("ta1"));
+      mLineArrayEdit[curEditTrackIx] = obj; //reinsert into master array of mLine objects.
+      doFormatArray(mLineArrayEdit, document.getElementById("ta1"));
     }

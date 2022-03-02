@@ -70,7 +70,7 @@ let len = sectionsArray.length;
 
         if(i>0) cocatSection(sectionsArray[i-1],sectionsArray[i]);
 
-        playSection(sectionsArray[i], origin);
+       // playSection(sectionsArray[i], origin);
       }
 
       let lenSectionsArray = sectionsArray.length;
@@ -82,14 +82,6 @@ let len = sectionsArray.length;
 
         playSection(sectionsArray[i], origin);
       }
-
-
-
-
-
-
-
-
  }
 
 

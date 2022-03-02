@@ -113,21 +113,21 @@
 
       //-------------------------------------------------------------------------------------
 
-      var music10 = new MLine(0, "CHORD", 0, 10, "Flute Pipe 1", 60, beatFlute3, ["C4", 0, 0, ["A3", 0, 3, 7, 0], ["G4", 0, 7], ["G4", 5, 0], ["F4", 0, 4, 7, 0], ["F4", 0, 4, 7, 0], ["E4", 6, 0], ["E4", 0, 7]], 0.98);
+      var music10 = new MLine(1, "CHORD", 0, 10, "Acoustic Grand Piano", 60, beatFlute3, ["C4", 0, 0, ["A3", 0, 3, 7, 0], ["G4", 0, 7], ["G4", 5, 0], ["F4", 0, 4, 7, 0], ["F4", 0, 4, 7, 0], ["E4", 6, 0], ["E4", 0, 7]], 0.98);
 
-      var music12 = new MLine(1, "ARPEGGIO", 0, 10, "Flute Pipe 1", 60, beatFlute3, ["C4", ["A5", 0, 3, 7, 0], ["A5", 0, 3, 7, 0],
+      var music12 = new MLine(0, "ARPEGGIO", 0, 10, "Acoustic Grand Piano", 60, beatFlute3, ["C4", ["A5", 0, 3, 7, 0], ["A5", 0, 3, 7, 0],
         ["G4", 0, 7], ["G4", 5, 0], ["F4", 0, 4, 7, 0], ["F4", 0, 4, 7, 0], ["E4", 6, 0], ["E4", 0, 7]], 0.98);
 
-      var music11 = new MLine(2, "CHORD", 0, 10, "Acoustic Bass Drum", 60,
+      var music11 = new MLine(0, "CHORD", 0, 10, "Acoustic Bass Drum", 60,
         beatHighHat1, ["C4", 0, 7, 12, 15], 0.9);
 
 
 // ***** determine a section***
 
-      sectionsArray[0] = [music10, music12];// music11,music12];
-      sectionsArray[1] = [music10,music11];
+      sectionsArray[0] = [music12,music10];// music11,music12];
+      sectionsArray[1] = [music11];
 
-      mLineArray = sectionsArray[0];
+      mLineArray = sectionsArray[(sectionsArray.length)-1];
 
 
 
@@ -139,8 +139,9 @@
 // now allow editing
       doEdit(0, mLineArray);//initialise the edit boxes with the first entry of array
 
-
+/*
 // --- show what is being suggested in read only mode in separate text area
+
       function doFormatArray(mLineArrayParam, aTextAreaEl) {
         aTextAreaEl.value = "";
         for (let j = 0; j < mLineArrayParam.length; j++) {
@@ -148,7 +149,7 @@
           aTextAreaEl.value = aTextAreaEl.value + "\n";
         }
       }
-
+*/
       doFormatArray(mLineArray, document.getElementById("ta1"));
 
       // ----

@@ -55,8 +55,16 @@
       let dur = mLineArray2[0].finish - mLineArray2[0].start;
       for (let i = 0; i < len; i++) {
        mLineArray2[i].start =st;
-       mLineArray2[i].finish += dur;
+      mLineArray2[i].finish =  st + dur;
       }
+    }
+
+    function concatSectionsArray(aSectionsArray){
+   for (let i =1;i <= aSectionsArray.length; i++)
+
+
+
+
     }
 
 

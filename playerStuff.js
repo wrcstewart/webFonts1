@@ -145,7 +145,8 @@
       let pitchBeat = 0;
       let tMult = 60 / bpm;
       let start = mL.start;
-      let endBeat = start + ((mL.finish - start) / tMult);
+     // let endBeat = start + ((mL.finish - start) / tMult);
+      let endBeat = mL.finish - start;
 
       let curBeat;
       let p, d, v; //actual values for playSound
@@ -157,7 +158,9 @@
 
 // --------------------------------
 
-      pitchBeat = start;// currently sets to start
+      //pitchBeat = start;// currently sets to start
+      pitchBeat = 0;//changed 2/3/2022
+
 
 
       while (pitchBeat < endBeat) { //overall process to stop when past finish time - from which endBeat was computed.
@@ -176,6 +179,12 @@
           if (timeIncr > 0) {
 
             // we need to set up note parameters
+
+            if (mL.instrument == "Acoustic Bass Drum"){
+
+              var dummy = 3;
+            }
+
             ixx = getPitchIndexFromTime(pitchBeat, lenPitches);//necessary because index is wrapped round to give a loop
             //s = pitchBeat;
             curBeat = pitchBeat; // needed because need this valaue after pitchBeat is incremented.
@@ -205,7 +214,8 @@
             if (!Array.isArray(p)) {
 
 
-              let t = origin + start + ((curBeat - start) * tMult);//tMult is to map time to true time
+             // let t = origin + start + ((curBeat - start) * tMult);//tMult is to map time to true time
+              let t = origin + start + ((curBeat) * tMult);//tMult is to map time to true time
               // the timeOutsArray sections are to display text of  note being played. This is complicated by the fact
               // that the player function just queues all the notes for performance at a later time.
               timeOutsArray.push(setTimeout(showIt, (t - origin) * 1000,
@@ -253,7 +263,8 @@
 
             if (but.getAttribute("data-playing") == "off") return;//reset button pressed - so finishing
 
-            let t = origin + start + ((curBeat - start) * tMult);
+           // let t = origin + start + ((curBeat - start) * tMult);
+            let t = origin + start + ((curBeat) * tMult);
 
             let chordNotes = extractNotesFromArrayOfMidiNumbers(pitchEntryNew);
 
@@ -277,7 +288,8 @@
           for (let j = 0; j < lenPitchesEntry; j++) {
 
             if (but.getAttribute("data-playing") == "off") return;
-            let t = origin + start + ((curBeat - start) + innerTime) * tMult;
+           // let t = origin + start + ((curBeat - start) + innerTime) * tMult;
+            let t = origin + start + ((curBeat) + innerTime) * tMult;
             let chordNotes = extractNotesFromArrayOfMidiNumbers(pitchEntryNew);
             timeOutsArray.push(setTimeout(showIt, (t - origin) * 1000,
               notes[pitchesEntry[j] - 21] + "  " + JSON.stringify(chordNotes) + "  " + JSON.stringify(cloneP)

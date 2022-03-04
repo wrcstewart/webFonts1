@@ -121,11 +121,16 @@
       var music11 = new MLine(0, "CHORD", 0, 10, "Acoustic Bass Drum", 60,
         beatHighHat1, ["C4", 0, 7, 12, 15], 0.9);
 
+       var music13 = new MLine(0, "CHORD", 0, 10, "Acoustic Grand Piano", 60,
+        beatHighHat1, ["C4", 0, 7, 12, 15], 0.9);
+
 
 // ***** determine a section***
 
       sectionsArray[0] = [music12,music10];// music11,music12];
       sectionsArray[1] = [music11];
+      sectionsArray[2] = [music13];
+
 
       mLineArray = sectionsArray[(sectionsArray.length)-1];
 

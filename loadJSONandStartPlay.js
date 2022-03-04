@@ -45,7 +45,7 @@
         playMLine(mLineArray[i], origin,tracksA);
       }
     }
-
+/*
    function cocatSection(mLineArray1,mLineArray2) {
 
       // need to adjust start and finish of second array.
@@ -58,6 +58,8 @@
       mLineArray2[i].finish =  st + dur;
       }
     }
+
+ */
 
 
 
@@ -124,11 +126,13 @@ function setSectionsArrayTimes(sectionsArray,startsArray,finishesArray){
  */
       let audioStopTime = newFinishes[len-1];
       setTimeout(stoppingRecorder,audioStopTime*1000);
-
+      setSectionsArrayTimes(sectionsArray,newStarts,newFinishes);
       for (let i = 0; i < len; i++) {
 
         playSection(sectionsArray[i], origin);
       }
+       setSectionsArrayTimes(sectionsArray,oldStarts,oldFinishes);
+
  }
 
 

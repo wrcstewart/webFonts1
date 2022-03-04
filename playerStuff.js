@@ -5,10 +5,11 @@
 
   this.track = track;
    this.start = start;
+    this.bpm = bpm;
       this.sequencing = sequencing;
 
       this.finish = finish;
-      this.bpm = bpm;
+
       this.instrument = instrument;
       this.noteDuration = noteDuration;
       this.rhythmBeats = rhythmBeats;

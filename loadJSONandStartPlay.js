@@ -59,13 +59,6 @@
       }
     }
 
-    function concatSectionsArray(aSectionsArray){
-   for (let i =1;i <= aSectionsArray.length; i++)
-
-
-
-
-    }
 
 
 
@@ -73,7 +66,50 @@
     function playComposition(sectionsArray,origin){
    // takes an array holding several  sections (mLineArray s to play sequentially.
 
+    //  first build an array of the  finish times. the start times are all zero
+
+      // then an array of new start times and new finish times for cocatenation
+
+      // before each section is played the start and finish times will be altered
+      // then reset to the old values after playing the section.
+      let oldStarts =[] ;
+let oldFinishes =[];
+let newStarts =[];
+let newFinishes = [];
 let len = sectionsArray.length;
+
+ for (let i = 0; i < len; i++) {
+
+        oldStarts[i] =0;
+       oldFinishes[i] = sectionsArray[i][0].finish;
+ }
+
+  newStarts[0] = 0;
+ newFinishes[0] = oldFinishes[0];
+ for (let i = 1; i < len; i++) {
+
+
+      newStarts[i] = newFinishes[i-1];
+      newFinishes[i] = newStarts[i] + oldFinishes[i];// oldFinishes[i] is just duration
+
+ }
+
+function setSectionsArrayTimes(sectionsArray,startsArray,finishesArray){
+   let l = sectionsArray.length;
+   for(let j = 0;j<l;j++) setMLineArray(sectionsArray[j],startsArray[j],finishesArray[j]);
+ }
+
+ function setMLineArray(mLArray, start,finish){
+   let len = mLArray.length;
+   for(let i=0;i<len;i++) {
+     mLArray[i].start = start;
+     mLArray[i].finish = finish;
+   }
+ }
+
+
+
+/*
       for (let i = 0; i < len; i++) {
 
         if(i>0) cocatSection(sectionsArray[i-1],sectionsArray[i]);
@@ -84,6 +120,9 @@ let len = sectionsArray.length;
       let lenSectionsArray = sectionsArray.length;
       let lastMLineArray = sectionsArray[lenSectionsArray - 1];
       let audioStopTime = lastMLineArray[0].finish;
+
+ */
+      let audioStopTime = newFinishes[len-1];
       setTimeout(stoppingRecorder,audioStopTime*1000);
 
       for (let i = 0; i < len; i++) {

@@ -2,9 +2,11 @@
 
 // constructor ie generator for a single track
     function MLine(track, sequencing, start, finish, instrument, bpm, rhythmBeats, pitchBeats, noteDuration) {
-      this.track = track;
+
+  this.track = track;
+   this.start = start;
       this.sequencing = sequencing;
-      this.start = start;
+
       this.finish = finish;
       this.bpm = bpm;
       this.instrument = instrument;
@@ -73,6 +75,8 @@
       for (let i = 0; i < monitor.length; i++) report += monitor[i] + "\n";
       ta.innerHTML = report;
     }
+
+    function clearMonitor(){monitor=[]};
 
     function showIt(s, instrument, track) {
       // if s is a pitch midi number  convert to note else just print it out

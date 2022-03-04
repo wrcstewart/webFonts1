@@ -130,6 +130,7 @@ function setSectionsArrayTimes(sectionsArray,startsArray,finishesArray){
       for (let i = 0; i < len; i++) {
 
         playSection(sectionsArray[i], origin);
+        setTimeout(clearMonitor,newFinishes[i] * 1000);
       }
        setSectionsArrayTimes(sectionsArray,oldStarts,oldFinishes);
 

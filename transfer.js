@@ -48,6 +48,9 @@ function buttonRow(panelIdStr, nButs, textArray, left, width, top, height, colSt
        })
 
      $buts[i].click(function () {
+
+       if(!chordEditorActive) alert("please set edit field to pitchBeats in order to use the chord editor");
+       if(chordEditorActive) setPitchArrayNoteName(noteNames[i]);
     alert(textArray[i]);
   });
 
@@ -62,6 +65,12 @@ function buttonRow(panelIdStr, nButs, textArray, left, width, top, height, colSt
 
      $("#" + panelIdStr).append($buts[i]);
   }
+}
+
+function setPitchArrayNoteName(aNoteName){
+  // find which array position from number control
+  // then update the noteName ie without the octave number
+
 }
 
 

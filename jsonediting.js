@@ -124,6 +124,18 @@ chunks =[]; // try and stop cocatenation
       let origVal = obj[aName];
       let valStr = JSON.stringify(origVal)
       taValueEl.value = valStr;
+      if (aName == "pitchBeats"){
+        chordEditorActive =true;
+        document.getElementById("taArrayValueId").value = JSON.stringify(origVal[0]);
+        curInnerPitchArray = origVal[0];
+
+      } else {
+        document.getElementById("taArrayValueId").value ="";
+      chordEditorActive = false;
+      };
+
+
+
     }
 
     function inputField(taNameEl, taValueEl) {
@@ -134,4 +146,10 @@ chunks =[]; // try and stop cocatenation
       obj[aKeyString] = JSON.parse(taValueEl.value);
       mLineArrayEdit[curEditTrackIx] = obj; //reinsert into master array of mLine objects.
       doFormatArray(mLineArrayEdit, document.getElementById("ta1"));
+    }
+
+    function selectPosition(pos){
+
+
+
     }

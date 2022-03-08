@@ -91,7 +91,9 @@
         tracksA[k] = new MidiWriter.Track();
       }
 
- crBut("testButton");
+ //
+      // crBut("testButton");
+       buttonRow("editButtonsPanel",12,noteNames,0, 400, 60, 50,"Blue");
 
     }
 
@@ -113,16 +115,16 @@
 
       //-------------------------------------------------------------------------------------
 
-      var music10 = new MLine(1, "CHORD", 0, 13, "Acoustic Grand Piano", 60, beatFlute3, ["C4", 0, 0, ["A3", 0, 3, 7, 0], ["G4", 0, 7], ["G4", 5, 0], ["F4", 0, 4, 7, 0], ["F4", 0, 4, 7, 0], ["E4", 6, 0], ["E4", 0, 7]], 0.98);
+      var music10 = new MLine(1, "CHORD", 0, 4, "Acoustic Grand Piano", 60, beatFlute3, ["C4", 0, 0, ["A3", 0, 3, 7, 0], ["G4", 0, 7], ["G4", 5, 0], ["F4", 0, 4, 7, 0], ["F4", 0, 4, 7, 0], ["E4", 6, 0], ["E4", 0, 7]], 0.98);
 
-      var music12 = new MLine(0, "ARPEGGIO", 0, 13, "Acoustic Grand Piano", 60, beatFlute3, ["C4", ["A5", 0, 3, 7, 0], ["A5", 0, 3, 7, 0],
+      var music12 = new MLine(0, "ARPEGGIO", 0, 4, "Acoustic Grand Piano", 60, beatFlute3, ["C4", ["A5", 0, 3, 7, 0], ["A5", 0, 3, 7, 0],
         ["G4", 0, 7], ["G4", 5, 0], ["F4", 0, 4, 7, 0], ["F4", 0, 4, 7, 0], ["E4", 6, 0], ["E4", 0, 7]], 0.98);
 
-      var music11 = new MLine(0, "CHORD", 0, 10, "Acoustic Bass Drum", 60,
+      var music11 = new MLine(0, "CHORD", 0, 4, "Acoustic Bass Drum", 60,
         beatHighHat1, ["C4", 0, 7, 12, 15], 0.9);
 
-       var music13 = new MLine(0, "CHORD", 0, 15, "Acoustic Grand Piano", 60,
-        beatHighHat1, ["C4", 0, 7, 12, 15], 0.9);
+       var music13 = new MLine(0, "CHORD", 0, 8, "Acoustic Grand Piano", 60,
+        beatHighHat1, [["C4", 0],["C4", 4],["C4", 7],["C4", 11]], 0.9);
 
 
 // ***** determine a section***
@@ -230,7 +232,14 @@
 
 </div>
 
-<div id="editButtonsPanel"   style="position:absolute;top:201px;left:1px;width:400px;height:300px;background-color: #b3e4fc" ></div>
+<div id="editButtonsPanel"   style="position:absolute;top:201px;left:1px;width:400px;height:300px;background-color: #b3e4fc" >
+  <input type="number" name="arrayPosition" id="arrayPositionId" style="position:absolute; left:100px; top:1px; width:30px;"
+         oninput="selectPosition(this.value)"
+         min="0" max="20" step="1" value="0">
+  <label style="position:absolute; left:1px; top:1px; width:70px;">main array position</label>
+
+
+</div>
 
 
 </body>

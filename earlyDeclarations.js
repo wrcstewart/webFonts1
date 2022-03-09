@@ -8,6 +8,10 @@ var audioContext = new (window.AudioContext || window.webkitAudioContext)();
    var tracksA =[];
     var ticksPerSec = 256;
     var mLineArrayEdit =[];
+    var chordEditorActive = false;
+    var curPitchArray;
+    var curPosPitchArray;
+    var curInnerPitchArray;
 
     // --- show what is being suggested in read only mode in separate text area
 

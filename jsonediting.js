@@ -171,3 +171,20 @@ function updateNoteNamePlusOctave(oldNoteNamePlusOctave, newNoteName) {
  //outputField(mLineArray[curEditTrack], curFieldNum, taNameEl, taValueEl);
 
 }
+
+function updateOctave(oldNoteNamePlusOctave, octave) {
+  // eg. inputting ("C4" , "5") should give "C5" etc
+  // old note name will be either 1 or 2 characters before the octave.
+  // octave is always single digit
+  let l = oldNoteNamePlusOctave.length;
+  let noteNameStem = oldNoteNamePlusOctave.substring(0, l - 1);
+  curInnerPitchArray[0] = noteNameStem + octave;
+  curPitchArray[curPosPitchArray] = curInnerPitchArray;
+  document.getElementById("taArrayValueId").value =
+    JSON.stringify(curPitchArray[curPosPitchArray]);
+  //taValueEl = document.getElementById("taArrayValueId").value;
+  //try this !!
+  //let curFieldNum = document.getElementById("fieldNumber").value;
+  //outputField(mLineArray[curEditTrack], curFieldNum, taNameEl, taValueEl);
+}
+

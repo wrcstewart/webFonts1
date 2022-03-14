@@ -32,7 +32,7 @@ function crBut(str) {
 */
 
 
-function buttonRow(panelIdStr, nButs, textArray, left, width, top, height, colStr) {
+function buttonNoteNameRow(panelIdStr, nButs, textArray, left, width, top, height, colStr) {
    var $buts = [];
   // textArray should be of length nButs and contain the labels for the nButs buttons.
   // the strings will also be used within a corresponding click function to select the reqd. action
@@ -44,7 +44,7 @@ function buttonRow(panelIdStr, nButs, textArray, left, width, top, height, colSt
 
   for (let i = 0; i < nButs; i++) {
      $buts[i] = $('<button/>',
-       {text:noteNames[i],
+       {text:textArray[i],
        })
 
      $buts[i].click(function () {
@@ -52,7 +52,7 @@ function buttonRow(panelIdStr, nButs, textArray, left, width, top, height, colSt
        if(!chordEditorActive) alert("please set edit field to pitchBeats in order to use the chord editor");
        if(chordEditorActive) {
         // alert("note namepressed");
-         setPitchArrayNoteName(noteNames[i]);
+         setPitchArrayNoteName(textArray[i]);
 
          let valStr = JSON.stringify(curPitchArray);
 
@@ -84,6 +84,60 @@ function setPitchArrayNoteName(aNoteName){
 
   let oldNoteNamePlusOctave = curPitchArray[curPosPitchArray][0];
    updateNoteNamePlusOctave(oldNoteNamePlusOctave, aNoteName);
+}
+
+function setPitchArrayOctave(octave){
+  let oldNoteNamePlusOctave = curPitchArray[curPosPitchArray][0];
+   updateOctave(oldNoteNamePlusOctave, octave);
+
+}
+
+function buttonNoteOctaveRow(panelIdStr, nButs, textArray, left, width, top, height, colStr) {
+   var $buts = [];
+  // textArray should be of length nButs and contain the labels for the nButs buttons.
+  // the strings will also be used within a corresponding click function to select the reqd. action
+
+  let relButWidth = 0.9;
+  let relSpacingWidth = 0.1;
+  let butWidth = (width * relButWidth) / nButs;
+  let butSpace = (width * relSpacingWidth) / nButs;
+
+  for (let i = 0; i < nButs; i++) {
+     $buts[i] = $('<button/>',
+       {text:textArray[i],
+       })
+
+     $buts[i].click(function () {
+
+       if(!chordEditorActive) alert("please set edit field to pitchBeats in order to use the chord editor");
+       if(chordEditorActive) {
+        // alert("note namepressed");
+         setPitchArrayOctave(textArray[i]);
+
+         let valStr = JSON.stringify(curPitchArray);
+
+          taValueEl.value = valStr;
+
+
+       }
+
+
+
+
+   // alert(textArray[i]);
+  });
+
+       $buts[i].css({
+
+       position:'absolute',
+       left:(butSpace)/2 + (i* width/nButs) + "px",
+       width:butWidth+"px",
+       top:top+"px",
+       height:height+"px"
+     });
+
+     $("#" + panelIdStr).append($buts[i]);
+  }
 }
 
 

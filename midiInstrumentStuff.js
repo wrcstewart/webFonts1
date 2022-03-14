@@ -92,6 +92,8 @@ const instrumentsMap = new Map();
     }
 
      var noteNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];//used to construct notes[] below
+    var noteNamesA = ["A", "A#", "B","C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"];
+    var noteOctaves = ["0","1","2","3","4","5","6","7"];
     var notes = []; // this allows easy look up of note name to midi number - but based with A0 = 0
     // a function will add 21 to give the correct official midi number of the notes.
     // the true note names are only used once per generative run - to allow user to enter start note.

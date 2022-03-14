@@ -13,6 +13,8 @@ var audioContext = new (window.AudioContext || window.webkitAudioContext)();
     var curPosPitchArray;
     var curInnerPitchArray;
 
+
+
     // --- show what is being suggested in read only mode in separate text area
 
       function doFormatArray(mLineArrayParam, aTextAreaEl) {

@@ -59,7 +59,16 @@ gainNode.connect(audioContext.destination);
 var gainWeights = [];
 var isFeaturing = false;
 
+function initGains(){
+ let normalGain = 0.5;
+ for (let track = 0; track < maxTracks; track++) {
+      gainNodeArray[track].gain.value = normalGain;
+    }
+}
+
 function edit(elTrackSpinner, isFeaturing) {
+  // overide the second parameter with a value from DOM !Hack
+  isFeaturing = document.getElementById("foreground").checked;
   let normalGain = 0.5;
   let backgroundGain = 0.05;
   let foregroundGain = 0.9;
@@ -99,6 +108,7 @@ function ixOfTrack(mLineArray, targetTrack) {
 function doEdit(editTrack, mLineArray) {
   let ix = ixOfTrack(mLineArray, editTrack);
   curEditTrackIx = ix;
+  curEditTrack = ix;
   //let strMusicLine  = JSON.stringify(mLineArray[ix]);//change to link to id
   // alert(""+ editTrack +strMusicLine);
   //document.getElementById('edit').innerText = strMusicLine;

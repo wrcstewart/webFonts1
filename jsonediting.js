@@ -75,6 +75,15 @@ function edit(elTrackSpinner, isFeaturing) {
       gainNodeArray[track].gain.value = normalGain;
     }
   }
+  curPitchArray =[];
+  curPosPitchArray=0;
+  document.getElementById("arrayPositionId").value =0;
+  curInnerPitchArray =[];
+
+
+
+
+
   doEdit(editTrack, mLineArray);
 }
 
@@ -179,7 +188,10 @@ function updateOctave(oldNoteNamePlusOctave, octave) {
   let l = oldNoteNamePlusOctave.length;
   let noteNameStem = oldNoteNamePlusOctave.substring(0, l - 1);
   curInnerPitchArray[0] = noteNameStem + octave;
-  curPitchArray[curPosPitchArray] = curInnerPitchArray;
+ // curPitchArray[curPosPitchArray] = curInnerPitchArray;
+ curPitchArray[curPosPitchArray][0] = noteNameStem + octave;
+
+
   document.getElementById("taArrayValueId").value =
     JSON.stringify(curPitchArray[curPosPitchArray]);
   //taValueEl = document.getElementById("taArrayValueId").value;

@@ -121,8 +121,7 @@
 
       var music10 = new MLine(1, "CHORD", 0, 4, "Acoustic Grand Piano", 60, beatFlute3, ["C4", 0, 0, ["A3", 0, 3, 7, 0], ["G4", 0, 7], ["G4", 5, 0], ["F4", 0, 4, 7, 0], ["F4", 0, 4, 7, 0], ["E4", 6, 0], ["E4", 0, 7]], 0.98);
 
-      var music12 = new MLine(0, "ARPEGGIO", 0, 4, "Acoustic Grand Piano", 60, beatFlute3, ["C4", ["A5", 0, 3, 7, 0], ["A5", 0, 3, 7, 0],
-        ["G4", 0, 7], ["G4", 5, 0], ["F4", 0, 4, 7, 0], ["F4", 0, 4, 7, 0], ["E4", 6, 0], ["E4", 0, 7]], 0.98);
+      var music12 = new MLine(1, "ARPEGGIO", 0, 8, "Acoustic Grand Piano", 60, beatFlute3, [["B4", 0],["B4", 0],["B4", 0],["B4", 0]], 0.98);
 
       var music11 = new MLine(0, "CHORD", 0, 4, "Acoustic Bass Drum", 60,
         beatHighHat1, ["C4", 0, 7, 12, 15], 0.9);
@@ -133,9 +132,9 @@
 
 // ***** determine a section***
 
-      sectionsArray[0] = [music12,music10];// music11,music12];
+      sectionsArray[0] = [music10];// music11,music12];
       sectionsArray[1] = [music11];
-      sectionsArray[2] = [music13];
+      sectionsArray[2] = [music13,music12];
 
 
       mLineArray = sectionsArray[(sectionsArray.length)-1];

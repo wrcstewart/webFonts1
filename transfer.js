@@ -83,8 +83,12 @@ function buttonNoteNameRow(panelIdStr, nButs, textArray, left, width, top, heigh
 function setPitchArrayNoteName(aNoteName) {
 
   let oldNoteNamePlusOctave = curPitchArray[curPosPitchArray][0];
+  curPitchArray[curPosPitchArray] =[];
   updateNoteNamePlusOctave(oldNoteNamePlusOctave, aNoteName);
+  curPitchArray[curPosPitchArray][1] =0;
 }
+
+
 
 function setPitchArrayOctave(octave) {
   let oldNoteNamePlusOctave = curPitchArray[curPosPitchArray][0];

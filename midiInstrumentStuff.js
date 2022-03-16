@@ -91,25 +91,35 @@ const instrumentsMap = new Map();
       beatsMap.set('SR', 0.25);
     }
 
-     var noteNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];//used to construct notes[] below
+    // var noteNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];//used to construct notes[] below
+     var noteNames =  ["A", "A#", "B","C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"];
     var noteNamesA = ["A", "A#", "B","C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"];
     var noteOctaves = ["0","1","2","3","4","5","6","7"];
     var dyadNamesPlus = ["1","+m2","+2","+m3","+3","+4","+m5","+5","+m6","+6","+m7","+7","+8","+9","+11","+13","+15"];
     var dyadNamesMinus = ["1","-m2","-2","-m3","-3","-4","-m5","-5","-m6","-6","-m7","-7","-8","-9","-11","-13","-15"];
-var triadNames = ["prim","sus2","min","maj","sus4","dim","aug","oct"];
+var triadNames = ["prim","sus2","m","M","sus4","dim","aug","oct"];
+var tetradNames = ["m&6","M&6","m&m7","M&m7","m&7","M&7","mOct","MOct"];
 
 
     const chords = new Map();
 
     chords.set("prim",[0,0,0]);
     chords.set("sus2",[0,2,7]);
-    chords.set("min",[0,3,7]);
-    chords.set("maj",[0,4,7]);
+    chords.set("m",[0,3,7]);
+    chords.set("M",[0,4,7]);
     chords.set("sus4",[0,5,7]);
     chords.set("dim",[0,3,6]);
     chords.set("aug",[0,4,8]);
     chords.set("oct",[0,8,8]);
 
+    chords.set("m&6",[0,3,7,9]);
+    chords.set("M&6",[0,4,7,9]);
+    chords.set("m&m7",[0,3,7,10]);
+    chords.set("M&m7",[0,4,7,10]);
+    chords.set("m&7",[0,3,7,11]);
+    chords.set("M&7",[0,4,7,11]);
+    chords.set("mOct",[0,3,7,12]);
+    chords.set("MOct",[0,4,7,12]);
 
 
 
@@ -155,24 +165,30 @@ chords.set("1",[0,0]);
     var notes = []; // this allows easy look up of note name to midi number - but based with A0 = 0
     // a function will add 21 to give the correct official midi number of the notes.
     // the true note names are only used once per generative run - to allow user to enter start note.
-    var notesIx = 3;//index 3 will correspond to the first C
+    //var notesIx = 3;//index 3 will correspond to the first C
+    var notesIx = 0;//index 3 will correspond to the first C
 
     // next loop adds the octave number to the noteName across th octaves outs result in notes[]
     // see the array definitions/ inits for clarification.
-    for (let octave = 1; octave <= 7; octave++) {
+    for (let octave = 0; octave <= 7; octave++) {
       for (let noteNamesIx = 0; noteNamesIx <= 11; noteNamesIx++) {
         notes[notesIx] = noteNames[noteNamesIx] + octave;
         notesIx++;
       }
     }
     //now fill in the few notes not covered by the loop above
-
+/*
     {
       notes[0] = "A0";
       notes[1] = "A#0";
       notes[2] = "B0";
       notes[87] = "C8";
     }
+    */
+
+
+
+
 
      function getMidiNumberFromName(noteName) {
       return (notes.indexOf(noteName) + 21)

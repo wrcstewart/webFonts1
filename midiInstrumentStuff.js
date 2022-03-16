@@ -94,6 +94,64 @@ const instrumentsMap = new Map();
      var noteNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];//used to construct notes[] below
     var noteNamesA = ["A", "A#", "B","C", "C#", "D", "D#", "E", "F", "F#", "G", "G#"];
     var noteOctaves = ["0","1","2","3","4","5","6","7"];
+    var dyadNamesPlus = ["1","+m2","+2","+m3","+3","+4","+m5","+5","+m6","+6","+m7","+7","+8","+9","+11","+13","+15"];
+    var dyadNamesMinus = ["1","-m2","-2","-m3","-3","-4","-m5","-5","-m6","-6","-m7","-7","-8","-9","-11","-13","-15"];
+var triadNames = ["prim","sus2","min","maj","sus4","dim","aug","oct"];
+
+
+    const chords = new Map();
+
+    chords.set("prim",[0,0,0]);
+    chords.set("sus2",[0,2,7]);
+    chords.set("min",[0,3,7]);
+    chords.set("maj",[0,4,7]);
+    chords.set("sus4",[0,5,7]);
+    chords.set("dim",[0,3,6]);
+    chords.set("aug",[0,4,8]);
+    chords.set("oct",[0,8,8]);
+
+
+
+
+chords.set("1",[0,0]);
+    chords.set("+m2",[0,1]);
+    chords.set("+2",[0,2]);
+    chords.set("+m3",[0,3]);
+    chords.set("+3",[0,4]);
+    chords.set("+4",[0,5]);
+    chords.set("+m5",[0,6]);
+    chords.set("+5",[0,7]);
+    chords.set("+m6",[0,8]);
+    chords.set("+6",[0,9]);
+    chords.set("+m7",[0,10]);
+    chords.set("+7",[0,11]);
+    chords.set("+8",[0,12]);
+    chords.set("+9",[0,14]);
+    chords.set("+11",[0,17]);
+    chords.set("+13",[0,21]);
+    chords.set("+15",[0,23]);
+    chords.set("-m2",[0,-1]);
+    chords.set("-2",[0,-2]);
+    chords.set("-m3",[0,-3]);
+    chords.set("-3",[0,-4]);
+    chords.set("-4",[0,-5]);
+    chords.set("-m5",[0,-6]);
+    chords.set("-5",[0,-7]);
+    chords.set("-m6",[0,-8]);
+    chords.set("-6",[0,-9]);
+    chords.set("-m7",[0,-10]);
+    chords.set("-7",[0,-11]);
+    chords.set("-8",[0,-12]);
+    chords.set("-9",[0,-14]);
+    chords.set("-11",[0,-17]);
+    chords.set("-13",[0,-21]);
+    chords.set("15",[0,-23]);
+
+
+
+
+
+
     var notes = []; // this allows easy look up of note name to midi number - but based with A0 = 0
     // a function will add 21 to give the correct official midi number of the notes.
     // the true note names are only used once per generative run - to allow user to enter start note.

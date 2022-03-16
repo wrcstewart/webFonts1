@@ -10,6 +10,7 @@ function initC(idStr, colStr, l, w, t, h) {
     "height": h + "%"
   })
 };
+
 /*
 function crBut(str) {
 
@@ -33,7 +34,7 @@ function crBut(str) {
 
 
 function buttonNoteNameRow(panelIdStr, nButs, textArray, left, width, top, height, colStr) {
-   var $buts = [];
+  var $buts = [];
   // textArray should be of length nButs and contain the labels for the nButs buttons.
   // the strings will also be used within a corresponding click function to select the reqd. action
 
@@ -43,57 +44,56 @@ function buttonNoteNameRow(panelIdStr, nButs, textArray, left, width, top, heigh
   let butSpace = (width * relSpacingWidth) / nButs;
 
   for (let i = 0; i < nButs; i++) {
-     $buts[i] = $('<button/>',
-       {text:textArray[i],
-       })
+    $buts[i] = $('<button/>',
+      {
+        text: textArray[i],
+      })
 
-     $buts[i].click(function () {
+    $buts[i].click(function () {
 
-       if(!chordEditorActive) alert("please set edit field to pitchBeats in order to use the chord editor");
-       if(chordEditorActive) {
+      if (!chordEditorActive) alert("please set edit field to pitchBeats in order to use the chord editor");
+      if (chordEditorActive) {
         // alert("note namepressed");
-         setPitchArrayNoteName(textArray[i]);
+        setPitchArrayNoteName(textArray[i]);
 
-         let valStr = JSON.stringify(curPitchArray);
+        let valStr = JSON.stringify(curPitchArray);
 
-          taValueEl.value = valStr;
-
-
-       }
+        taValueEl.value = valStr;
 
 
+      }
 
 
-   // alert(textArray[i]);
-  });
+      // alert(textArray[i]);
+    });
 
-       $buts[i].css({
+    $buts[i].css({
 
-       position:'absolute',
-       left:(butSpace)/2 + (i* width/nButs) + "px",
-       width:butWidth+"px",
-       top:top+"px",
-       height:height+"px"
-     });
+      position: 'absolute',
+      left: (butSpace) / 2 + (i * width / nButs) + "px",
+      width: butWidth + "px",
+      top: top + "px",
+      height: height + "px"
+    });
 
-     $("#" + panelIdStr).append($buts[i]);
+    $("#" + panelIdStr).append($buts[i]);
   }
 }
 
-function setPitchArrayNoteName(aNoteName){
+function setPitchArrayNoteName(aNoteName) {
 
   let oldNoteNamePlusOctave = curPitchArray[curPosPitchArray][0];
-   updateNoteNamePlusOctave(oldNoteNamePlusOctave, aNoteName);
+  updateNoteNamePlusOctave(oldNoteNamePlusOctave, aNoteName);
 }
 
-function setPitchArrayOctave(octave){
+function setPitchArrayOctave(octave) {
   let oldNoteNamePlusOctave = curPitchArray[curPosPitchArray][0];
-   updateOctave(oldNoteNamePlusOctave, octave);
+  updateOctave(oldNoteNamePlusOctave, octave);
 
 }
 
 function buttonNoteOctaveRow(panelIdStr, nButs, textArray, left, width, top, height, colStr) {
-   var $buts = [];
+  var $buts = [];
   // textArray should be of length nButs and contain the labels for the nButs buttons.
   // the strings will also be used within a corresponding click function to select the reqd. action
 
@@ -101,43 +101,107 @@ function buttonNoteOctaveRow(panelIdStr, nButs, textArray, left, width, top, hei
   let relSpacingWidth = 0.1;
   let butWidth = (width * relButWidth) / nButs;
   let butSpace = (width * relSpacingWidth) / nButs;
-
   for (let i = 0; i < nButs; i++) {
-     $buts[i] = $('<button/>',
-       {text:textArray[i],
-       })
+    $buts[i] = $('<button/>',
+      {
+        text: textArray[i],
+      })
+    $buts[i].click(function () {
 
-     $buts[i].click(function () {
-
-       if(!chordEditorActive) alert("please set edit field to pitchBeats in order to use the chord editor");
-       if(chordEditorActive) {
+      if (!chordEditorActive) alert("please set edit field to pitchBeats in order to use the chord editor");
+      if (chordEditorActive) {
         // alert("note namepressed");
-         setPitchArrayOctave(textArray[i]);
+        setPitchArrayOctave(textArray[i]);
 
-         let valStr = JSON.stringify(curPitchArray);
+        let valStr = JSON.stringify(curPitchArray);
 
-          taValueEl.value = valStr;
+        taValueEl.value = valStr;
+      }
+      // alert(textArray[i]);
+    });
 
+    $buts[i].css({
 
-       }
+      position: 'absolute',
+      left: (butSpace) / 2 + (i * width / nButs) + "px",
+      width: butWidth + "px",
+      top: top + "px",
+      height: height + "px"
+    });
 
-
-
-
-   // alert(textArray[i]);
-  });
-
-       $buts[i].css({
-
-       position:'absolute',
-       left:(butSpace)/2 + (i* width/nButs) + "px",
-       width:butWidth+"px",
-       top:top+"px",
-       height:height+"px"
-     });
-
-     $("#" + panelIdStr).append($buts[i]);
+    $("#" + panelIdStr).append($buts[i]);
   }
 }
+
+//---------------------------------------------------------------------------
+
+function buttonChordsRow(panelIdStr, nButs, textArray, left, width, top, height, colStr) {
+  var $buts = [];
+  // textArray should be of length nButs and contain the labels for the nButs buttons.
+  // the strings will also be used within a corresponding click function to select the reqd. action
+
+  let relButWidth = 1.0;
+  let relSpacingWidth = 0;
+  let butWidth = (width * relButWidth) / nButs;
+  let butSpace = (width * relSpacingWidth) / nButs;
+  for (let i = 0; i < nButs; i++) {
+    $buts[i] = $('<button/>',
+      {
+        text: textArray[i],
+        textAlign: left,
+
+      })
+    $buts[i].click(function () {
+
+      if (!chordEditorActive) alert("please set edit field to pitchBeats in order to use the chord editor");
+      if (chordEditorActive) {
+        // alert("note namepressed");
+
+        let updateArray = chords.get(textArray[i]);
+        curPitchArray[curPosPitchArray] = updateArrayAfterIx0(curPitchArray[curPosPitchArray], updateArray);
+
+        document.getElementById("taArrayValueId").value =
+          JSON.stringify(curPitchArray[curPosPitchArray]);
+
+        let valStr = JSON.stringify(curPitchArray);
+
+        taValueEl.value = valStr;
+      }
+      // alert(textArray[i]);
+    });
+
+    $buts[i].css({
+      margin:0,
+      padding:0,
+      fontSize: 10,
+      textAlign:'left',
+      position: 'absolute',
+      left: (butSpace) / 2 + (i * width / nButs) + "px",
+      width: butWidth + "px",
+      top: top + "px",
+
+      height: height + "px"
+    });
+
+    $("#" + panelIdStr).append($buts[i]);
+
+
+  }
+}
+
+function updateArrayAfterIx0(oldArray, newEndOfArray) {
+  // first ensure entries after ix 0 are clear.
+
+  let firstEntry = oldArray[0];
+  oldArray = [];
+  oldArray[0] = firstEntry;
+
+  // now good old for loop
+  for (let i = 0; i < newEndOfArray.length; i++) {
+    oldArray[i + 1] = newEndOfArray[i];
+  }
+  return (oldArray);
+}
+
 
 

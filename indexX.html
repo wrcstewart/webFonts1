@@ -93,8 +93,11 @@
 
  //
       // crBut("testButton");
-       buttonNoteNameRow("editButtonsPanel",12,noteNamesA,0, 400, 60, 30,"Blue");
-       buttonNoteOctaveRow("editButtonsPanel",8,noteOctaves,0, 400, 100, 30,"Blue");
+       buttonNoteNameRow("editButtonsPanel",12,noteNamesA,0, 450, 100, 30,"Blue");
+       buttonNoteOctaveRow("editButtonsPanel",8,noteOctaves,0, 450, 60, 30,"Blue");
+       buttonChordsRow("editButtonsPanel",17,dyadNamesPlus,0, 450, 140, 30,"Blue");
+      buttonChordsRow("editButtonsPanel",17,dyadNamesMinus,0, 450, 170, 30,"Blue");
+      buttonChordsRow("editButtonsPanel",8,triadNames,0, 450, 200, 30,"Blue");
 
     }
 
@@ -125,7 +128,7 @@
         beatHighHat1, ["C4", 0, 7, 12, 15], 0.9);
 
        var music13 = new MLine(0, "CHORD", 0, 8, "Acoustic Grand Piano", 60,
-        beatHighHat1, [["C4", 0],["C4", 4],["C4", 7],["C4", 11]], 0.9);
+        beatHighHat1, [["C4", 0],["C4", 0],["C4", 0],["C4", 0]], 0.9);
 
 
 // ***** determine a section***
@@ -193,15 +196,15 @@
 
 <!-- will show the json version of the music section -->
 <textarea id="ta1" readonly wrap="soft"
-          style="position:absolute;left:420px;top:1px;width:400px;height:580px;">awaiting load</textarea>
+          style="position:absolute;left:450px;top:1px;width:400px;height:380px;">awaiting load</textarea>
 
 <!-- will show the notes as they are played -->
 <textarea id="ta4" readonly
-          style="position:absolute;top:600px;left:1px;width: 1000px; height: 230px;">Playing Now</textarea>
+          style="position:absolute;top:600px;left:1px;width: 450px; height: 230px;">Playing Now</textarea>
 <!-- will show the development area that will hold the list of pieces -->
 <!-- the list of the pieces functions will be developed here  -->
 <textarea id="taPublic"
-          style="position:absolute;top:1px;left:840px; width: 400px; height: 580px;">Store: List of Bars</textarea>
+          style="position:absolute;top:400px;left:450px; width: 400px; height: 400px;">Store: List of Bars</textarea>
 
 
 <div id="editControlsPanel"   style="position:absolute;top:50px;left:1px;width:400px;height:200px;background-color: #b3d4fc">
@@ -233,7 +236,7 @@
 
 </div>
 
-<div id="editButtonsPanel"   style="position:absolute;top:201px;left:1px;width:400px;height:300px;background-color: #b3e4fc" >
+<div id="editButtonsPanel"   style="position:absolute;top:201px;left:1px;width:450px;height:300px;background-color: #b3e4fc" >
   <input type="number" name="arrayPosition" id="arrayPositionId" style="position:absolute; left:100px; top:1px; width:30px;"
          oninput="selectPosition(this.value)"
          min="0" max="20" step="1" value="0">

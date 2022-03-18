@@ -100,7 +100,7 @@
       buttonChordsRow("editButtonsPanel",8,triadNames,0, 450, 200, 30,"Blue");
       buttonChordsRow("editButtonsPanel",8,tetradNames,0, 450, 232, 30,"Blue");
 
-      alert(getMidiNumberFromName("B4") + "  " + getMidiNumberFromName("C4"));
+     // alert(getMidiNumberFromName("B4") + "  " + getMidiNumberFromName("C4"));
 
 
     }
@@ -125,20 +125,28 @@
 
       var music10 = new MLine(0, "CHORD", 0, 4, "Acoustic Grand Piano", 60, beatFlute3, ["C4", 0, 0, ["A3", 0, 3, 7, 0], ["G4", 0, 7], ["G4", 5, 0], ["F4", 0, 4, 7, 0], ["F4", 0, 4, 7, 0], ["E4", 6, 0], ["E4", 0, 7]], 0.98);
 
-      var music12 = new MLine(1, "ARPEGGIO", 0, 8, "Acoustic Grand Piano", 60, beatFlute3, [["B4", 0],["B4", 0],["B4", 0],["B4", 0]], 0.98);
+      var music12A = new MLine(1, "ARPEGGIO", 0, 8, "Acoustic Grand Piano", 60, beatFlute3, [["B4", 0],["B4", 0],["B4", 0],["B4", 0]], 0.98);
+      var music12B = new MLine(1, "ARPEGGIO", 0, 8, "Acoustic Grand Piano", 60, beatFlute3, [["G4", 0],["G4", 0],["G4", 0],["G4", 0]], 0.98);
+      var music12C = new MLine(1, "ARPEGGIO", 0, 8, "Acoustic Grand Piano", 60, beatFlute3, [["G4", 0],["G4", 0],["G4", 0],["G4", 0]], 0.98);
 
       var music11 = new MLine(0, "CHORD", 0, 4, "Acoustic Bass Drum", 60,
         beatHighHat1, ["C4", 0, 7, 12, 15], 0.9);
 
-       var music13 = new MLine(0, "CHORD", 0, 8, "Acoustic Grand Piano", 60,
+       var music13A = new MLine(0, "CHORD", 0, 8, "Acoustic Grand Piano", 60,
+        beatHighHat1, [["C4", 0],["C4", 0],["C4", 0],["C4", 0]], 0.9);
+
+        var music13B = new MLine(0, "CHORD", 0, 8, "Acoustic Grand Piano", 60,
+        beatHighHat1, [["C4", 0],["C4", 0],["C4", 0],["C4", 0]], 0.9);
+
+         var music13C = new MLine(0, "CHORD", 0, 8, "Acoustic Grand Piano", 60,
         beatHighHat1, [["C4", 0],["C4", 0],["C4", 0],["C4", 0]], 0.9);
 
 
 // ***** determine a section***
 
-      sectionsArray[0] = [music10];// music11,music12];
-      sectionsArray[1] = [music11];
-      sectionsArray[2] = [music13,music12];
+      sectionsArray[0] = [music13A,music12A];// music11,music12];
+      sectionsArray[1] = [music13B,music12B];
+      //sectionsArray[2] = [music13C,music12C];
 
 
       mLineArray = sectionsArray[(sectionsArray.length)-1];

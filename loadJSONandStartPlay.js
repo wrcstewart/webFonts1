@@ -1,6 +1,7 @@
  var origin;// this is used by soundfont player to find current time zero in the audio context
 
  function loadJSON() {
+   // put bit below in a function
       let but = document.getElementById("loadMusicLine");
 
       let playState = but.getAttribute("data-playing");
@@ -32,7 +33,16 @@
 
       // setTimeout(stoppingRecorder,(mLineArray[0]).finish)*1000);
      // playSection(mLineArray, origin);
-   playComposition(sectionsArray,origin);
+
+   //playComposition(sectionsArray,origin);
+
+   curNumberOfBarsToPlay = 2;//later set this in gui
+    lastIx = sectionsArray.length-1;
+   firstIx = 1 + lastIx - curNumberOfBarsToPlay;
+    origin = audioContext.currentTime;
+    playPartComposition(sectionsArray,origin, firstIx, lastIx);
+
+
 
     }//main PLAY it function !!!!!!!
 
@@ -136,6 +146,24 @@ function setSectionsArrayTimes(sectionsArray,startsArray,finishesArray){
 
  }
 
+function copyPartArrayDeep(inArray,firstIx,lastIx){
+      // create an array deep copied from inArray from firstIx to lastIx
+      let outArray=[];
+      let j=0;
+
+  for(let i=firstIx;i <= lastIx;i++) {
+    outArray[j] = JSON.parse(JSON.stringify(inArray[i]));
+    j++
+  }
+  return(outArray)
+
+}
+
+ function playPartComposition(sectionsArray,origin,firstIx,lastIx) {
+
+      let partSectionsArray = copyPartArrayDeep(sectionsArray,firstIx,lastIx);
+      playComposition(partSectionsArray,origin);
+    }
 
 
 

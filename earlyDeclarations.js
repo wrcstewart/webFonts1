@@ -12,6 +12,8 @@ var audioContext = new (window.AudioContext || window.webkitAudioContext)();
     var curPitchArray;
     var curPosPitchArray;
     var curInnerPitchArray;
+    var curNumberOfBarsToPlay;
+    var audioFileLink;
 
 
 

@@ -29,13 +29,36 @@ mediaRecorder.onstop = function (evt) {
   // Browsers that support HTML5 download attribute
   var url = URL.createObjectURL(blob);
 
-  var link = document.createElement("a");
-  link.setAttribute("href", url);
-  link.setAttribute("download", "audiotestAmpF");
-  link.style.visibility = 'hidden';
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
+ // var link = document.createElement("a");
+  audioFileLink = document.createElement("a");
+
+  //link.setAttribute("href", url);
+  audioFileLink.setAttribute("href", url);
+
+ // link.setAttribute("download", "audiotestAmpF");
+  audioFileLink.setAttribute("download", "audiotestAmpF");
+
+  //link.style.visibility = 'hidden';
+  audioFileLink.style.visibility = 'hidden';
+
+  //document.body.appendChild(link);
+  document.body.appendChild(audioFileLink);
+  document.getElementById("idSaveAudio").disabled = false;
+
+ // link.click();
+ // audioFileLink.click();
+
+  //document.body.removeChild(link);
+  //document.body.removeChild(audioFileLink);
+
+
+}
+
+function saveAudio(){
+  audioFileLink.click();
+  document.body.removeChild(audioFileLink);
+   document.getElementById("idSaveAudio").disabled = true;
+
 }
 
 function stoppingRecorder() {

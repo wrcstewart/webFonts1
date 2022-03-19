@@ -59,6 +59,12 @@ function buttonNoteNameRow(panelIdStr, nButs, textArray, left, width, top, heigh
         let valStr = JSON.stringify(curPitchArray);
 
         taValueEl.value = valStr;
+         origin = audioContext.currentTime;
+
+        let oldFirstIx = firstIx;
+        firstIx = lastIx;
+        playPartComposition(sectionsArray, origin, firstIx, lastIx);
+        firstIx = oldFirstIx;
 
 
       }
@@ -83,11 +89,10 @@ function buttonNoteNameRow(panelIdStr, nButs, textArray, left, width, top, heigh
 function setPitchArrayNoteName(aNoteName) {
 
   let oldNoteNamePlusOctave = curPitchArray[curPosPitchArray][0];
-  curPitchArray[curPosPitchArray] =[];
+  curPitchArray[curPosPitchArray] = [];
   updateNoteNamePlusOctave(oldNoteNamePlusOctave, aNoteName);
-  curPitchArray[curPosPitchArray][1] =0;
+  curPitchArray[curPosPitchArray][1] = 0;
 }
-
 
 
 function setPitchArrayOctave(octave) {
@@ -120,6 +125,13 @@ function buttonNoteOctaveRow(panelIdStr, nButs, textArray, left, width, top, hei
         let valStr = JSON.stringify(curPitchArray);
 
         taValueEl.value = valStr;
+
+        origin = audioContext.currentTime;
+
+        let oldFirstIx = firstIx;
+        firstIx = lastIx;
+        playPartComposition(sectionsArray, origin, firstIx, lastIx);
+        firstIx = oldFirstIx;
       }
       // alert(textArray[i]);
     });
@@ -170,15 +182,23 @@ function buttonChordsRow(panelIdStr, nButs, textArray, left, width, top, height,
         let valStr = JSON.stringify(curPitchArray);
 
         taValueEl.value = valStr;
+         origin = audioContext.currentTime;
+
+        let oldFirstIx = firstIx;
+        firstIx = lastIx;
+        playPartComposition(sectionsArray, origin, firstIx, lastIx);
+        firstIx = oldFirstIx;
+
+
       }
       // alert(textArray[i]);
     });
 
     $buts[i].css({
-      margin:0,
-      padding:0,
+      margin: 0,
+      padding: 0,
       fontSize: 10,
-      textAlign:'left',
+      textAlign: 'left',
       position: 'absolute',
       left: (butSpace) / 2 + (i * width / nButs) + "px",
       width: butWidth + "px",

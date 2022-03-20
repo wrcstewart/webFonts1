@@ -189,6 +189,7 @@ function inputField(taNameEl, taValueEl) {
   obj[aKeyString] = JSON.parse(taValueEl.value);
   mLineArrayEdit[curEditTrackIx] = obj; //reinsert into master array of mLine objects.
   doFormatArray(mLineArrayEdit, document.getElementById("ta1"));
+   document.getElementById("idSaveAudio").disabled = true;
 }
 
 function selectPosition(pos) {

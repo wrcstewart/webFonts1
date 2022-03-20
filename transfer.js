@@ -51,8 +51,14 @@ function buttonNoteNameRow(panelIdStr, nButs, textArray, left, width, top, heigh
 
     $buts[i].click(function () {
 
+
+
       if (!chordEditorActive) alert("please set edit field to pitchBeats in order to use the chord editor");
       if (chordEditorActive) {
+
+         let but = document.getElementById("loadMusicLine");
+       let playState = but.getAttribute("data-playing");
+       but.setAttribute("data-playing", "on");
         // alert("note namepressed");
         setPitchArrayNoteName(textArray[i]);
 
@@ -65,6 +71,7 @@ function buttonNoteNameRow(panelIdStr, nButs, textArray, left, width, top, heigh
         firstIx = lastIx;
         playPartComposition(sectionsArray, origin, firstIx, lastIx);
         firstIx = oldFirstIx;
+        but.setAttribute("data-playing",playState);
 
 
       }
@@ -117,8 +124,16 @@ function buttonNoteOctaveRow(panelIdStr, nButs, textArray, left, width, top, hei
       })
     $buts[i].click(function () {
 
+
+
+
+
       if (!chordEditorActive) alert("please set edit field to pitchBeats in order to use the chord editor");
       if (chordEditorActive) {
+
+         let but = document.getElementById("loadMusicLine");
+       let playState = but.getAttribute("data-playing");
+       but.setAttribute("data-playing", "on");
         // alert("note namepressed");
         setPitchArrayOctave(textArray[i]);
 
@@ -132,8 +147,10 @@ function buttonNoteOctaveRow(panelIdStr, nButs, textArray, left, width, top, hei
         firstIx = lastIx;
         playPartComposition(sectionsArray, origin, firstIx, lastIx);
         firstIx = oldFirstIx;
+         but.setAttribute("data-playing",playState);
       }
       // alert(textArray[i]);
+
     });
 
     $buts[i].css({
@@ -147,6 +164,7 @@ function buttonNoteOctaveRow(panelIdStr, nButs, textArray, left, width, top, hei
 
     $("#" + panelIdStr).append($buts[i]);
   }
+
 }
 
 //---------------------------------------------------------------------------
@@ -169,10 +187,13 @@ function buttonChordsRow(panelIdStr, nButs, textArray, left, width, top, height,
       })
     $buts[i].click(function () {
 
+
       if (!chordEditorActive) alert("please set edit field to pitchBeats in order to use the chord editor");
       if (chordEditorActive) {
         // alert("note namepressed");
-
+let but = document.getElementById("loadMusicLine");
+       let playState = but.getAttribute("data-playing");
+       but.setAttribute("data-playing", "on");
         let updateArray = chords.get(textArray[i]);
         curPitchArray[curPosPitchArray] = updateArrayAfterIx0(curPitchArray[curPosPitchArray], updateArray);
 
@@ -188,7 +209,7 @@ function buttonChordsRow(panelIdStr, nButs, textArray, left, width, top, height,
         firstIx = lastIx;
         playPartComposition(sectionsArray, origin, firstIx, lastIx);
         firstIx = oldFirstIx;
-
+but.setAttribute("data-playing",playState);
 
       }
       // alert(textArray[i]);

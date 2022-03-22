@@ -92,6 +92,7 @@
         tracksA[k] = new MidiWriter.Track();
       }
 
+
  //
       // crBut("testButton");
        buttonNoteNameRow("editButtonsPanel",12,noteNamesA,0, 450, 100, 30,"Blue");
@@ -105,6 +106,43 @@
 
 
     }
+var musicKey = 'mettaTreeMusicStorage';
+    function initSectionsArray(){
+
+
+      if (localStorage.getItem(musicKey) === null){
+         var basicBeat = ["CF","C","C","C"];
+        var musicZero0 = new MLine(0, "CHORD", 0, 4, "Acoustic Grand Piano", 60,
+        basicBeat, [["C4", 0],["C4", 0],["C4", 0],["C4", 0]], 0.9);
+         var musicZero1 = new MLine(1, "CHORD", 0, 4, "Acoustic Grand Piano", 60,
+        basicBeat, [["C4", 0],["C4", 0],["C4", 0],["C4", 0]], 0.9);
+         var musicZero2 = new MLine(2, "CHORD", 0, 4, "Acoustic Grand Piano", 60,
+        basicBeat, [["C4", 0],["C4", 0],["C4", 0],["C4", 0]], 0.9);
+
+        sectionsArray[0] = [musicZero0,musicZero1,musicZero2];
+        localStorage.setItem(musicKey,JSON.stringify(sectionsArray));
+      }
+
+
+      else{
+        sectionsArray = JSON.parse(localStorage.getItem(musicKey));
+      }
+
+    }
+    //now do it
+    initSectionsArray();
+
+    function addDuplicateOfLastEntry(anArray){
+      let l = anArray.length;
+      let lastEntry = anArray[l-1];
+      let duplicate = JSON.parse( JSON.stringify(lastEntry));
+      anArray[l] = duplicate;
+      return(anArray);
+    }
+
+    //do the duplication
+    sectionsArray = addDuplicateOfLastEntry(sectionsArray);
+
 
     function genMusic() {
 
@@ -145,16 +183,18 @@
 
 // ***** determine a section***
 
-      sectionsArray[0] = [music13A,music12A];// music11,music12];
-      sectionsArray[1] = [music13B,music12B];
-      sectionsArray[2] = [music13C,music12C];
+      //sectionsArray[0] = [music13A,music12A];// music11,music12];
+      //sectionsArray[1] = [music13B,music12B];
+      //sectionsArray[2] = [music13C,music12C];
 
 
       mLineArray = sectionsArray[(sectionsArray.length)-1];
 
 lastIx = sectionsArray.length -1;
 
-if (lastIx>0)  {firstIx = lastIx-1} else {firstIx =lastIx};
+//if (lastIx>0)  {firstIx = lastIx-1} else {firstIx =lastIx};
+
+fistIx =0;
 
 
 

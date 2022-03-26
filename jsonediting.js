@@ -141,7 +141,7 @@ function doEdit(editTrack, mLineArray) {
   outputField(aMLine, document.getElementById("fieldNumber").value, taNameEl, taValueEl);
   return
 }
-
+/*
 function doFormat(obj, aTextAreaEl) {
 
   let arrayOfKeys = Object.keys(obj);
@@ -153,7 +153,7 @@ function doFormat(obj, aTextAreaEl) {
     aTextAreaEl.value = aTextAreaEl.value + aEntryStr + "\n";
   }
 }
-
+*/
 function outputField(obj, position, taNameEl, taValueEl) {
   let arr = Object.entries(obj);
   let aField = arr[position];
@@ -178,8 +178,14 @@ function outputField(obj, position, taNameEl, taValueEl) {
   }
   ;
 
-
 }
+
+
+
+
+
+
+
 
 function inputField(taNameEl, taValueEl) {
   let l = sectionsArray.length;
@@ -187,6 +193,23 @@ function inputField(taNameEl, taValueEl) {
   let obj = mLineArrayEdit[curEditTrackIx];
   let aKeyString = taNameEl.value;
   obj[aKeyString] = JSON.parse(taValueEl.value);
+  mLineArrayEdit[curEditTrackIx] = obj; //reinsert into master array of mLine objects.
+  doFormatArray(mLineArrayEdit, document.getElementById("ta1"));
+   document.getElementById("idSaveAudio").disabled = true;
+}
+
+function inputValueForKey(key, taValueEl) {
+  // on the action of the corresponding button etc, taValue receives the value to set for the key
+  //and this function is then called.
+  // the value is then set into music.
+  // the last entry of sectionsArray contains the section being edited
+  //curEditTrackIx determines which trackIx within that section
+  let l = sectionsArray.length;
+  mLineArrayEdit = sectionsArray[l - 1];
+  let obj = mLineArrayEdit[curEditTrackIx];
+  //let aKeyString = taNameEl.value;
+  //obj[aKeyString] = JSON.parse(taValueEl.value);
+  obj[key] = JSON.parse(taValueEl.value);
   mLineArrayEdit[curEditTrackIx] = obj; //reinsert into master array of mLine objects.
   doFormatArray(mLineArrayEdit, document.getElementById("ta1"));
    document.getElementById("idSaveAudio").disabled = true;

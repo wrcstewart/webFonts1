@@ -36,9 +36,9 @@
 
    //playComposition(sectionsArray,origin);
 
-   curNumberOfBarsToPlay = 2;//later set this in gui
+   //curNumberOfBarsToPlay = 2;//later set this in gui
     lastIx = sectionsArray.length-1;
-   firstIx = 1 + lastIx - curNumberOfBarsToPlay;
+   firstIx = 0;//1 + lastIx - curNumberOfBarsToPlay;
     origin = audioContext.currentTime;
     playPartComposition(sectionsArray,origin, firstIx, lastIx);
 

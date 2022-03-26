@@ -67,10 +67,11 @@ function buttonNoteNameRow(panelIdStr, nButs, textArray, left, width, top, heigh
         taValueEl.value = valStr;
          origin = audioContext.currentTime;
 
-        let oldFirstIx = firstIx;
-        firstIx = lastIx;
+       // let oldFirstIx = firstIx;
+        //firstIx = lastIx;
+         barsToPlay(document.getElementById("barsToPlayId").value);// set firstIx and lastIx
         playPartComposition(sectionsArray, origin, firstIx, lastIx);
-        firstIx = oldFirstIx;
+        //firstIx = oldFirstIx;
         but.setAttribute("data-playing",playState);
 
 
@@ -143,10 +144,11 @@ function buttonNoteOctaveRow(panelIdStr, nButs, textArray, left, width, top, hei
 
         origin = audioContext.currentTime;
 
-        let oldFirstIx = firstIx;
-        firstIx = lastIx;
+        //let oldFirstIx = firstIx;
+       //firstIx = lastIx;
+        barsToPlay(document.getElementById("barsToPlayId").value);
         playPartComposition(sectionsArray, origin, firstIx, lastIx);
-        firstIx = oldFirstIx;
+        //firstIx = oldFirstIx;
          but.setAttribute("data-playing",playState);
       }
       // alert(textArray[i]);
@@ -205,10 +207,11 @@ let but = document.getElementById("loadMusicLine");
         taValueEl.value = valStr;
          origin = audioContext.currentTime;
 
-        let oldFirstIx = firstIx;
-        firstIx = lastIx;
+        //let oldFirstIx = firstIx;
+       // firstIx = lastIx;
+         barsToPlay(document.getElementById("barsToPlayId").value);
         playPartComposition(sectionsArray, origin, firstIx, lastIx);
-        firstIx = oldFirstIx;
+      //  firstIx = oldFirstIx;
 but.setAttribute("data-playing",playState);
 
       }

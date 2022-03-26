@@ -30,9 +30,8 @@
   <script src='./generationUtils.js'></script>
   <script src='./loadJSONandStartPlay.js'></script>
   <script src='./saveJSON.js'></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" ></script>
-<script src='./transfer.js'></script><!-- jquery developed functions -->
-
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src='./transfer.js'></script><!-- jquery developed functions -->
 
 
   <script>
@@ -44,11 +43,11 @@
 
 
     window.playState = false; //used to toggle play and reset of soundfonts i.e. the audio
-  var isCreatingFile = true;//when true writing midi file
+    var isCreatingFile = true;//when true writing midi file
     //var tracks = [];//used for midi file writing
-   ;//used for midi file writing
-    var mLineArray =[];// IMPORTANT DATA STRUCTURE holds the current lines (tracks) of data to play/ edit /file
-    var sectionsArray =[];
+    ;//used for midi file writing
+    var mLineArray = [];// IMPORTANT DATA STRUCTURE holds the current lines (tracks) of data to play/ edit /file
+    var sectionsArray = [];
     // following used in the editing system
     var trackEl, taNameEl, taValueEl;
     var curEditTrackIx = 0;
@@ -59,24 +58,23 @@
     // for real time info on notes being played
     var timeOutsArray = []; //used to track time to display note being played.
     var monitor = [];// this is used to print a display of the notes as they are played.
-/*
-    function initC(idStr,colStr,l,w,t,h) {
+    /*
+        function initC(idStr,colStr,l,w,t,h) {
 
-            $("#"+idStr).css({
+                $("#"+idStr).css({
 
-                    "background-color":colStr,
-                    "position":"absolute",
-                    "left":l+"%",
-                    "width":w+"%",
-                    "top":t+"%",
-                    "height":h+"%"
-            })
+                        "background-color":colStr,
+                        "position":"absolute",
+                        "left":l+"%",
+                        "width":w+"%",
+                        "top":t+"%",
+                        "height":h+"%"
+                })
 
 
 
-    };
-*/
-
+        };
+    */
 
 
     function onLoad() { //normal onLoad statement
@@ -87,61 +85,68 @@
       curEditTrack = 0;
       //initC("ta4","Red",5,90,5,90);
 
-      for(let k =0;k<2;k++){
+      for (let k = 0; k < 3; k++) {
 
         tracksA[k] = new MidiWriter.Track();
       }
 
 
- //
+      //
       // crBut("testButton");
-       buttonNoteNameRow("editButtonsPanel",12,noteNamesA,0, 450, 100, 30,"Blue");
-       buttonNoteOctaveRow("editButtonsPanel",8,noteOctaves,0, 450, 60, 30,"Blue");
-       buttonChordsRow("editButtonsPanel",17,dyadNamesPlus,0, 450, 140, 30,"Blue");
-      buttonChordsRow("editButtonsPanel",17,dyadNamesMinus,0, 450, 170, 30,"Blue");
-      buttonChordsRow("editButtonsPanel",8,triadNames,0, 450, 200, 30,"Blue");
-      buttonChordsRow("editButtonsPanel",8,tetradNames,0, 450, 232, 30,"Blue");
+      buttonNoteNameRow("editButtonsPanel", 12, noteNamesA, 0, 450, 100, 30, "Blue");
+      buttonNoteOctaveRow("editButtonsPanel", 8, noteOctaves, 0, 450, 60, 30, "Blue");
+      buttonChordsRow("editButtonsPanel", 17, dyadNamesPlus, 0, 450, 140, 30, "Blue");
+      buttonChordsRow("editButtonsPanel", 17, dyadNamesMinus, 0, 450, 170, 30, "Blue");
+      buttonChordsRow("editButtonsPanel", 8, triadNames, 0, 450, 200, 30, "Blue");
+      buttonChordsRow("editButtonsPanel", 8, tetradNames, 0, 450, 232, 30, "Blue");
 
-     // alert(getMidiNumberFromName("B4") + "  " + getMidiNumberFromName("C4"));
+      // alert(getMidiNumberFromName("B4") + "  " + getMidiNumberFromName("C4"));
 
+      // moved below into onload
 
+      initSectionsArray();
+      sectionsArray = addDuplicateOfLastEntry(sectionsArray);
+
+// next do gen music
+
+      genMusic();
     }
-var musicKey = 'mettaTreeMusicStorage';
-    function initSectionsArray(){
+
+    //var musicKey = 'mettaTreeMusicStorage';
+    //localStorage.removeItem(musicKey);
+    function initSectionsArray() {
 
 
-      if (localStorage.getItem(musicKey) === null){
-         var basicBeat = ["CF","C","C","C"];
+      if (localStorage.getItem(musicKey) === null) {
+        var basicBeat = ["CF", "C", "C", "C"];
         var musicZero0 = new MLine(0, "CHORD", 0, 4, "Acoustic Grand Piano", 60,
-        basicBeat, [["C4", 0],["C4", 0],["C4", 0],["C4", 0]], 0.9);
-         var musicZero1 = new MLine(1, "CHORD", 0, 4, "Acoustic Grand Piano", 60,
-        basicBeat, [["C4", 0],["C4", 0],["C4", 0],["C4", 0]], 0.9);
-         var musicZero2 = new MLine(2, "CHORD", 0, 4, "Acoustic Grand Piano", 60,
-        basicBeat, [["C4", 0],["C4", 0],["C4", 0],["C4", 0]], 0.9);
+          basicBeat, [["C4", 0], ["C4", 0], ["C4", 0], ["C4", 0]], 0.9);
+        var musicZero1 = new MLine(1, "CHORD", 0, 4, "Acoustic Grand Piano", 60,
+          basicBeat, [["C4", 0], ["C4", 0], ["C4", 0], ["C4", 0]], 0.9);
+        var musicZero2 = new MLine(2, "CHORD", 0, 4, "Acoustic Grand Piano", 60,
+          basicBeat, [["C4", 0], ["C4", 0], ["C4", 0], ["C4", 0]], 0.9);
 
-        sectionsArray[0] = [musicZero0,musicZero1,musicZero2];
-        localStorage.setItem(musicKey,JSON.stringify(sectionsArray));
-      }
-
-
-      else{
+        sectionsArray[0] = [musicZero0, musicZero1, musicZero2];
+        localStorage.setItem(musicKey, JSON.stringify(sectionsArray));
+      } else {
         sectionsArray = JSON.parse(localStorage.getItem(musicKey));
       }
 
     }
-    //now do it
-    initSectionsArray();
 
-    function addDuplicateOfLastEntry(anArray){
+    //now do it
+    //initSectionsArray();
+
+    function addDuplicateOfLastEntry(anArray) {
       let l = anArray.length;
-      let lastEntry = anArray[l-1];
-      let duplicate = JSON.parse( JSON.stringify(lastEntry));
+      let lastEntry = anArray[l - 1];
+      let duplicate = JSON.parse(JSON.stringify(lastEntry));
       anArray[l] = duplicate;
-      return(anArray);
+      return (anArray);
     }
 
     //do the duplication
-    sectionsArray = addDuplicateOfLastEntry(sectionsArray);
+    //sectionsArray = addDuplicateOfLastEntry(sectionsArray);
 
 
     function genMusic() {
@@ -158,27 +163,27 @@ var musicKey = 'mettaTreeMusicStorage';
       var beatFlute2 = ["C", "CP", "CP", "CP"];
       var beatFlute3 = ["C"]
       var beatHighHat1 = ["C", "C", "C", "C"];
-      var basic4Beat = ["CF","C","C","C"];
+      var basic4Beat = ["CF", "C", "C", "C"];
 
       //-------------------------------------------------------------------------------------
 
       var music10 = new MLine(0, "CHORD", 0, 4, "Acoustic Grand Piano", 60, beatFlute3, ["C4", 0, 0, ["A3", 0, 3, 7, 0], ["G4", 0, 7], ["G4", 5, 0], ["F4", 0, 4, 7, 0], ["F4", 0, 4, 7, 0], ["E4", 6, 0], ["E4", 0, 7]], 0.98);
 
-      var music12A = new MLine(1, "ARPEGGIO", 0, 4, "Acoustic Grand Piano", 60, beatFlute3, [["B4", 0],["B4", 0],["B4", 0],["B4", 0]], 0.98);
-      var music12B = new MLine(1, "ARPEGGIO", 0, 4, "Acoustic Grand Piano", 60, beatFlute3, [["G4", 0],["G4", 0],["G4", 0],["G4", 0]], 0.98);
-      var music12C = new MLine(1, "ARPEGGIO", 0, 4, "Acoustic Grand Piano", 60, beatFlute3, [["G4", 0],["G4", 0],["G4", 0],["G4", 0]], 0.98);
+      var music12A = new MLine(1, "ARPEGGIO", 0, 4, "Acoustic Grand Piano", 60, beatFlute3, [["B4", 0], ["B4", 0], ["B4", 0], ["B4", 0]], 0.98);
+      var music12B = new MLine(1, "ARPEGGIO", 0, 4, "Acoustic Grand Piano", 60, beatFlute3, [["G4", 0], ["G4", 0], ["G4", 0], ["G4", 0]], 0.98);
+      var music12C = new MLine(1, "ARPEGGIO", 0, 4, "Acoustic Grand Piano", 60, beatFlute3, [["G4", 0], ["G4", 0], ["G4", 0], ["G4", 0]], 0.98);
 
       var music11 = new MLine(0, "CHORD", 0, 4, "Acoustic Bass Drum", 60,
         beatHighHat1, ["C4", 0, 7, 12, 15], 0.9);
 
-       var music13A = new MLine(0, "CHORD", 0, 4, "Acoustic Grand Piano", 60,
-        beatHighHat1, [["A4", 0],["A4", 0],["A4", 0],["A4", 0]], 0.9);
+      var music13A = new MLine(0, "CHORD", 0, 4, "Acoustic Grand Piano", 60,
+        beatHighHat1, [["A4", 0], ["A4", 0], ["A4", 0], ["A4", 0]], 0.9);
 
-        var music13B = new MLine(0, "CHORD", 0, 4, "Acoustic Grand Piano", 60,
-        beatHighHat1, [["C5", 0],["C5", 0],["C5", 0],["C5", 0]], 0.9);
+      var music13B = new MLine(0, "CHORD", 0, 4, "Acoustic Grand Piano", 60,
+        beatHighHat1, [["C5", 0], ["C5", 0], ["C5", 0], ["C5", 0]], 0.9);
 
-         var music13C = new MLine(0, "CHORD", 0, 4, "Acoustic Grand Piano", 60,
-        beatHighHat1, [["C6", 0],["C6", 0],["C6", 0],["C6", 0]], 0.9);
+      var music13C = new MLine(0, "CHORD", 0, 4, "Acoustic Grand Piano", 60,
+        beatHighHat1, [["C6", 0], ["C6", 0], ["C6", 0], ["C6", 0]], 0.9);
 
 
 // ***** determine a section***
@@ -188,16 +193,15 @@ var musicKey = 'mettaTreeMusicStorage';
       //sectionsArray[2] = [music13C,music12C];
 
 
-      mLineArray = sectionsArray[(sectionsArray.length)-1];
+      mLineArray = sectionsArray[(sectionsArray.length) - 1];
 
-lastIx = sectionsArray.length -1;
+      lastIx = sectionsArray.length - 1;
+      /*
+      if (lastIx>0)  {firstIx = lastIx-1} else {firstIx =lastIx};
 
-//if (lastIx>0)  {firstIx = lastIx-1} else {firstIx =lastIx};
-
-fistIx =0;
-
-
-
+      firstIx =0;
+      */
+      //barsToPlay(2)
 
 
       // ---------------------end of setup section --------------------------------------------------------------------------
@@ -205,21 +209,21 @@ fistIx =0;
 // now allow editing
       doEdit(0, mLineArray);//initialise the edit boxes with the first entry of array
 
-/*
-// --- show what is being suggested in read only mode in separate text area
+      /*
+      // --- show what is being suggested in read only mode in separate text area
 
-      function doFormatArray(mLineArrayParam, aTextAreaEl) {
-        aTextAreaEl.value = "";
-        for (let j = 0; j < mLineArrayParam.length; j++) {
-          doFormat(mLineArrayParam[j], aTextAreaEl);
-          aTextAreaEl.value = aTextAreaEl.value + "\n";
-        }
-      }
-*/
+            function doFormatArray(mLineArrayParam, aTextAreaEl) {
+              aTextAreaEl.value = "";
+              for (let j = 0; j < mLineArrayParam.length; j++) {
+                doFormat(mLineArrayParam[j], aTextAreaEl);
+                aTextAreaEl.value = aTextAreaEl.value + "\n";
+              }
+            }
+      */
       doFormatArray(mLineArray, document.getElementById("ta1"));
       initGains();
       //?????? below
-      edit(trackEl,false);
+      edit(trackEl, false);
 
       // ----
 
@@ -233,8 +237,27 @@ fistIx =0;
 
     }
 
+    function saveSectionsArrayToStore() {
 
+      localStorage.setItem(musicKey, JSON.stringify(sectionsArray));
+      onLoad();
 
+      //unfreeze edit track
+    }
+
+    function cancelEdit() {
+      initSectionsArray();
+      sectionsArray = addDuplicateOfLastEntry(sectionsArray);
+    }
+
+    function barsToPlay(bars) {
+
+      lastIx = sectionsArray.length - 1
+      if (lastIx < 0) lastIx = 0;
+      firstIx = 1 +lastIx - bars;
+
+      if (firstIx < 0) firstIx = 0;
+    }
 
 
   </script>
@@ -245,11 +268,13 @@ fistIx =0;
 
 
 <div id="butPanel" style="position:absolute;top:1px;left:1px;width:400px;height:60px;background-color: linen">
-  <button id="genMusic" onclick="genMusic()">Suggest</button>
+  <button id="genMusic" disabled="true" onclick="genMusic()">Suggest</button>
   <button id="loadMusicLine" data-playing="off" onclick="loadJSON()">Play</button>
   <button id="save" onclick="saveMidiFile()">Save Midi File</button>
   <button id="idSaveAudio" onclick="saveAudio()">Save Audio</button>
-  <button id="saveEdit" onclick="inputField(taNameEl,taValueEl)">Save Edit</button>
+  <button id="saveEdit" disabled="true" onclick="inputField(taNameEl,taValueEl)">Save Edit</button>
+  <button id="saveToStore" onclick="saveSectionsArrayToStore()">Store</button>
+  <button id="cancelEdit" onclick="cancelEdit()">Cancel</button>
 </div>
 
 <!-- will show the json version of the music section -->
@@ -265,41 +290,53 @@ fistIx =0;
           style="position:absolute;top:400px;left:450px; width: 400px; height: 150px;">Store: List of Bars</textarea>
 
 
-<div id="editControlsPanel"   style="position:absolute;top:50px;left:1px;width:400px;height:200px;background-color: #b3d4fc">
+<div id="editControlsPanel"
+     style="position:absolute;top:50px;left:1px;width:400px;height:200px;background-color: #b3d4fc">
 
   <input type="checkbox" name="foreground" id="foreground" style="position:absolute; left:250px; top:1px; width:30px;"
          oninput="edit(trackEl,this.checked)">
   <label style="position:absolute; left:180px; top:1px; width:30px;">foreground</label>
 
-<!-- set track number -->
+  <!-- set track number -->
   <input type="number" name="track" id="track" style="position:absolute; left:100px; top:1px; width:30px;"
          oninput="edit(this,true)"
          min="0" max="20" step="1" value="0">
   <label style="position:absolute; left:1px; top:1px; width:70px;">edit track</label>
 
-<!-- set field number -->
+  <!-- set field number -->
   <input type="number" name="fieldNumber" id="fieldNumber"
          style="position:absolute; left:100px; top:31px;height:20px; width:30px;"
          oninput="outputField(mLineArray[curEditTrack], this.value, taNameEl, taValueEl)"
          min="3" max="50" step="1" value="3">
   <label style="position:absolute; left:1px; top:31px; width:70px;">edit field</label>
 
-<!-- field name is read only  -->
+  <!-- field name is read only  -->
   <textarea id="taName" readonly
             style="position:absolute; left:1px; top:51px; width: 388px; height: 20px;">field name</textarea>
 
   <!-- field value can be edited  -->
   <textarea id="taValue"
+            onchange="inputField(taNameEl,taValueEl)"
             style="position:absolute;left:1px; top:80px; width: 388px; height:100px;">field value</textarea>
 
 </div>
 
-<div id="editButtonsPanel"   style="position:absolute;top:201px;left:1px;width:450px;height:300px;background-color: #b3e4fc" >
-  <input type="number" name="arrayPosition" id="arrayPositionId" style="position:absolute; left:100px; top:1px; width:30px;"
+<div id="editButtonsPanel"
+     style="position:absolute;top:201px;left:1px;width:450px;height:300px;background-color: #b3e4fc">
+  <input type="number" name="arrayPosition" id="arrayPositionId"
+         style="position:absolute; left:100px; top:1px; width:30px;"
          oninput="selectPosition(this.value)"
          min="0" max="20" step="1" value="0">
   <label style="position:absolute; left:1px; top:1px; width:100px;">array position</label>
-<textarea id="taArrayValueId" readonly style="position:absolute; left:150px; top:1px;height:15px;width:240px;" ></textarea>
+
+  <input type="number" name="barsToPlay" id="barsToPlayId" style="position:absolute; left:100px; top:30px; width:30px;"
+         oninput="barsToPlay(this.value)"
+         min="1" max="10000" step="1" value="2">
+  <label style="position:absolute; left:1px; top:30px; width:100px;">bars to play</label>
+
+
+  <textarea id="taArrayValueId" readonly
+            style="position:absolute; left:150px; top:1px;height:15px;width:240px;"></textarea>
 
 </div>
 

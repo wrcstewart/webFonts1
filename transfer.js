@@ -70,7 +70,7 @@ function buttonNoteNameRow(panelIdStr, nButs, textArray, left, width, top, heigh
        // let oldFirstIx = firstIx;
         //firstIx = lastIx;
          barsToPlay(document.getElementById("barsToPlayId").value);// set firstIx and lastIx
-        playPartComposition(sectionsArray, origin, firstIx, lastIx);
+        if (autoPlay) playPartComposition(sectionsArray, origin, firstIx, lastIx);
         //firstIx = oldFirstIx;
         but.setAttribute("data-playing",playState);
 
@@ -147,7 +147,7 @@ function buttonNoteOctaveRow(panelIdStr, nButs, textArray, left, width, top, hei
         //let oldFirstIx = firstIx;
        //firstIx = lastIx;
         barsToPlay(document.getElementById("barsToPlayId").value);
-        playPartComposition(sectionsArray, origin, firstIx, lastIx);
+         if (autoPlay) playPartComposition(sectionsArray, origin, firstIx, lastIx);
         //firstIx = oldFirstIx;
          but.setAttribute("data-playing",playState);
       }
@@ -210,7 +210,7 @@ let but = document.getElementById("loadMusicLine");
         //let oldFirstIx = firstIx;
        // firstIx = lastIx;
          barsToPlay(document.getElementById("barsToPlayId").value);
-        playPartComposition(sectionsArray, origin, firstIx, lastIx);
+         if (autoPlay) playPartComposition(sectionsArray, origin, firstIx, lastIx);
       //  firstIx = oldFirstIx;
 but.setAttribute("data-playing",playState);
 

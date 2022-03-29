@@ -251,6 +251,11 @@
     }
 
     function barsToPlay(bars) {
+      autoPlay =true;
+      if (bars == 0){
+        autoPlay = false;
+        return;
+      }
 
       lastIx = sectionsArray.length - 1
       if (lastIx < 0) lastIx = 0;
@@ -258,6 +263,9 @@
 
       if (firstIx < 0) firstIx = 0;
     }
+function emptyStore(){
+      localStorage.removeItem(musicKey)
+}
 
 
   </script>
@@ -275,6 +283,7 @@
   <button id="saveEdit" disabled="true" onclick="inputField(taNameEl,taValueEl)">Save Edit</button>
   <button id="saveToStore" onclick="saveSectionsArrayToStore()">Store</button>
   <button id="cancelEdit" onclick="cancelEdit()">Cancel</button>
+  <button id="emptyStore" onclick="emptyStore()">Empty Store</button>
 </div>
 
 <!-- will show the json version of the music section -->
@@ -331,9 +340,9 @@
 
   <input type="number" name="barsToPlay" id="barsToPlayId" style="position:absolute; left:100px; top:30px; width:30px;"
          oninput="barsToPlay(this.value)"
-         min="1" max="10000" step="1" value="2">
+         min="0" max="10000" step="1" value="2">
   <label style="position:absolute; left:1px; top:30px; width:100px;">bars to play</label>
-
+nom,,m9qj0,
 
   <textarea id="taArrayValueId" readonly
             style="position:absolute; left:150px; top:1px;height:15px;width:240px;"></textarea>

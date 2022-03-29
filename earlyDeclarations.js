@@ -15,6 +15,7 @@ var audioContext = new (window.AudioContext || window.webkitAudioContext)();
     var curNumberOfBarsToPlay;
     var audioFileLink;
     var musicKey = 'mettaTreeMusicStorage';
+    var autoPlay = 'true';
 
 
 

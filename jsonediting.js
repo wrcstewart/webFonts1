@@ -209,7 +209,8 @@ function inputValueForKey(key, taValueEl) {
   let obj = mLineArrayEdit[curEditTrackIx];
   //let aKeyString = taNameEl.value;
   //obj[aKeyString] = JSON.parse(taValueEl.value);
-  obj[key] = JSON.parse(taValueEl.value);
+  //obj[key] = JSON.parse(taValueEl.value);
+  obj[key] = taValueEl.value;
   mLineArrayEdit[curEditTrackIx] = obj; //reinsert into master array of mLine objects.
   doFormatArray(mLineArrayEdit, document.getElementById("ta1"));
    document.getElementById("idSaveAudio").disabled = true;

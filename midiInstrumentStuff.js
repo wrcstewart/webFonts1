@@ -3,9 +3,9 @@ var percussionMidiNum = -1; //arbitrary number to signal a percussion instrument
 const instrumentsMap = new Map();
     {
       instrumentsMap.set("Blown bottle Pipe 1", _tone_0760_Aspirin_sf2_file)
-      instrumentsMap.set("Flute Pipe 1", _tone_0730_Aspirin_sf2_file)
-      instrumentsMap.set("Acoustic Grand Piano", _tone_0000_JCLive_sf2_file)
-      instrumentsMap.set("Bass Drum 2", _drum_35_0_Chaos_sf2_file);
+      instrumentsMap.set("Flute", _tone_0730_Aspirin_sf2_file)
+      instrumentsMap.set("Piano", _tone_0000_JCLive_sf2_file)
+      instrumentsMap.set("Bass Drum", _drum_35_0_Chaos_sf2_file);
       instrumentsMap.set("Acoustic Bass Drum", _drum_35_0_Chaos_sf2_file);
       instrumentsMap.set("Snare Drum 1", _drum_38_0_Chaos_sf2_file);
       instrumentsMap.set("Hi-hat 1", _drum_42_0_Chaos_sf2_file);
@@ -14,14 +14,20 @@ const instrumentsMap = new Map();
     const instrumentsNumMap = new Map(); //gives the midi patch num or an arb neg num for percussion
     {
       instrumentsNumMap.set("Blown bottle Pipe 1", 77)
-      instrumentsNumMap.set("Flute Pipe 1", 74)
-      instrumentsNumMap.set("Acoustic Grand Piano", 1)
+      instrumentsNumMap.set("Flute", 74)
+      instrumentsNumMap.set("Piano", 1)
       instrumentsNumMap.set("Acoustic Bass Drum", percussionMidiNum);
-      instrumentsNumMap.set("Bass Drum 2", percussionMidiNum);
+      instrumentsNumMap.set("Bass Drum", percussionMidiNum);
       instrumentsNumMap.set("Acoustic Snare", percussionMidiNum);
       instrumentsNumMap.set("Closed Hi Hat", percussionMidiNum);
       instrumentsNumMap.set("Hi-hat 1", percussionMidiNum);
     }
+    instrumentArray[0] = "Piano";
+    instrumentArray[1] = "Bass Drum";
+    instrumentArray[2] = "Flute";
+
+
+
     /*
     CHECK THE UNCOMMENTED SECTION BELOW IN loadJSONandStartPlay.js
     is consistent with the Maps above. I don't know why I can't put the following statements here.
@@ -64,7 +70,7 @@ const instrumentsMap = new Map();
       if (instrumentNum !== percussionMidiNum) {
         return (pitch)
       } else {
-        if (instrument == "Acoustic Bass Drum") return (35);
+        if (instrument == "Bass Drum") return (35);
         if (instrument == "Bass Drum 2") return (35);
 
         if (instrument == "Acoustic Snare") return (38);

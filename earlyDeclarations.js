@@ -16,6 +16,8 @@ var audioContext = new (window.AudioContext || window.webkitAudioContext)();
     var audioFileLink;
     var musicKey = 'mettaTreeMusicStorage';
     var autoPlay = 'true';
+    var selectbox;
+    var instrumentArray = [];
 
 
 
